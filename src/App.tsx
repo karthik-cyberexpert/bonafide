@@ -16,16 +16,19 @@ import TutorLayout from "./components/layouts/TutorLayout";
 import TutorDashboard from "./pages/tutor/Dashboard";
 import TutorProfile from "./pages/tutor/Profile";
 import TutorRequestHistory from "./pages/tutor/RequestHistory";
+import TutorPendingRequests from "./pages/tutor/PendingRequests";
 
 import HodLayout from "./components/layouts/HodLayout";
 import HodDashboard from "./pages/hod/Dashboard";
 import HodProfile from "./pages/hod/Profile";
 import HodRequestHistory from "./pages/hod/RequestHistory";
+import HodPendingRequests from "./pages/hod/PendingRequests";
 
 import AdminLayout from "./components/layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProfile from "./pages/admin/Profile";
 import AdminRequestHistory from "./pages/admin/RequestHistory";
+import AdminPendingRequests from "./pages/admin/PendingRequests";
 
 const queryClient = new QueryClient();
 
@@ -48,6 +51,10 @@ const App = () => (
           <Route element={<TutorLayout />}>
             <Route path="/tutor/dashboard" element={<TutorDashboard />} />
             <Route
+              path="/tutor/pending-requests"
+              element={<TutorPendingRequests />}
+            />
+            <Route
               path="/tutor/request-history"
               element={<TutorRequestHistory />}
             />
@@ -57,6 +64,10 @@ const App = () => (
           <Route element={<HodLayout />}>
             <Route path="/hod/dashboard" element={<HodDashboard />} />
             <Route
+              path="/hod/pending-requests"
+              element={<HodPendingRequests />}
+            />
+            <Route
               path="/hod/request-history"
               element={<HodRequestHistory />}
             />
@@ -65,6 +76,10 @@ const App = () => (
 
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route
+              path="/admin/pending-requests"
+              element={<AdminPendingRequests />}
+            />
             <Route
               path="/admin/request-history"
               element={<AdminRequestHistory />}
