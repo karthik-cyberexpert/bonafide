@@ -31,10 +31,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { dummyRequests } from "@/data/dummyRequests";
 import { dummyTemplates } from "@/data/dummyTemplates";
 import { BonafideRequest } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
+import { getStatusVariant } from "@/lib/utils";
 
 const HodDashboard = () => {
   const [requests, setRequests] = useState<BonafideRequest[]>(dummyRequests);
@@ -63,85 +66,134 @@ const HodDashboard = () => {
   const pendingRequests = requests.filter(
     (req) => req.status === "Pending HOD Approval"
   );
+  const requestHistory = requests.filter(
+    (req) =>
+      req.status !== "Pending HOD Approval" &&
+      req.status !== "Pending Tutor Approval"
+  );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pending HOD Approval</CardTitle>
+        <CardTitle>HOD Dashboard</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Request ID</TableHead>
-              <TableHead>Student Name</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Reason</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pendingRequests.length > 0 ? (
-              pendingRequests.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell className="font-medium">{request.id}</TableCell>
-                  <TableCell>{request.studentName}</TableCell>
-                  <TableCell>{request.date}</TableCell>
-                  <TableCell>{request.reason}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button variant="outline" size="sm">
-                      Return to Student
-                    </Button>
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button size="sm">Forward to Admin</Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Select Certificate Template</DialogTitle>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <Label htmlFor="template-select">Template</Label>
-                          <Select onValueChange={setSelectedTemplate}>
-                            <SelectTrigger id="template-select">
-                              <SelectValue placeholder="Select a template" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {dummyTemplates.map((template) => (
-                                <SelectItem
-                                  key={template.id}
-                                  value={template.id}
-                                >
-                                  {template.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button
-                              onClick={() => handleForward(request.id)}
-                              disabled={!selectedTemplate}
-                            >
-                              Forward
-                            </Button>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </TableCell>
+        <Tabs defaultValue="pending">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="pending">Pending Requests</TabsTrigger>
+            <TabsTrigger value="history">Request History</TabsTrigger>
+          </TabsList>
+          <TabsContent value="pending" className="mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Request ID</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                  No pending requests.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {pendingRequests.length > 0 ? (
+                  pendingRequests.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-medium">{request.id}</TableCell>
+                      <TableCell>{request.studentName}</TableCell>
+                      <TableCell>{request.date}</TableCell>
+                      <TableCell>{request.reason}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button variant="outline" size="sm">
+                          Return to Student
+                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button size="sm">Forward to Admin</Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Select Certificate Template
+                              </DialogTitle>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <Label htmlFor="template-select">Template</Label>
+                              <Select onValueChange={setSelectedTemplate}>
+                                <SelectTrigger id="template-select">
+                                  <SelectValue placeholder="Select a template" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {dummyTemplates.map((template) => (
+                                    <SelectItem
+                                      key={template.id}
+                                      value={template.id}
+                                    >
+                                      {template.name}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button
+                                  onClick={() => handleForward(request.id)}
+                                  disabled={!selectedTemplate}
+                                >
+                                  Forward
+                                </Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">
+                      No pending requests.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TabsContent>
+          <TabsContent value="history" className="mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Request ID</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {requestHistory.length > 0 ? (
+                  requestHistory.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-medium">{request.id}</TableCell>
+                      <TableCell>{request.studentName}</TableCell>
+                      <TableCell>{request.date}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(request.status)}>
+                          {request.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center">
+                      No request history.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );

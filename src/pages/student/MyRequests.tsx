@@ -16,28 +16,12 @@ import {
 } from "@/components/ui/table";
 import { dummyRequests } from "@/data/dummyRequests";
 import { BonafideRequest } from "@/lib/types";
+import { getStatusVariant } from "@/lib/utils";
 import { Download } from "lucide-react";
 
 const studentRequests = dummyRequests.filter(
   (req) => req.studentId === "S12345"
 );
-
-const getStatusVariant = (status: BonafideRequest["status"]) => {
-  switch (status) {
-    case "Approved":
-      return "success";
-    case "Pending Tutor Approval":
-    case "Pending HOD Approval":
-    case "Pending Admin Approval":
-      return "secondary";
-    case "Returned by Tutor":
-    case "Returned by HOD":
-    case "Returned by Admin":
-      return "destructive";
-    default:
-      return "default";
-  }
-};
 
 const MyRequests = () => {
   return (

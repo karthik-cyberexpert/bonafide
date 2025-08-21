@@ -25,11 +25,14 @@ import {
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 import { dummyRequests } from "@/data/dummyRequests";
 import { dummyTemplates } from "@/data/dummyTemplates";
 import { dummyStudentProfile } from "@/data/dummyProfiles";
 import { BonafideRequest } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
+import { getStatusVariant } from "@/lib/utils";
 
 const AdminDashboard = () => {
   const [requests, setRequests] = useState<BonafideRequest[]>(dummyRequests);
@@ -56,8 +59,7 @@ const AdminDashboard = () => {
       .replace("{parentName}", dummyStudentProfile.parentName);
 
     if (addSignature) {
-      content +=
-        "\n\n\n--- E-Signed by Principal Thompson ---";
+      content += "\n\n\n--- E-Signed by Principal Thompson ---";
     }
     return content;
   };
@@ -65,82 +67,130 @@ const AdminDashboard = () => {
   const pendingRequests = requests.filter(
     (req) => req.status === "Pending Admin Approval"
   );
+  const requestHistory = requests.filter(
+    (req) =>
+      req.status === "Approved" || req.status === "Returned by Admin"
+  );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Pending Admin Approval</CardTitle>
+        <CardTitle>Admin Dashboard</CardTitle>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Request ID</TableHead>
-              <TableHead>Student Name</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Reason</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pendingRequests.length > 0 ? (
-              pendingRequests.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell className="font-medium">{request.id}</TableCell>
-                  <TableCell>{request.studentName}</TableCell>
-                  <TableCell>{request.date}</TableCell>
-                  <TableCell>{request.reason}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button variant="outline" size="sm">
-                      Return to HOD
-                    </Button>
-                    <Dialog onOpenChange={() => setAddSignature(false)}>
-                      <DialogTrigger asChild>
-                        <Button size="sm">Approve</Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Approve Certificate</DialogTitle>
-                        </DialogHeader>
-                        <div className="py-4">
-                          <h3 className="font-semibold mb-2">
-                            Certificate Preview
-                          </h3>
-                          <div className="p-4 border rounded-md bg-muted whitespace-pre-wrap text-sm">
-                            {getCertificatePreview(request)}
-                          </div>
-                          <div className="flex items-center space-x-2 mt-4">
-                            <Checkbox
-                              id="e-sign"
-                              checked={addSignature}
-                              onCheckedChange={(checked) =>
-                                setAddSignature(checked as boolean)
-                              }
-                            />
-                            <Label htmlFor="e-sign">Add E-Signature</Label>
-                          </div>
-                        </div>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button onClick={() => handleApprove(request.id)}>
-                              Approve and Issue
-                            </Button>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  </TableCell>
+        <Tabs defaultValue="pending">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="pending">Pending Requests</TabsTrigger>
+            <TabsTrigger value="history">Request History</TabsTrigger>
+          </TabsList>
+          <TabsContent value="pending" className="mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Request ID</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Reason</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                  No pending requests.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              </TableHeader>
+              <TableBody>
+                {pendingRequests.length > 0 ? (
+                  pendingRequests.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-medium">{request.id}</TableCell>
+                      <TableCell>{request.studentName}</TableCell>
+                      <TableCell>{request.date}</TableCell>
+                      <TableCell>{request.reason}</TableCell>
+                      <TableCell className="text-right space-x-2">
+                        <Button variant="outline" size="sm">
+                          Return to HOD
+                        </Button>
+                        <Dialog onOpenChange={() => setAddSignature(false)}>
+                          <DialogTrigger asChild>
+                            <Button size="sm">Approve</Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-2xl">
+                            <DialogHeader>
+                              <DialogTitle>Approve Certificate</DialogTitle>
+                            </DialogHeader>
+                            <div className="py-4">
+                              <h3 className="font-semibold mb-2">
+                                Certificate Preview
+                              </h3>
+                              <div className="p-4 border rounded-md bg-muted whitespace-pre-wrap text-sm">
+                                {getCertificatePreview(request)}
+                              </div>
+                              <div className="flex items-center space-x-2 mt-4">
+                                <Checkbox
+                                  id="e-sign"
+                                  checked={addSignature}
+                                  onCheckedChange={(checked) =>
+                                    setAddSignature(checked as boolean)
+                                  }
+                                />
+                                <Label htmlFor="e-sign">Add E-Signature</Label>
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button
+                                  onClick={() => handleApprove(request.id)}
+                                >
+                                  Approve and Issue
+                                </Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center">
+                      No pending requests.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TabsContent>
+          <TabsContent value="history" className="mt-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Request ID</TableHead>
+                  <TableHead>Student Name</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {requestHistory.length > 0 ? (
+                  requestHistory.map((request) => (
+                    <TableRow key={request.id}>
+                      <TableCell className="font-medium">{request.id}</TableCell>
+                      <TableCell>{request.studentName}</TableCell>
+                      <TableCell>{request.date}</TableCell>
+                      <TableCell>
+                        <Badge variant={getStatusVariant(request.status)}>
+                          {request.status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center">
+                      No request history.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
