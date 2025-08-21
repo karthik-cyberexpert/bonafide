@@ -1,83 +1,41 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import ProfileHeader from "@/components/shared/ProfileHeader";
-import ProfileField from "@/components/shared/ProfileField";
+import EditableProfileField from "@/components/shared/EditableProfileField";
 import { dummyAdminProfile } from "@/data/dummyProfiles";
 import { AdminProfile as AdminProfileType } from "@/lib/types";
 
 const AdminProfile = () => {
-  const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<AdminProfileType>(dummyAdminProfile);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
+  const handleSaveField = (field: keyof AdminProfileType, value: string) => {
     setProfile((prevProfile) => ({
       ...prevProfile,
-      [id]: value,
+      [field]: value,
     }));
-  };
-
-  const handleSave = () => {
-    console.log("Saving profile:", profile);
-    setIsEditing(false);
-  };
-
-  const handleCancel = () => {
-    setProfile(dummyAdminProfile);
-    setIsEditing(false);
+    console.log(`Saving ${field}:`, value);
   };
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader>
         <ProfileHeader name={profile.name} subtitle="Admin Profile Details" />
-        {!isEditing && (
-          <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
-        )}
       </CardHeader>
       <CardContent>
         <Separator className="my-4" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-          {isEditing ? (
-            <>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  value={profile.email}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phoneNumber">Phone Number</Label>
-                <Input
-                  id="phoneNumber"
-                  value={profile.phoneNumber}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <ProfileField label="Email">{profile.email}</ProfileField>
-              <ProfileField label="Phone Number">
-                {profile.phoneNumber}
-              </ProfileField>
-            </>
-          )}
+          <EditableProfileField
+            label="Email"
+            value={profile.email}
+            onSave={(newValue) => handleSaveField("email", newValue)}
+          />
+          <EditableProfileField
+            label="Phone Number"
+            value={profile.phoneNumber}
+            onSave={(newValue) => handleSaveField("phoneNumber", newValue)}
+          />
         </div>
-        {isEditing && (
-          <div className="mt-6 flex justify-end gap-2">
-            <Button variant="outline" onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave}>Save Changes</Button>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
