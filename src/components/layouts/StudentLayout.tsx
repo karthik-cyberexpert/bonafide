@@ -1,5 +1,5 @@
 import Sidebar from "@/components/shared/Sidebar";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, FilePlus } from "lucide-react";
 import { Outlet } from "react-router-dom";
 
 const navItems = [
@@ -7,6 +7,11 @@ const navItems = [
     title: "Dashboard",
     href: "/student/dashboard",
     icon: <LayoutDashboard className="h-4 w-4" />,
+  },
+  {
+    title: "New Request",
+    href: "/student/request",
+    icon: <FilePlus className="h-4 w-4" />,
   },
 ];
 

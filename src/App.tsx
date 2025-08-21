@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 
 import StudentLayout from "./components/layouts/StudentLayout";
 import StudentDashboard from "./pages/student/Dashboard";
+import NewRequest from "./pages/student/NewRequest";
 
 import TutorLayout from "./components/layouts/TutorLayout";
 import TutorDashboard from "./pages/tutor/Dashboard";
@@ -31,6 +32,7 @@ const App = () => (
 
           <Route element={<StudentLayout />}>
             <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route path="/student/request" element={<NewRequest />} />
           </Route>
 
           <Route element={<TutorLayout />}>
