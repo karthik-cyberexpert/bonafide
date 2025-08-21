@@ -32,6 +32,7 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProfile from "./pages/admin/Profile";
 import AdminRequestHistory from "./pages/admin/RequestHistory";
 import AdminPendingRequests from "./pages/admin/PendingRequests";
+import ManageFaculties from "./pages/admin/ManageFaculties";
 
 const queryClient = new QueryClient();
 
@@ -95,6 +96,10 @@ const App = () => (
             <Route
               path="/admin/request-history"
               element={<AdminRequestHistory />}
+            />
+            <Route
+              path="/admin/manage-faculties"
+              element={<ManageFaculties />}
             />
             <Route path="/admin/profile" element={<AdminProfile />} />
           </Route>

@@ -1,4 +1,4 @@
-import { StudentProfile } from "@/lib/types";
+import { StudentProfile, HodProfile } from "@/lib/types";
 
 export interface Batch {
   id: string;
@@ -36,6 +36,30 @@ export const dummyBatches: Batch[] = [
     tutor: "Dr. Alan Grant",
     studentCount: 55,
     status: "Inactive",
+  },
+];
+
+export const dummyHods: HodProfile[] = [
+  {
+    name: "Dr. Robert Clark",
+    username: "robert_c",
+    department: "Computer Science",
+    email: "robert.c@example.com",
+    mobileNumber: "+91 555 666 777",
+  },
+  {
+    name: "Dr. Eleanor Vance",
+    username: "eleanor_v",
+    department: "Mechanical Engineering",
+    email: "eleanor.v@example.com",
+    mobileNumber: "+91 555 111 222",
+  },
+  {
+    name: "Dr. Marcus Thorne",
+    username: "marcus_t",
+    department: "Civil Engineering",
+    email: "marcus.t@example.com",
+    mobileNumber: "+91 555 333 444",
   },
 ];
 
