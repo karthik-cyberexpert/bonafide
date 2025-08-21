@@ -1,4 +1,4 @@
-import { StudentProfile, HodProfile, TutorProfile } from "@/lib/types";
+import { StudentProfile, HodProfile, TutorProfile, Department } from "@/lib/types";
 
 export interface Batch {
   id: string;
@@ -37,6 +37,13 @@ export const dummyBatches: Batch[] = [
     studentCount: 55,
     status: "Inactive",
   },
+];
+
+export const dummyDepartments: Department[] = [
+  { id: "D001", name: "Computer Science" },
+  { id: "D002", name: "Mechanical Engineering" },
+  { id: "D003", name: "Civil Engineering" },
+  { id: "D004", name: "Electrical Engineering" },
 ];
 
 export const dummyHods: HodProfile[] = [

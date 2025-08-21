@@ -1,6 +1,13 @@
 import Sidebar from "@/components/shared/Sidebar";
 import Header from "@/components/shared/Header";
-import { LayoutDashboard, User, History, FileClock, Users } from "lucide-react";
+import {
+  LayoutDashboard,
+  User,
+  History,
+  FileClock,
+  Users,
+  Building,
+} from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
 
@@ -24,6 +31,11 @@ const navItems: NavItem[] = [
     title: "Manage Faculties",
     href: "/admin/manage-faculties",
     icon: <Users className="h-4 w-4" />,
+  },
+  {
+    title: "Department Management",
+    href: "/admin/department-management",
+    icon: <Building className="h-4 w-4" />,
   },
   {
     title: "Profile",

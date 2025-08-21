@@ -68,3 +68,8 @@ export interface NavItem {
   href: string;
   icon: React.ReactNode;
 }
+
+export interface Department {
+  id: string;
+  name: string;
+}
