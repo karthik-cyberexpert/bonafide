@@ -4,33 +4,33 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   LayoutDashboard,
-  ShoppingCart,
-  BarChart,
   Menu,
+  User,
+  Users,
   Briefcase,
-  Share2,
+  Shield,
 } from "lucide-react";
 
 const sidebarNavItems = [
   {
-    title: "Analytics",
-    href: "/dashboards/analytics",
-    icon: <BarChart className="h-4 w-4" />,
+    title: "Student",
+    href: "/dashboards/student",
+    icon: <User className="h-4 w-4" />,
   },
   {
-    title: "E-commerce",
-    href: "/dashboards/ecommerce",
-    icon: <ShoppingCart className="h-4 w-4" />,
+    title: "Tutor",
+    href: "/dashboards/tutor",
+    icon: <Users className="h-4 w-4" />,
   },
   {
-    title: "Projects",
-    href: "/dashboards/projects",
+    title: "HOD",
+    href: "/dashboards/hod",
     icon: <Briefcase className="h-4 w-4" />,
   },
   {
-    title: "Social Media",
-    href: "/dashboards/social",
-    icon: <Share2 className="h-4 w-4" />,
+    title: "Admin",
+    href: "/dashboards/admin",
+    icon: <Shield className="h-4 w-4" />,
   },
 ];
 
@@ -38,7 +38,7 @@ const Sidebar = () => (
   <aside className="hidden md:flex md:flex-col md:w-64 border-r bg-background">
     <div className="flex h-16 items-center border-b px-6">
       <LayoutDashboard className="h-6 w-6 mr-2" />
-      <h2 className="text-lg font-semibold">Dashboards</h2>
+      <h2 className="text-lg font-semibold">College Portal</h2>
     </div>
     <nav className="flex-1 space-y-2 p-4">
       {sidebarNavItems.map((item) => (
@@ -72,7 +72,7 @@ const MobileNav = () => (
       <nav className="grid gap-6 text-lg font-medium">
         <div className="flex items-center gap-2 text-lg font-semibold mb-4">
           <LayoutDashboard className="h-6 w-6" />
-          <span>Dashboards</span>
+          <span>College Portal</span>
         </div>
         {sidebarNavItems.map((item) => (
           <NavLink

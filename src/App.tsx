@@ -5,10 +5,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Layout from "./components/Layout";
-import AnalyticsDashboard from "./pages/dashboards/AnalyticsDashboard";
-import EcommerceDashboard from "./pages/dashboards/EcommerceDashboard";
-import ProjectDashboard from "./pages/dashboards/ProjectDashboard";
-import SocialMediaDashboard from "./pages/dashboards/SocialMediaDashboard";
+import StudentDashboard from "./pages/dashboards/StudentDashboard";
+import TutorDashboard from "./pages/dashboards/TutorDashboard";
+import HodDashboard from "./pages/dashboards/HodDashboard";
+import AdminDashboard from "./pages/dashboards/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -19,12 +19,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboards/analytics" replace />} />
+          <Route path="/" element={<Navigate to="/dashboards/student" replace />} />
           <Route path="/dashboards" element={<Layout />}>
-            <Route path="analytics" element={<AnalyticsDashboard />} />
-            <Route path="ecommerce" element={<EcommerceDashboard />} />
-            <Route path="projects" element={<ProjectDashboard />} />
-            <Route path="social" element={<SocialMediaDashboard />} />
+            <Route path="student" element={<StudentDashboard />} />
+            <Route path="tutor" element={<TutorDashboard />} />
+            <Route path="hod" element={<HodDashboard />} />
+            <Route path="admin" element={<AdminDashboard />} />
           </Route>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
