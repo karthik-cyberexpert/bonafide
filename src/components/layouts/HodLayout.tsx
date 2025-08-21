@@ -7,6 +7,7 @@ import {
   FileClock,
   Users,
   ClipboardList,
+  Briefcase,
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
@@ -36,6 +37,11 @@ const navItems: NavItem[] = [
     title: "Batch Management",
     href: "/hod/batch-management",
     icon: <ClipboardList className="h-4 w-4" />,
+  },
+  {
+    title: "Manage Staff",
+    href: "/hod/manage-staff",
+    icon: <Briefcase className="h-4 w-4" />,
   },
   {
     title: "Profile",

@@ -27,6 +27,7 @@ import HodRequestHistory from "./pages/hod/RequestHistory";
 import HodPendingRequests from "./pages/hod/PendingRequests";
 import BatchManagement from "./pages/hod/BatchManagement";
 import StudentManagement from "./pages/hod/StudentManagement";
+import ManageStaff from "./pages/hod/ManageStaff";
 
 import AdminLayout from "./components/layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -86,6 +87,7 @@ const App = () => (
                 path="/hod/batch-management"
                 element={<BatchManagement />}
               />
+              <Route path="/hod/manage-staff" element={<ManageStaff />} />
               <Route path="/hod/profile" element={<HodProfile />} />
             </Route>
 
