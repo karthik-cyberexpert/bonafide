@@ -1,5 +1,12 @@
 import Sidebar from "@/components/shared/Sidebar";
-import { LayoutDashboard, User, History, FileClock } from "lucide-react";
+import {
+  LayoutDashboard,
+  User,
+  History,
+  FileClock,
+  Users,
+  ClipboardList,
+} from "lucide-react";
 import { Outlet } from "react-router-dom";
 
 const navItems = [
@@ -17,6 +24,16 @@ const navItems = [
     title: "Request History",
     href: "/hod/request-history",
     icon: <History className="h-4 w-4" />,
+  },
+  {
+    title: "Student Management",
+    href: "/hod/student-management",
+    icon: <Users className="h-4 w-4" />,
+  },
+  {
+    title: "Batch Management",
+    href: "/hod/batch-management",
+    icon: <ClipboardList className="h-4 w-4" />,
   },
   {
     title: "Profile",
