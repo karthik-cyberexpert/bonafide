@@ -2,13 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NotFound from "./pages/NotFound";
-import Layout from "./components/Layout";
-import StudentDashboard from "./pages/dashboards/StudentDashboard";
-import TutorDashboard from "./pages/dashboards/TutorDashboard";
-import HodDashboard from "./pages/dashboards/HodDashboard";
-import AdminDashboard from "./pages/dashboards/AdminDashboard";
+import Index from "./pages/Index";
+import StudentDashboard from "./pages/student/Dashboard";
+import TutorDashboard from "./pages/tutor/Dashboard";
+import HodDashboard from "./pages/hod/Dashboard";
+import AdminDashboard from "./pages/admin/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -19,13 +19,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboards/student" replace />} />
-          <Route path="/dashboards" element={<Layout />}>
-            <Route path="student" element={<StudentDashboard />} />
-            <Route path="tutor" element={<TutorDashboard />} />
-            <Route path="hod" element={<HodDashboard />} />
-            <Route path="admin" element={<AdminDashboard />} />
-          </Route>
+          <Route path="/" element={<Index />} />
+          <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/tutor/dashboard" element={<TutorDashboard />} />
+          <Route path="/hod/dashboard" element={<HodDashboard />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
