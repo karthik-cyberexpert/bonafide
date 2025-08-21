@@ -17,6 +17,7 @@ import TutorDashboard from "./pages/tutor/Dashboard";
 import TutorProfile from "./pages/tutor/Profile";
 import TutorRequestHistory from "./pages/tutor/RequestHistory";
 import TutorPendingRequests from "./pages/tutor/PendingRequests";
+import TutorStudents from "./pages/tutor/Students";
 
 import HodLayout from "./components/layouts/HodLayout";
 import HodDashboard from "./pages/hod/Dashboard";
@@ -60,6 +61,7 @@ const App = () => (
               path="/tutor/request-history"
               element={<TutorRequestHistory />}
             />
+            <Route path="/tutor/students" element={<TutorStudents />} />
             <Route path="/tutor/profile" element={<TutorProfile />} />
           </Route>
 
