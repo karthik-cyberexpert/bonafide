@@ -21,28 +21,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { dummyStudents, dummyBatches } from "@/data/dummyData";
-import { MoreHorizontal } from "lucide-react";
+import { Download, MoreHorizontal, Upload } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { downloadStudentTemplate, parseStudentFile } from "@/lib/xlsx";
+import { showSuccess, showError } from "@/utils/toast";
 
 const StudentManagement = () => {
   const [selectedBatch, setSelectedBatch] = useState("all");
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
   const filteredStudents =
     selectedBatch === "all"
       ? dummyStudents
       : dummyStudents.filter((student) => student.batch === selectedBatch);
 
+  const handleFileUpload = async () => {
+    if (!uploadFile) {
+      showError("Please select a file to upload.");
+      return;
+    }
+
+    try {
+      const students = await parseStudentFile(uploadFile);
+      // In a real app, you would send this data to your backend.
+      console.log("Uploaded students:", students);
+      showSuccess(`${students.length} students parsed successfully!`);
+      setUploadFile(null);
+      setIsUploadDialogOpen(false);
+    } catch (error) {
+      showError("Failed to parse the file. Please check the format.");
+      console.error(error);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Student Management</CardTitle>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Select onValueChange={setSelectedBatch} defaultValue="all">
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by batch" />
@@ -56,7 +90,46 @@ const StudentManagement = () => {
               ))}
             </SelectContent>
           </Select>
-          <Button>Add New Student</Button>
+          <Button variant="outline" onClick={downloadStudentTemplate}>
+            <Download className="mr-2 h-4 w-4" />
+            Download Template
+          </Button>
+          <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Upload className="mr-2 h-4 w-4" />
+                Bulk Upload
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Bulk Upload Students</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <p className="text-sm text-muted-foreground">
+                  Select an XLSX file with student data. Use the downloadable
+                  template for the correct format.
+                </p>
+                <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Label htmlFor="student-file">XLSX File</Label>
+                  <Input
+                    id="student-file"
+                    type="file"
+                    accept=".xlsx"
+                    onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleFileUpload} disabled={!uploadFile}>
+                  Upload and Process
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
       <CardContent>
