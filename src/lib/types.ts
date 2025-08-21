@@ -14,6 +14,13 @@ export interface BonafideRequest {
   date: string;
   reason: string;
   status: RequestStatus;
+  templateId?: string;
+}
+
+export interface CertificateTemplate {
+  id: string;
+  name: string;
+  content: string;
 }
 
 export interface StudentProfile {
