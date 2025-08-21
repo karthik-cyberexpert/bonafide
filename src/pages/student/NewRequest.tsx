@@ -9,6 +9,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 const NewRequest = () => {
@@ -31,10 +38,28 @@ const NewRequest = () => {
             <Input id="student-id" defaultValue="S12345" disabled />
           </div>
           <div className="grid gap-2">
+            <Label htmlFor="bonafide-type">Type</Label>
+            <Select>
+              <SelectTrigger id="bonafide-type">
+                <SelectValue placeholder="Select a bonafide type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="passport">Passport Application</SelectItem>
+                <SelectItem value="bank-loan">Bank Loan</SelectItem>
+                <SelectItem value="scholarship">Scholarship</SelectItem>
+                <SelectItem value="internship">
+                  Internship Application
+                </SelectItem>
+                <SelectItem value="visa">Visa Application</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-2">
             <Label htmlFor="reason">Reason for Certificate</Label>
             <Textarea
               id="reason"
-              placeholder="e.g., Passport Application, Bank Loan"
+              placeholder="Please provide any additional details here."
             />
           </div>
         </form>
