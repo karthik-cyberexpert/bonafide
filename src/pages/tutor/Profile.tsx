@@ -1,16 +1,43 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import ProfileHeader from "@/components/shared/ProfileHeader";
 import ProfileField from "@/components/shared/ProfileField";
 import { dummyTutorProfile } from "@/data/dummyProfiles";
+import { TutorProfile as TutorProfileType } from "@/lib/types";
 
 const TutorProfile = () => {
-  const profile = dummyTutorProfile;
+  const [isEditing, setIsEditing] = useState(false);
+  const [profile, setProfile] = useState<TutorProfileType>(dummyTutorProfile);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setProfile((prevProfile) => ({
+      ...prevProfile,
+      [id]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    console.log("Saving profile:", profile);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setProfile(dummyTutorProfile);
+    setIsEditing(false);
+  };
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <ProfileHeader name={profile.name} subtitle="Tutor Profile Details" />
+        {!isEditing && (
+          <Button onClick={() => setIsEditing(true)}>Edit Profile</Button>
+        )}
       </CardHeader>
       <CardContent>
         <Separator className="my-4" />
@@ -19,9 +46,43 @@ const TutorProfile = () => {
           <ProfileField label="Batch Assigned">
             {profile.batchAssigned}
           </ProfileField>
-          <ProfileField label="Email">{profile.email}</ProfileField>
-          <ProfileField label="Phone Number">{profile.phoneNumber}</ProfileField>
+
+          {isEditing ? (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  value={profile.email}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phoneNumber">Phone Number</Label>
+                <Input
+                  id="phoneNumber"
+                  value={profile.phoneNumber}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <ProfileField label="Email">{profile.email}</ProfileField>
+              <ProfileField label="Phone Number">
+                {profile.phoneNumber}
+              </ProfileField>
+            </>
+          )}
         </div>
+        {isEditing && (
+          <div className="mt-6 flex justify-end gap-2">
+            <Button variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave}>Save Changes</Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
