@@ -1,5 +1,5 @@
 import Sidebar from "@/components/shared/Sidebar";
-import { LayoutDashboard, FilePlus, History } from "lucide-react";
+import { LayoutDashboard, FilePlus, History, User } from "lucide-react";
 import { Outlet } from "react-router-dom";
 
 const navItems = [
@@ -17,6 +17,11 @@ const navItems = [
     title: "My Requests",
     href: "/student/my-requests",
     icon: <History className="h-4 w-4" />,
+  },
+  {
+    title: "Profile",
+    href: "/student/profile",
+    icon: <User className="h-4 w-4" />,
   },
 ];
 

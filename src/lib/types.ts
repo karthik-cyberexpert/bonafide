@@ -15,3 +15,37 @@ export interface BonafideRequest {
   reason: string;
   status: RequestStatus;
 }
+
+export interface StudentProfile {
+  name: string;
+  registerNumber: string;
+  email: string;
+  phoneNumber: string;
+  parentName: string;
+  department: string;
+  batch: string;
+  currentSemester: string;
+  tutor: string;
+  hod: string;
+}
+
+export interface TutorProfile {
+  name: string;
+  department: string;
+  batchAssigned: string;
+  email: string;
+  phoneNumber: string;
+}
+
+export interface HodProfile {
+  name: string;
+  email: string;
+  mobileNumber: string;
+  department: string;
+}
+
+export interface AdminProfile {
+  name: string;
+  email: string;
+  phoneNumber: string;
+}
