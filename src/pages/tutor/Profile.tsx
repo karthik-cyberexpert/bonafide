@@ -26,6 +26,7 @@ const TutorProfile = () => {
       <CardContent>
         <Separator className="my-4" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <ProfileField label="Username">{profile.username}</ProfileField>
           <ProfileField label="Department">{profile.department}</ProfileField>
           <ProfileField label="Batch Assigned">
             {profile.batchAssigned}

@@ -18,6 +18,7 @@ export interface BonafideRequest {
 
 export interface StudentProfile {
   name: string;
+  username: string;
   registerNumber: string;
   email: string;
   phoneNumber: string;
@@ -31,6 +32,7 @@ export interface StudentProfile {
 
 export interface TutorProfile {
   name: string;
+  username: string;
   department: string;
   batchAssigned: string;
   email: string;
@@ -39,6 +41,7 @@ export interface TutorProfile {
 
 export interface HodProfile {
   name: string;
+  username: string;
   email: string;
   mobileNumber: string;
   department: string;
@@ -46,6 +49,7 @@ export interface HodProfile {
 
 export interface AdminProfile {
   name: string;
+  username: string;
   email: string;
   phoneNumber: string;
 }

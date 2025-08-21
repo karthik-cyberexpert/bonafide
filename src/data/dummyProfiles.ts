@@ -7,6 +7,7 @@ import {
 
 export const dummyStudentProfile: StudentProfile = {
   name: "Alice Johnson",
+  username: "alice_j",
   registerNumber: "S12345",
   email: "alice.j@example.com",
   phoneNumber: "+91 234 567 890",
@@ -20,6 +21,7 @@ export const dummyStudentProfile: StudentProfile = {
 
 export const dummyTutorProfile: TutorProfile = {
   name: "Dr. Evelyn Reed",
+  username: "evelyn_r",
   department: "Computer Science",
   batchAssigned: "2021-2025",
   email: "evelyn.r@example.com",
@@ -28,6 +30,7 @@ export const dummyTutorProfile: TutorProfile = {
 
 export const dummyHodProfile: HodProfile = {
   name: "Dr. Robert Clark",
+  username: "robert_c",
   department: "Computer Science",
   email: "robert.c@example.com",
   mobileNumber: "+91 555 666 777",
@@ -35,6 +38,7 @@ export const dummyHodProfile: HodProfile = {
 
 export const dummyAdminProfile: AdminProfile = {
   name: "Principal Thompson",
+  username: "principal_t",
   email: "principal@example.com",
   phoneNumber: "+91 111 222 333",
 };
