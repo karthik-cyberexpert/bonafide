@@ -1,8 +1,10 @@
 import Sidebar from "@/components/shared/Sidebar";
+import Header from "@/components/shared/Header";
 import { LayoutDashboard, User, History, FileClock, Users } from "lucide-react";
 import { Outlet } from "react-router-dom";
+import { NavItem } from "@/lib/types";
 
-const navItems = [
+const navItems: NavItem[] = [
   {
     title: "Dashboard",
     href: "/admin/dashboard",
@@ -32,9 +34,10 @@ const navItems = [
 
 const AdminLayout = () => {
   return (
-    <div className="flex min-h-screen w-full bg-muted/40">
+    <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="Admin Portal" />
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 bg-muted/40">
+        <Header navItems={navItems} portalName="Admin Portal" />
         <main className="flex-1 p-6">
           <Outlet />
         </main>

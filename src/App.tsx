@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+import { ThemeProvider } from "@/components/shared/ThemeProvider";
 
 import StudentLayout from "./components/layouts/StudentLayout";
 import StudentDashboard from "./pages/student/Dashboard";
@@ -38,77 +39,79 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
 
-          <Route element={<StudentLayout />}>
-            <Route path="/student/dashboard" element={<StudentDashboard />} />
-            <Route path="/student/request" element={<NewRequest />} />
-            <Route path="/student/my-requests" element={<MyRequests />} />
-            <Route path="/student/profile" element={<StudentProfile />} />
-          </Route>
+            <Route element={<StudentLayout />}>
+              <Route path="/student/dashboard" element={<StudentDashboard />} />
+              <Route path="/student/request" element={<NewRequest />} />
+              <Route path="/student/my-requests" element={<MyRequests />} />
+              <Route path="/student/profile" element={<StudentProfile />} />
+            </Route>
 
-          <Route element={<TutorLayout />}>
-            <Route path="/tutor/dashboard" element={<TutorDashboard />} />
-            <Route
-              path="/tutor/pending-requests"
-              element={<TutorPendingRequests />}
-            />
-            <Route
-              path="/tutor/request-history"
-              element={<TutorRequestHistory />}
-            />
-            <Route path="/tutor/students" element={<TutorStudents />} />
-            <Route path="/tutor/profile" element={<TutorProfile />} />
-          </Route>
+            <Route element={<TutorLayout />}>
+              <Route path="/tutor/dashboard" element={<TutorDashboard />} />
+              <Route
+                path="/tutor/pending-requests"
+                element={<TutorPendingRequests />}
+              />
+              <Route
+                path="/tutor/request-history"
+                element={<TutorRequestHistory />}
+              />
+              <Route path="/tutor/students" element={<TutorStudents />} />
+              <Route path="/tutor/profile" element={<TutorProfile />} />
+            </Route>
 
-          <Route element={<HodLayout />}>
-            <Route path="/hod/dashboard" element={<HodDashboard />} />
-            <Route
-              path="/hod/pending-requests"
-              element={<HodPendingRequests />}
-            />
-            <Route
-              path="/hod/request-history"
-              element={<HodRequestHistory />}
-            />
-            <Route
-              path="/hod/student-management"
-              element={<StudentManagement />}
-            />
-            <Route
-              path="/hod/batch-management"
-              element={<BatchManagement />}
-            />
-            <Route path="/hod/profile" element={<HodProfile />} />
-          </Route>
+            <Route element={<HodLayout />}>
+              <Route path="/hod/dashboard" element={<HodDashboard />} />
+              <Route
+                path="/hod/pending-requests"
+                element={<HodPendingRequests />}
+              />
+              <Route
+                path="/hod/request-history"
+                element={<HodRequestHistory />}
+              />
+              <Route
+                path="/hod/student-management"
+                element={<StudentManagement />}
+              />
+              <Route
+                path="/hod/batch-management"
+                element={<BatchManagement />}
+              />
+              <Route path="/hod/profile" element={<HodProfile />} />
+            </Route>
 
-          <Route element={<AdminLayout />}>
-            <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route
-              path="/admin/pending-requests"
-              element={<AdminPendingRequests />}
-            />
-            <Route
-              path="/admin/request-history"
-              element={<AdminRequestHistory />}
-            />
-            <Route
-              path="/admin/manage-faculties"
-              element={<ManageFaculties />}
-            />
-            <Route path="/admin/profile" element={<AdminProfile />} />
-          </Route>
+            <Route element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<AdminDashboard />} />
+              <Route
+                path="/admin/pending-requests"
+                element={<AdminPendingRequests />}
+              />
+              <Route
+                path="/admin/request-history"
+                element={<AdminRequestHistory />}
+              />
+              <Route
+                path="/admin/manage-faculties"
+                element={<ManageFaculties />}
+              />
+              <Route path="/admin/profile" element={<AdminProfile />} />
+            </Route>
 
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

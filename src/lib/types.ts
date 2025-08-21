@@ -1,3 +1,5 @@
+import * as React from "react";
+
 export type RequestStatus =
   | "Pending Tutor Approval"
   | "Pending HOD Approval"
@@ -59,4 +61,10 @@ export interface AdminProfile {
   username: string;
   email: string;
   phoneNumber: string;
+}
+
+export interface NavItem {
+  title: string;
+  href: string;
+  icon: React.ReactNode;
 }

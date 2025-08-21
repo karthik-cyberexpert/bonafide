@@ -1,8 +1,10 @@
 import Sidebar from "@/components/shared/Sidebar";
+import Header from "@/components/shared/Header";
 import { LayoutDashboard, FilePlus, History, User } from "lucide-react";
 import { Outlet } from "react-router-dom";
+import { NavItem } from "@/lib/types";
 
-const navItems = [
+const navItems: NavItem[] = [
   {
     title: "Dashboard",
     href: "/student/dashboard",
@@ -27,9 +29,10 @@ const navItems = [
 
 const StudentLayout = () => {
   return (
-    <div className="flex min-h-screen w-full bg-muted/40">
+    <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="Student Portal" />
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 bg-muted/40">
+        <Header navItems={navItems} portalName="Student Portal" />
         <main className="flex-1 p-6">
           <Outlet />
         </main>
