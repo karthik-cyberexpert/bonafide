@@ -15,14 +15,17 @@ import StudentProfile from "./pages/student/Profile";
 import TutorLayout from "./components/layouts/TutorLayout";
 import TutorDashboard from "./pages/tutor/Dashboard";
 import TutorProfile from "./pages/tutor/Profile";
+import TutorRequestHistory from "./pages/tutor/RequestHistory";
 
 import HodLayout from "./components/layouts/HodLayout";
 import HodDashboard from "./pages/hod/Dashboard";
 import HodProfile from "./pages/hod/Profile";
+import HodRequestHistory from "./pages/hod/RequestHistory";
 
 import AdminLayout from "./components/layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProfile from "./pages/admin/Profile";
+import AdminRequestHistory from "./pages/admin/RequestHistory";
 
 const queryClient = new QueryClient();
 
@@ -44,16 +47,28 @@ const App = () => (
 
           <Route element={<TutorLayout />}>
             <Route path="/tutor/dashboard" element={<TutorDashboard />} />
+            <Route
+              path="/tutor/request-history"
+              element={<TutorRequestHistory />}
+            />
             <Route path="/tutor/profile" element={<TutorProfile />} />
           </Route>
 
           <Route element={<HodLayout />}>
             <Route path="/hod/dashboard" element={<HodDashboard />} />
+            <Route
+              path="/hod/request-history"
+              element={<HodRequestHistory />}
+            />
             <Route path="/hod/profile" element={<HodProfile />} />
           </Route>
 
           <Route element={<AdminLayout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route
+              path="/admin/request-history"
+              element={<AdminRequestHistory />}
+            />
             <Route path="/admin/profile" element={<AdminProfile />} />
           </Route>
 
