@@ -5,6 +5,7 @@ export interface Batch {
   name: string;
   tutor: string;
   studentCount: number;
+  status: "Active" | "Inactive";
 }
 
 export const dummyBatches: Batch[] = [
@@ -13,18 +14,28 @@ export const dummyBatches: Batch[] = [
     name: "2021-2025",
     tutor: "Dr. Evelyn Reed",
     studentCount: 62,
+    status: "Active",
   },
   {
     id: "B002",
     name: "2022-2026",
     tutor: "Dr. Samuel Chen",
     studentCount: 58,
+    status: "Active",
   },
   {
     id: "B003",
     name: "2023-2027",
     tutor: "Dr. Maria Garcia",
     studentCount: 65,
+    status: "Active",
+  },
+  {
+    id: "B004",
+    name: "2020-2024",
+    tutor: "Dr. Alan Grant",
+    studentCount: 55,
+    status: "Inactive",
   },
 ];
 
