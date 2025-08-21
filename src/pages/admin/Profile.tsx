@@ -1,6 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import ProfileHeader from "@/components/shared/ProfileHeader";
+import ProfileField from "@/components/shared/ProfileField";
 import { dummyAdminProfile } from "@/data/dummyProfiles";
-import ProfileDetail from "@/components/shared/ProfileDetail";
 
 const AdminProfile = () => {
   const profile = dummyAdminProfile;
@@ -8,12 +10,14 @@ const AdminProfile = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>My Profile</CardTitle>
+        <ProfileHeader name={profile.name} subtitle="Admin Profile Details" />
       </CardHeader>
-      <CardContent className="space-y-4">
-        <ProfileDetail label="Name" value={profile.name} />
-        <ProfileDetail label="Email" value={profile.email} />
-        <ProfileDetail label="Phone Number" value={profile.phoneNumber} />
+      <CardContent>
+        <Separator className="my-4" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <ProfileField label="Email">{profile.email}</ProfileField>
+          <ProfileField label="Phone Number">{profile.phoneNumber}</ProfileField>
+        </div>
       </CardContent>
     </Card>
   );

@@ -1,6 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import ProfileHeader from "@/components/shared/ProfileHeader";
+import ProfileField from "@/components/shared/ProfileField";
 import { dummyStudentProfile } from "@/data/dummyProfiles";
-import ProfileDetail from "@/components/shared/ProfileDetail";
 
 const StudentProfile = () => {
   const profile = dummyStudentProfile;
@@ -8,22 +11,28 @@ const StudentProfile = () => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>My Profile</CardTitle>
+        <ProfileHeader name={profile.name} subtitle="Student Profile Details" />
       </CardHeader>
-      <CardContent className="space-y-4">
-        <ProfileDetail label="Name" value={profile.name} />
-        <ProfileDetail label="Register Number" value={profile.registerNumber} />
-        <ProfileDetail label="Email" value={profile.email} />
-        <ProfileDetail label="Phone Number" value={profile.phoneNumber} />
-        <ProfileDetail label="Parent Name" value={profile.parentName} />
-        <ProfileDetail label="Department" value={profile.department} />
-        <ProfileDetail label="Batch" value={profile.batch} />
-        <ProfileDetail
-          label="Current Semester"
-          value={profile.currentSemester}
-        />
-        <ProfileDetail label="Tutor" value={profile.tutor} />
-        <ProfileDetail label="HOD" value={profile.hod} />
+      <CardContent>
+        <Separator className="my-4" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <ProfileField label="Register Number">
+            {profile.registerNumber}
+          </ProfileField>
+          <ProfileField label="Academic Year">{profile.batch}</ProfileField>
+          <ProfileField label="Current Semester">
+            {profile.currentSemester}
+          </ProfileField>
+          <ProfileField label="Status">
+            <Badge variant="success">Active</Badge>
+          </ProfileField>
+          <ProfileField label="Email">{profile.email}</ProfileField>
+          <ProfileField label="Mobile">{profile.phoneNumber}</ProfileField>
+          <ProfileField label="Tutor">{profile.tutor}</ProfileField>
+          <ProfileField label="HOD">{profile.hod}</ProfileField>
+          <ProfileField label="Department">{profile.department}</ProfileField>
+          <ProfileField label="Parent Name">{profile.parentName}</ProfileField>
+        </div>
       </CardContent>
     </Card>
   );
