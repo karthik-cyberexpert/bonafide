@@ -77,6 +77,13 @@ export interface Department {
   name: string;
 }
 
+export interface Section {
+  id: string;
+  name: string;
+  tutor: string;
+  studentCount: number;
+}
+
 export interface Batch {
   id: string;
   name: string;
@@ -86,4 +93,5 @@ export interface Batch {
   currentSemester?: number;
   semesterFromDate?: string;
   semesterToDate?: string;
+  sections: Section[];
 }

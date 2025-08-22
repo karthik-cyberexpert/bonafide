@@ -18,6 +18,12 @@ import { Separator } from "@/components/ui/separator";
 import { Batch } from "@/lib/types";
 import { formatDateToIndian } from "@/lib/utils";
 import { MoreHorizontal, Users } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface BatchCardProps {
   batch: Batch;
@@ -76,11 +82,40 @@ const BatchCard = ({ batch, onEdit, onToggleStatus }: BatchCardProps) => {
             {formatDateToIndian(batch.semesterToDate)}
           </span>
         </div>
+        <Separator />
+        <Accordion type="single" collapsible className="w-full">
+          <AccordionItem value="sections">
+            <AccordionTrigger className="text-sm pt-0">
+              View Sections ({batch.sections.length})
+            </AccordionTrigger>
+            <AccordionContent>
+              <ul className="space-y-2 pt-2">
+                {batch.sections.map((section) => (
+                  <li
+                    key={section.id}
+                    className="flex items-center justify-between text-sm p-2 bg-muted/50 rounded-md"
+                  >
+                    <div>
+                      <p className="font-medium">Section {section.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {section.tutor}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Users className="h-3 w-3" />
+                      <span>{section.studentCount}</span>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       </CardContent>
       <CardFooter className="bg-muted/50 px-6 py-3">
         <div className="flex items-center text-sm text-muted-foreground">
           <Users className="h-4 w-4 mr-2" />
-          <span>{batch.studentCount} Students</span>
+          <span>{batch.studentCount} Students (Total)</span>
         </div>
       </CardFooter>
     </Card>
