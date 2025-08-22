@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { BonafideRequest, CertificateTemplate, StudentProfile } from "./types";
+import { BonafideRequest, CertificateTemplate, StudentDetails } from "./types";
+import { fetchStudentDetails, fetchTemplates } from "@/data/appData";
 
 /**
  * Generates the final HTML content for a certificate by populating a template with data.
@@ -12,7 +13,7 @@ import { BonafideRequest, CertificateTemplate, StudentProfile } from "./types";
  */
 export const getCertificateHtml = (
   request: BonafideRequest,
-  student: StudentProfile | undefined,
+  student: StudentDetails | null,
   template: CertificateTemplate | undefined,
   addSignature: boolean = false
 ): string => {
@@ -24,13 +25,13 @@ export const getCertificateHtml = (
   }
 
   let content = template.content
-    .replace(/{studentName}/g, student.name)
-    .replace(/{studentId}/g, student.registerNumber)
+    .replace(/{studentName}/g, `${student.first_name} ${student.last_name || ''}`.trim())
+    .replace(/{studentId}/g, student.register_number)
     .replace(/{reason}/g, request.type)
-    .replace(/{parentName}/g, student.parentName)
-    .replace(/{department}/g, student.department)
-    .replace(/{batch}/g, student.batch)
-    .replace(/{currentSemester}/g, student.currentSemester);
+    .replace(/{parentName}/g, student.parent_name || 'N/A')
+    .replace(/{department}/g, student.department_name || 'N/A')
+    .replace(/{batch}/g, student.batch_name || 'N/A')
+    .replace(/{currentSemester}/g, student.current_semester?.toString() || 'N/A');
 
   if (addSignature) {
     content +=

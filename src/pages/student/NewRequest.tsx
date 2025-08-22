@@ -18,38 +18,85 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { requests as appRequests } from "@/data/appData";
+import { createRequest, fetchStudentDetails } from "@/data/appData";
 import { showSuccess, showError } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { useEffect } from "react";
+import { StudentDetails } from "@/lib/types";
 
 const NewRequest = () => {
   const navigate = useNavigate();
+  const { user, profile } = useSession();
+  const [studentDetails, setStudentDetails] = useState<StudentDetails | null>(null);
   const [type, setType] = useState("");
   const [subType, setSubType] = useState("");
   const [reason, setReason] = useState("");
+  const [loadingStudent, setLoadingStudent] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const getStudentData = async () => {
+      if (user?.id) {
+        setLoadingStudent(true);
+        const details = await fetchStudentDetails(user.id);
+        setStudentDetails(details);
+        setLoadingStudent(false);
+      }
+    };
+    getStudentData();
+  }, [user]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!type || !reason) {
-      showError("Please fill in all required fields.");
+    if (!type || !reason || !user?.id) {
+      showError("Please fill in all required fields and ensure you are logged in.");
       return;
     }
 
-    const newRequest = {
-      id: `REQ${String(appRequests.length + 1).padStart(3, "0")}`,
-      studentName: "Alice Johnson", // Hardcoded for demo
-      studentId: "S12345", // Hardcoded for demo
+    const newRequestPayload = {
+      student_id: user.id,
       date: new Date().toISOString().split("T")[0],
       type,
-      subType,
+      sub_type: subType,
       reason,
       status: "Pending Tutor Approval" as const,
     };
 
-    appRequests.unshift(newRequest);
-    showSuccess("Request submitted successfully!");
-    navigate("/student/my-requests");
+    const createdRequest = await createRequest(newRequestPayload);
+
+    if (createdRequest) {
+      showSuccess("Request submitted successfully!");
+      navigate("/student/my-requests");
+    } else {
+      showError("Failed to submit request.");
+    }
   };
+
+  if (loadingStudent) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Student Details...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch your information.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!studentDetails) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Error</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Could not load student details. Please ensure your profile is complete.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -64,11 +111,11 @@ const NewRequest = () => {
           <div className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="student-name">Student Name</Label>
-              <Input id="student-name" defaultValue="Alice Johnson" disabled />
+              <Input id="student-name" defaultValue={`${studentDetails.first_name} ${studentDetails.last_name || ''}`.trim()} disabled />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="student-id">Student ID</Label>
-              <Input id="student-id" defaultValue="S12345" disabled />
+              <Label htmlFor="student-id">Register Number</Label>
+              <Input id="student-id" defaultValue={studentDetails.register_number} disabled />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="grid gap-2">

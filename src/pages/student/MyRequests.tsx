@@ -22,29 +22,59 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { dummyStudents } from "@/data/dummyData";
-import { dummyRequests } from "@/data/dummyRequests";
-import { dummyTemplates } from "@/data/dummyTemplates";
-import { BonafideRequest } from "@/lib/types";
+import { fetchRequests, fetchStudentDetails, fetchTemplates } from "@/data/appData";
+import { BonafideRequest, StudentDetails, CertificateTemplate } from "@/lib/types";
 import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
 import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { Download } from "lucide-react";
-
-const studentRequests = dummyRequests.filter(
-  (req) => req.studentId === "S12345"
-);
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { useEffect, useState } from "react";
 
 const MyRequests = () => {
+  const { user } = useSession();
+  const [studentRequests, setStudentRequests] = useState<BonafideRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const getRequests = async () => {
+      if (user?.id) {
+        setLoading(true);
+        const allRequests = await fetchRequests();
+        const filtered = allRequests.filter((req) => req.student_id === user.id);
+        setStudentRequests(filtered);
+        setLoading(false);
+      }
+    };
+    getRequests();
+  }, [user]);
+
   const handleDownload = async (request: BonafideRequest) => {
-    const student = dummyStudents.find(
-      (s) => s.registerNumber === request.studentId
-    );
-    const template = dummyTemplates.find((t) => t.id === request.templateId);
+    const student: StudentDetails | null = await fetchStudentDetails(request.student_id);
+    const templates: CertificateTemplate[] = await fetchTemplates();
+    const template: CertificateTemplate | undefined = templates.find((t) => t.id === request.template_id);
+
+    if (!student || !template) {
+      console.error("Could not fetch student or template for download.");
+      return;
+    }
 
     const htmlContent = getCertificateHtml(request, student, template, true);
-    const fileName = `Bonafide-${request.studentId}.pdf`;
+    const fileName = `Bonafide-${student.register_number}.pdf`;
     await generatePdf(htmlContent, fileName);
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Requests...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch your requests.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -63,55 +93,63 @@ const MyRequests = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {studentRequests.map((request) => (
-              <TableRow key={request.id}>
-                <TableCell>{request.type}</TableCell>
-                <TableCell>{request.subType || "N/A"}</TableCell>
-                <TableCell className="max-w-xs truncate">
-                  {request.reason}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={getStatusVariant(request.status)}>
-                    {request.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  {request.status === "Approved" && (
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleDownload(request)}
-                    >
-                      <Download className="h-4 w-4" />
-                      <span className="sr-only">Download</span>
-                    </Button>
-                  )}
-                  {request.status.startsWith("Returned by") && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          Review
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Reason for Return</DialogTitle>
-                          <DialogDescription>
-                            Your request was returned for the following reason.
-                            Please address the issue and resubmit if necessary.
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4">
-                          <p className="text-sm font-medium bg-muted p-4 rounded-md">
-                            {request.returnReason || "No reason provided."}
-                          </p>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  )}
+            {studentRequests.length > 0 ? (
+              studentRequests.map((request) => (
+                <TableRow key={request.id}>
+                  <TableCell>{request.type}</TableCell>
+                  <TableCell>{request.sub_type || "N/A"}</TableCell>
+                  <TableCell className="max-w-xs truncate">
+                    {request.reason}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusVariant(request.status)}>
+                      {request.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {request.status === "Approved" && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleDownload(request)}
+                      >
+                        <Download className="h-4 w-4" />
+                        <span className="sr-only">Download</span>
+                      </Button>
+                    )}
+                    {request.status.startsWith("Returned by") && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            Review
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Reason for Return</DialogTitle>
+                            <DialogDescription>
+                              Your request was returned for the following reason.
+                              Please address the issue and resubmit if necessary.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="py-4">
+                            <p className="text-sm font-medium bg-muted p-4 rounded-md">
+                              {request.return_reason || "No reason provided."}
+                            </p>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  No requests found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

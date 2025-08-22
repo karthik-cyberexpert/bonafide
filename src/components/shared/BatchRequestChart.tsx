@@ -14,30 +14,10 @@ import {
   ChartTooltipContent,
   ChartConfig,
 } from "@/components/ui/chart"
-import { dummyRequests } from "@/data/dummyRequests"
-import { dummyStudents } from "@/data/dummyData"
-
-// Process data to get request count per batch
-const processChartData = () => {
-  const requestsWithBatch = dummyRequests.map(request => {
-    const student = dummyStudents.find(s => s.registerNumber === request.studentId);
-    return { ...request, batch: student?.batch };
-  });
-
-  const batchCounts = requestsWithBatch.reduce((acc, request) => {
-    if (request.batch) {
-      acc[request.batch] = (acc[request.batch] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
-
-  return Object.entries(batchCounts).map(([batch, requests]) => ({
-    batch,
-    requests,
-  }));
-};
-
-const chartData = processChartData();
+import { useEffect, useState } from "react"
+import { supabase } from "@/integrations/supabase/client"
+import { showError } from "@/utils/toast"
+import { BonafideRequest, StudentDetails, Batch } from "@/lib/types"
 
 const chartConfig = {
   requests: {
@@ -47,6 +27,83 @@ const chartConfig = {
 } satisfies ChartConfig
 
 const BatchRequestChart = () => {
+  const [chartData, setChartData] = useState<Array<{ batch: string; requests: number }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      setLoading(true);
+      const { data: requestsData, error: requestsError } = await supabase
+        .from('requests')
+        .select('student_id');
+
+      if (requestsError) {
+        showError("Error fetching requests for chart: " + requestsError.message);
+        setLoading(false);
+        return;
+      }
+
+      const studentIds = requestsData.map(r => r.student_id);
+
+      if (studentIds.length === 0) {
+        setChartData([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: studentsData, error: studentsError } = await supabase
+        .from('students')
+        .select(`
+          id,
+          batches(name, section)
+        `)
+        .in('id', studentIds);
+
+      if (studentsError) {
+        showError("Error fetching student data for chart: " + studentsError.message);
+        setLoading(false);
+        return;
+      }
+
+      const requestsWithBatch = requestsData.map(request => {
+        const student = studentsData.find(s => s.id === request.student_id);
+        const batch = student?.batches as unknown as Batch;
+        return {
+          ...request,
+          batch_name: batch ? `${batch.name} ${batch.section || ''}`.trim() : undefined
+        };
+      });
+
+      const batchCounts = requestsWithBatch.reduce((acc, request) => {
+        if (request.batch_name) {
+          acc[request.batch_name] = (acc[request.batch_name] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+
+      setChartData(Object.entries(batchCounts).map(([batch, requests]) => ({
+        batch,
+        requests,
+      })));
+      setLoading(false);
+    };
+
+    fetchChartData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Chart...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we load the chart data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>

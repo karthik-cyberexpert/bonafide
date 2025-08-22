@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -21,42 +21,77 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  requests as appRequests,
-  students as appStudents,
-  batches as appBatches,
-  departments as appDepartments,
-} from "@/data/appData";
+import { fetchRequests, fetchAllStudentsWithDetails, fetchBatches, fetchDepartments } from "@/data/appData";
 import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
+import { BonafideRequest, StudentDetails, Department, Batch } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
 
 const PrincipalRequestHistory = () => {
+  const [allRequests, setAllRequests] = useState<BonafideRequest[]>([]);
+  const [allStudents, setAllStudents] = useState<StudentDetails[]>([]);
+  const [allDepartments, setAllDepartments] = useState<Department[]>([]);
+  const [allBatches, setAllBatches] = useState<Batch[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [selectedBatch, setSelectedBatch] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("all");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const fetchedRequests = await fetchRequests();
+      const fetchedStudents = await fetchAllStudentsWithDetails();
+      const fetchedDepartments = await fetchDepartments();
+      const fetchedBatches = await fetchBatches();
+
+      setAllRequests(fetchedRequests);
+      setAllStudents(fetchedStudents);
+      setAllDepartments(fetchedDepartments);
+      setAllBatches(fetchedBatches);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
 
   const uniqueBatches = useMemo(() => {
-    const batchNames = appBatches.map((b) =>
+    const batchNames = allBatches.map((b) =>
       b.section ? `${b.name} ${b.section}` : b.name
     );
     return [...new Set(batchNames)];
-  }, []);
+  }, [allBatches]);
 
-  const filteredHistory = appRequests.filter((request) => {
-    const student = appStudents.find(
-      (s) => s.registerNumber === request.studentId
+  const filteredHistory = useMemo(() => {
+    return allRequests.filter((request) => {
+      const student = allStudents.find(
+        (s) => s.id === request.student_id
+      );
+      if (!student) return false;
+
+      const departmentMatch =
+        selectedDepartment === "all" || student.department_name === selectedDepartment;
+      const batchMatch =
+        selectedBatch === "all" || student.batch_name === selectedBatch;
+      const semesterMatch =
+        selectedSemester === "all" ||
+        student.current_semester === Number(selectedSemester);
+
+      return departmentMatch && batchMatch && semesterMatch;
+    });
+  }, [allRequests, allStudents, selectedDepartment, selectedBatch, selectedSemester]);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Request History...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch the request history.</p>
+        </CardContent>
+      </Card>
     );
-    if (!student) return false;
-
-    const departmentMatch =
-      selectedDepartment === "all" || student.department === selectedDepartment;
-    const batchMatch =
-      selectedBatch === "all" || student.batch === selectedBatch;
-    const semesterMatch =
-      selectedSemester === "all" ||
-      student.currentSemester === `${selectedSemester}th`;
-
-    return departmentMatch && batchMatch && semesterMatch;
-  });
+  }
 
   return (
     <Card>
@@ -69,7 +104,7 @@ const PrincipalRequestHistory = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Departments</SelectItem>
-              {appDepartments.map((dept) => (
+              {allDepartments.map((dept) => (
                 <SelectItem key={dept.id} value={dept.name}>
                   {dept.name}
                 </SelectItem>
@@ -109,7 +144,7 @@ const PrincipalRequestHistory = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Student Name</TableHead>
-              <TableHead>HOD</TableHead>
+              <TableHead>Department</TableHead>
               <TableHead>Batch</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Type</TableHead>
@@ -119,19 +154,19 @@ const PrincipalRequestHistory = () => {
           <TableBody>
             {filteredHistory.length > 0 ? (
               filteredHistory.map((request) => {
-                const student = appStudents.find(
-                  (s) => s.registerNumber === request.studentId
+                const student = allStudents.find(
+                  (s) => s.id === request.student_id
                 );
                 return (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
-                      <div>{request.studentName}</div>
+                      <div>{student ? `${student.first_name} ${student.last_name || ''}`.trim() : "N/A"}</div>
                       <div className="text-xs text-muted-foreground">
-                        [{request.studentId}]
+                        [{student?.register_number || "N/A"}]
                       </div>
                     </TableCell>
-                    <TableCell>{student?.hod || "N/A"}</TableCell>
-                    <TableCell>{student?.batch || "N/A"}</TableCell>
+                    <TableCell>{student?.department_name || "N/A"}</TableCell>
+                    <TableCell>{student?.batch_name || "N/A"}</TableCell>
                     <TableCell>{formatDateToIndian(request.date)}</TableCell>
                     <TableCell>{request.type}</TableCell>
                     <TableCell>

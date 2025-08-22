@@ -2,10 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Outlet, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Index from "./pages/Index";
+import Login from "./pages/Login"; // Import the new Login page
 import { ThemeProvider } from "@/components/shared/ThemeProvider";
+import { SessionContextProvider, useSession } from "@/components/auth/SessionContextProvider"; // Import SessionContextProvider and useSession
 
 import StudentLayout from "./components/layouts/StudentLayout";
 import StudentDashboard from "./pages/student/Dashboard";
@@ -45,6 +47,43 @@ import DepartmentOverview from "./pages/principal/DepartmentOverview";
 
 const queryClient = new QueryClient();
 
+// ProtectedRoute component to check authentication and role
+const ProtectedRoute = ({ allowedRoles }: { allowedRoles: string[] }) => {
+  const { session, loading, profile } = useSession();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-muted/40">
+        <div className="text-center">Loading application...</div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!profile) {
+    // If session exists but profile is not loaded, it might be a new user or a loading issue.
+    // Redirect to login or a loading screen until profile is ready.
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!allowedRoles.includes(profile.role)) {
+    // Redirect to a generic dashboard or unauthorized page if role doesn't match
+    switch (profile.role) {
+      case 'student': return <Navigate to="/student/dashboard" replace />;
+      case 'tutor': return <Navigate to="/tutor/dashboard" replace />;
+      case 'hod': return <Navigate to="/hod/dashboard" replace />;
+      case 'admin': return <Navigate to="/admin/dashboard" replace />;
+      case 'principal': return <Navigate to="/principal/dashboard" replace />;
+      default: return <Navigate to="/" replace />;
+    }
+  }
+
+  return <Outlet />;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -52,95 +91,71 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
+          <SessionContextProvider> {/* Wrap with SessionContextProvider */}
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/" element={<Index />} /> {/* Public home page */}
 
-            <Route element={<StudentLayout />}>
-              <Route path="/student/dashboard" element={<StudentDashboard />} />
-              <Route path="/student/request" element={<NewRequest />} />
-              <Route path="/student/my-requests" element={<MyRequests />} />
-              <Route path="/student/profile" element={<StudentProfile />} />
-            </Route>
+              {/* Student Routes */}
+              <Route element={<ProtectedRoute allowedRoles={["student"]} />}>
+                <Route element={<StudentLayout />}>
+                  <Route path="/student/dashboard" element={<StudentDashboard />} />
+                  <Route path="/student/request" element={<NewRequest />} />
+                  <Route path="/student/my-requests" element={<MyRequests />} />
+                  <Route path="/student/profile" element={<StudentProfile />} />
+                </Route>
+              </Route>
 
-            <Route element={<TutorLayout />}>
-              <Route path="/tutor/dashboard" element={<TutorDashboard />} />
-              <Route
-                path="/tutor/pending-requests"
-                element={<TutorPendingRequests />}
-              />
-              <Route
-                path="/tutor/request-history"
-                element={<TutorRequestHistory />}
-              />
-              <Route path="/tutor/students" element={<TutorStudents />} />
-              <Route path="/tutor/profile" element={<TutorProfile />} />
-            </Route>
+              {/* Tutor Routes */}
+              <Route element={<ProtectedRoute allowedRoles={["tutor"]} />}>
+                <Route element={<TutorLayout />}>
+                  <Route path="/tutor/dashboard" element={<TutorDashboard />} />
+                  <Route path="/tutor/pending-requests" element={<TutorPendingRequests />} />
+                  <Route path="/tutor/request-history" element={<TutorRequestHistory />} />
+                  <Route path="/tutor/students" element={<TutorStudents />} />
+                  <Route path="/tutor/profile" element={<TutorProfile />} />
+                </Route>
+              </Route>
 
-            <Route element={<HodLayout />}>
-              <Route path="/hod/dashboard" element={<HodDashboard />} />
-              <Route
-                path="/hod/pending-requests"
-                element={<HodPendingRequests />}
-              />
-              <Route
-                path="/hod/request-history"
-                element={<HodRequestHistory />}
-              />
-              <Route path="/hod/profile" element={<HodProfile />} />
-            </Route>
+              {/* HOD Routes */}
+              <Route element={<ProtectedRoute allowedRoles={["hod"]} />}>
+                <Route element={<HodLayout />}>
+                  <Route path="/hod/dashboard" element={<HodDashboard />} />
+                  <Route path="/hod/pending-requests" element={<HodPendingRequests />} />
+                  <Route path="/hod/request-history" element={<HodRequestHistory />} />
+                  <Route path="/hod/profile" element={<HodProfile />} />
+                </Route>
+              </Route>
 
-            <Route element={<AdminLayout />}>
-              <Route path="/admin/dashboard" element={<AdminDashboard />} />
-              <Route
-                path="/admin/manage-faculties"
-                element={<ManageFaculties />}
-              />
-              <Route
-                path="/admin/manage-tutors"
-                element={<ManageTutors />}
-              />
-              <Route
-                path="/admin/student-management"
-                element={<StudentManagement />}
-              />
-              <Route
-                path="/admin/batch-management"
-                element={<BatchManagement />}
-              />
-              <Route
-                path="/admin/department-management"
-                element={<DepartmentManagement />}
-              />
-              <Route
-                path="/admin/template-management"
-                element={<TemplateManagement />}
-              />
-              <Route path="/admin/profile" element={<AdminProfile />} />
-            </Route>
+              {/* Admin Routes */}
+              <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+                <Route element={<AdminLayout />}>
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/manage-faculties" element={<ManageFaculties />} />
+                  <Route path="/admin/manage-tutors" element={<ManageTutors />} />
+                  <Route path="/admin/student-management" element={<StudentManagement />} />
+                  <Route path="/admin/batch-management" element={<BatchManagement />} />
+                  <Route path="/admin/department-management" element={<DepartmentManagement />} />
+                  <Route path="/admin/template-management" element={<TemplateManagement />} />
+                  <Route path="/admin/profile" element={<AdminProfile />} />
+                </Route>
+              </Route>
 
-            <Route element={<PrincipalLayout />}>
-              <Route
-                path="/principal/dashboard"
-                element={<PrincipalDashboard />}
-              />
-              <Route
-                path="/principal/pending-requests"
-                element={<PrincipalPendingRequests />}
-              />
-              <Route
-                path="/principal/request-history"
-                element={<PrincipalRequestHistory />}
-              />
-              <Route
-                path="/principal/department-overview"
-                element={<DepartmentOverview />}
-              />
-              <Route path="/principal/profile" element={<PrincipalProfile />} />
-            </Route>
+              {/* Principal Routes */}
+              <Route element={<ProtectedRoute allowedRoles={["principal"]} />}>
+                <Route element={<PrincipalLayout />}>
+                  <Route path="/principal/dashboard" element={<PrincipalDashboard />} />
+                  <Route path="/principal/pending-requests" element={<PrincipalPendingRequests />} />
+                  <Route path="/principal/request-history" element={<PrincipalRequestHistory />} />
+                  <Route path="/principal/department-overview" element={<DepartmentOverview />} />
+                  <Route path="/principal/profile" element={<PrincipalProfile />} />
+                </Route>
+              </Route>
 
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </SessionContextProvider>
         </BrowserRouter>
       </TooltipProvider>
     </ThemeProvider>

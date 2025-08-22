@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,9 +33,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  students as appStudents,
-  batches as appBatches,
-  departments as appDepartments,
+  fetchAllStudentsWithDetails,
+  fetchBatches,
+  fetchDepartments,
+  createStudent,
 } from "@/data/appData";
 import { Download, MoreHorizontal, Upload } from "lucide-react";
 import {
@@ -46,20 +47,44 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { downloadStudentTemplate, parseStudentFile } from "@/lib/xlsx";
 import { showSuccess, showError } from "@/utils/toast";
+import { StudentDetails, Department, Batch } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client";
 
 const StudentManagement = () => {
+  const [allStudents, setAllStudents] = useState<StudentDetails[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [batches, setBatches] = useState<Batch[]>([]);
   const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [selectedBatch, setSelectedBatch] = useState("all");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const filteredStudents = appStudents.filter((student) => {
-    const departmentMatch =
-      selectedDepartment === "all" || student.department === selectedDepartment;
-    const batchMatch =
-      selectedBatch === "all" || student.batch === selectedBatch;
-    return departmentMatch && batchMatch;
-  });
+  const fetchAllData = async () => {
+    setLoading(true);
+    const fetchedStudents = await fetchAllStudentsWithDetails();
+    const fetchedDepartments = await fetchDepartments();
+    const fetchedBatches = await fetchBatches();
+
+    setAllStudents(fetchedStudents);
+    setDepartments(fetchedDepartments);
+    setBatches(fetchedBatches);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const filteredStudents = useMemo(() => {
+    return allStudents.filter((student) => {
+      const departmentMatch =
+        selectedDepartment === "all" || student.department_name === selectedDepartment;
+      const batchMatch =
+        selectedBatch === "all" || student.batch_name === selectedBatch;
+      return departmentMatch && batchMatch;
+    });
+  }, [allStudents, selectedDepartment, selectedBatch]);
 
   const handleFileUpload = async () => {
     if (!uploadFile) {
@@ -68,17 +93,62 @@ const StudentManagement = () => {
     }
 
     try {
-      const students = await parseStudentFile(uploadFile);
-      // In a real app, you would send this data to your backend.
-      console.log("Uploaded students:", students);
-      showSuccess(`${students.length} students parsed successfully!`);
+      const parsedStudents = await parseStudentFile(uploadFile);
+      const newStudents: StudentDetails[] = [];
+      for (const student of parsedStudents) {
+        // Find department and batch IDs based on names from template
+        const department = departments.find(d => d.id === student.department_id);
+        const batch = batches.find(b => b.id === student.batch_id);
+
+        if (!department || !batch) {
+          console.warn(`Skipping student ${student.register_number} due to missing department or batch.`);
+          continue;
+        }
+
+        const newStudent = await createStudent(
+          {
+            first_name: student.first_name,
+            last_name: student.last_name,
+            username: student.username,
+            email: student.email,
+            phone_number: student.phone_number,
+            department_id: department.id,
+            batch_id: batch.id,
+          },
+          {
+            register_number: student.register_number!,
+            parent_name: student.parent_name,
+            batch_id: batch.id,
+            tutor_id: batch.tutor_id, // Assign batch's tutor as student's tutor
+            hod_id: departments.find(d => d.id === batch.department_id)?.id, // This needs to be fetched from profiles table for HOD
+          }
+        );
+        if (newStudent) {
+          newStudents.push(newStudent);
+        }
+      }
+      showSuccess(`${newStudents.length} students uploaded successfully!`);
       setUploadFile(null);
       setIsUploadDialogOpen(false);
-    } catch (error) {
-      showError("Failed to parse the file. Please check the format.");
+      fetchAllData(); // Refresh student list
+    } catch (error: any) {
+      showError("Failed to parse or upload file: " + error.message);
       console.error(error);
     }
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Students...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch student data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -91,7 +161,7 @@ const StudentManagement = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Departments</SelectItem>
-              {appDepartments.map((dept) => (
+              {departments.map((dept) => (
                 <SelectItem key={dept.id} value={dept.name}>
                   {dept.name}
                 </SelectItem>
@@ -104,7 +174,7 @@ const StudentManagement = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Batches</SelectItem>
-              {appBatches.map((batch) => {
+              {batches.map((batch) => {
                 const fullBatchName = batch.section
                   ? `${batch.name} ${batch.section}`
                   : batch.name;
@@ -164,41 +234,48 @@ const StudentManagement = () => {
             <TableRow>
               <TableHead>Register No.</TableHead>
               <TableHead>Student Name</TableHead>
-              <TableHead>Department</TableHead> {/* Added Department column */}
+              <TableHead>Department</TableHead>
               <TableHead>Batch</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredStudents.map((student) => (
-              <TableRow key={student.registerNumber}>
-                <TableCell className="font-medium">
-                  {student.registerNumber}
-                </TableCell>
-                <TableCell>{student.name}</TableCell>
-                <TableCell>{student.department}</TableCell>{" "}
-                {/* Display Department */}
-                <TableCell>{student.batch}</TableCell>
-                <TableCell>{student.tutor}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Edit Student</DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive">
-                        Remove Student
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {filteredStudents.length > 0 ? (
+              filteredStudents.map((student) => (
+                <TableRow key={student.register_number}>
+                  <TableCell className="font-medium">
+                    {student.register_number}
+                  </TableCell>
+                  <TableCell>{`${student.first_name} ${student.last_name || ''}`.trim()}</TableCell>
+                  <TableCell>{student.department_name}</TableCell>
+                  <TableCell>{student.batch_name}</TableCell>
+                  <TableCell>{student.tutor_name}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem>View Details</DropdownMenuItem>
+                        <DropdownMenuItem>Edit Student</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">
+                          Remove Student
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  No students found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

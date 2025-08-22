@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -31,15 +31,17 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { requests as appRequests } from "@/data/appData";
-import { dummyTemplates } from "@/data/dummyTemplates";
-import { BonafideRequest } from "@/lib/types";
-import { showSuccess } from "@/utils/toast";
+import { fetchRequests, updateRequestStatus, fetchTemplates } from "@/data/appData";
+import { BonafideRequest, CertificateTemplate } from "@/lib/types";
+import { showSuccess, showError } from "@/utils/toast";
 import { formatDateToIndian } from "@/lib/utils";
 import RequestDetailsView from "@/components/shared/RequestDetailsView";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 const HodPendingRequests = () => {
-  const [requests, setRequests] = useState<BonafideRequest[]>(appRequests);
+  const { user, profile } = useSession();
+  const [requests, setRequests] = useState<BonafideRequest[]>([]);
   const [selectedRequest, setSelectedRequest] =
     useState<BonafideRequest | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -47,41 +49,102 @@ const HodPendingRequests = () => {
   const [isForwardOpen, setIsForwardOpen] = useState(false);
   const [returnReason, setReturnReason] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleForward = () => {
-    if (!selectedRequest || !selectedTemplate) return;
-    const updatedRequests = appRequests.map((req) =>
-      req.id === selectedRequest.id
-        ? {
-            ...req,
-            status: "Pending Principal Approval",
-            templateId: selectedTemplate,
-          }
-        : req
-    );
-    appRequests.length = 0;
-    appRequests.push(...updatedRequests);
-    setRequests(updatedRequests);
-    showSuccess(`Request ${selectedRequest.id} forwarded to Principal.`);
-    setIsForwardOpen(false);
-    setSelectedRequest(null);
-    setSelectedTemplate("");
+  const fetchHodRequests = async () => {
+    if (user?.id && profile?.department_id) {
+      setLoading(true);
+      // Fetch batches for HOD's department
+      const { data: batchesData, error: batchesError } = await supabase
+        .from('batches')
+        .select('id')
+        .eq('department_id', profile.department_id);
+
+      if (batchesError) {
+        showError("Error fetching batches for department: " + batchesError.message);
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      const batchIdsInDepartment = batchesData?.map(b => b.id) || [];
+      if (batchIdsInDepartment.length === 0) {
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch students in these batches
+      const { data: studentsData, error: studentsError } = await supabase
+        .from('students')
+        .select('id')
+        .in('batch_id', batchIdsInDepartment);
+
+      if (studentsError) {
+        showError("Error fetching students for department: " + studentsError.message);
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      const studentIdsInDepartment = studentsData?.map(s => s.id) || [];
+      if (studentIdsInDepartment.length === 0) {
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch pending requests for these students
+      const { data: requestsData, error: requestsError } = await supabase
+        .from('requests')
+        .select('*')
+        .eq('status', 'Pending HOD Approval')
+        .in('student_id', studentIdsInDepartment);
+
+      if (requestsError) {
+        showError("Error fetching pending requests: " + requestsError.message);
+        setRequests([]);
+      } else {
+        setRequests(requestsData as BonafideRequest[]);
+      }
+
+      const fetchedTemplates = await fetchTemplates();
+      setTemplates(fetchedTemplates);
+      setLoading(false);
+    }
   };
 
-  const handleReturn = () => {
+  useEffect(() => {
+    fetchHodRequests();
+  }, [user, profile?.department_id]);
+
+  const handleForward = async () => {
+    if (!selectedRequest || !selectedTemplate) return;
+    const updated = await updateRequestStatus(selectedRequest.id, "Pending Principal Approval", undefined);
+    if (updated) {
+      showSuccess(`Request ${selectedRequest.id} forwarded to Principal.`);
+      fetchHodRequests(); // Refresh list
+      setIsForwardOpen(false);
+      setSelectedRequest(null);
+      setSelectedTemplate("");
+    } else {
+      showError("Failed to forward request.");
+    }
+  };
+
+  const handleReturn = async () => {
     if (!selectedRequest || !returnReason) return;
-    const updatedRequests = appRequests.map((req) =>
-      req.id === selectedRequest.id
-        ? { ...req, status: "Returned by HOD", returnReason: returnReason }
-        : req
-    );
-    appRequests.length = 0;
-    appRequests.push(...updatedRequests);
-    setRequests(updatedRequests);
-    showSuccess(`Request ${selectedRequest.id} returned to student.`);
-    setIsReturnOpen(false);
-    setReturnReason("");
-    setSelectedRequest(null);
+    const updated = await updateRequestStatus(selectedRequest.id, "Returned by HOD", returnReason);
+    if (updated) {
+      showSuccess(`Request ${selectedRequest.id} returned to student.`);
+      fetchHodRequests(); // Refresh list
+      setIsReturnOpen(false);
+      setReturnReason("");
+      setSelectedRequest(null);
+    } else {
+      showError("Failed to return request.");
+    }
   };
 
   const openReviewDialog = (request: BonafideRequest) => {
@@ -89,9 +152,18 @@ const HodPendingRequests = () => {
     setIsReviewOpen(true);
   };
 
-  const pendingRequests = requests.filter(
-    (req) => req.status === "Pending HOD Approval"
-  );
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Requests...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch pending requests.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -103,21 +175,18 @@ const HodPendingRequests = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Student Name</TableHead>
+                <TableHead>Student ID</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pendingRequests.length > 0 ? (
-                pendingRequests.map((request) => (
+              {requests.length > 0 ? (
+                requests.map((request) => (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
-                      <div>{request.studentName}</div>
-                      <div className="text-xs text-muted-foreground">
-                        [{request.studentId}]
-                      </div>
+                      <div>{request.student_id}</div>
                     </TableCell>
                     <TableCell>{formatDateToIndian(request.date)}</TableCell>
                     <TableCell>{request.type}</TableCell>
@@ -180,7 +249,7 @@ const HodPendingRequests = () => {
                 <SelectValue placeholder="Select a template" />
               </SelectTrigger>
               <SelectContent>
-                {dummyTemplates.map((template) => (
+                {templates.map((template) => (
                   <SelectItem key={template.id} value={template.id}>
                     {template.name}
                   </SelectItem>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -21,23 +21,98 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { requests as appRequests, students as appStudents } from "@/data/appData";
+import { fetchRequests, fetchStudentDetails } from "@/data/appData";
 import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
+import { BonafideRequest, StudentDetails } from "@/lib/types";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
 
 const TutorRequestHistory = () => {
+  const { user } = useSession();
+  const [allRequests, setAllRequests] = useState<BonafideRequest[]>([]);
+  const [studentsInCharge, setStudentsInCharge] = useState<StudentDetails[]>([]);
   const [selectedSemester, setSelectedSemester] = useState("all");
+  const [loading, setLoading] = useState(true);
 
-  const requestHistory = appRequests.filter(
-    (req) => req.status !== "Pending Tutor Approval"
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      if (user?.id) {
+        setLoading(true);
+        // Fetch students assigned to this tutor
+        const { data: studentsData, error: studentsError } = await supabase
+          .from('students')
+          .select(`
+            id,
+            register_number,
+            profiles(first_name, last_name),
+            batches(current_semester)
+          `)
+          .eq('tutor_id', user.id);
 
-  const filteredHistory = requestHistory.filter((request) => {
+        if (studentsError) {
+          showError("Error fetching assigned students: " + studentsError.message);
+          setStudentsInCharge([]);
+          setLoading(false);
+          return;
+        }
+
+        const mappedStudents: StudentDetails[] = studentsData.map((s: any) => ({
+          id: s.id,
+          register_number: s.register_number,
+          first_name: s.profiles.first_name,
+          last_name: s.profiles.last_name,
+          current_semester: s.batches?.current_semester,
+        }));
+        setStudentsInCharge(mappedStudents);
+
+        const studentIds = mappedStudents.map(s => s.id);
+
+        if (studentIds.length === 0) {
+          setAllRequests([]);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch requests for these students, excluding pending tutor approval
+        const { data: requestsData, error: requestsError } = await supabase
+          .from('requests')
+          .select('*')
+          .in('student_id', studentIds)
+          .neq('status', 'Pending Tutor Approval');
+
+        if (requestsError) {
+          showError("Error fetching request history: " + requestsError.message);
+          setAllRequests([]);
+        } else {
+          setAllRequests(requestsData as BonafideRequest[]);
+        }
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [user]);
+
+  const filteredHistory = allRequests.filter((request) => {
     if (selectedSemester === "all") return true;
-    const student = appStudents.find(
-      (s) => s.registerNumber === request.studentId
+    const student = studentsInCharge.find(
+      (s) => s.id === request.student_id
     );
-    return student?.currentSemester === `${selectedSemester}th`;
+    return student?.current_semester === Number(selectedSemester);
   });
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Request History...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch the request history.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -71,23 +146,28 @@ const TutorRequestHistory = () => {
           </TableHeader>
           <TableBody>
             {filteredHistory.length > 0 ? (
-              filteredHistory.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell className="font-medium">
-                    <div>{request.studentName}</div>
-                    <div className="text-xs text-muted-foreground">
-                      [{request.studentId}]
-                    </div>
-                  </TableCell>
-                  <TableCell>{formatDateToIndian(request.date)}</TableCell>
-                  <TableCell>{request.type}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(request.status)}>
-                      {request.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))
+              filteredHistory.map((request) => {
+                const student = studentsInCharge.find(
+                  (s) => s.id === request.student_id
+                );
+                return (
+                  <TableRow key={request.id}>
+                    <TableCell className="font-medium">
+                      <div>{student ? `${student.first_name} ${student.last_name || ''}`.trim() : "N/A"}</div>
+                      <div className="text-xs text-muted-foreground">
+                        [{student?.register_number || "N/A"}]
+                      </div>
+                    </TableCell>
+                    <TableCell>{formatDateToIndian(request.date)}</TableCell>
+                    <TableCell>{request.type}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(request.status)}>
+                        {request.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={4} className="text-center">

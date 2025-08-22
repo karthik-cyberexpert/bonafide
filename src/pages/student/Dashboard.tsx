@@ -8,20 +8,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { dummyStudents } from "@/data/dummyData";
-import { dummyRequests } from "@/data/dummyRequests";
-import { dummyTemplates } from "@/data/dummyTemplates";
-import { BonafideRequest } from "@/lib/types";
+import { fetchRequests, fetchStudentDetails, fetchTemplates } from "@/data/appData";
+import { BonafideRequest, StudentDetails, CertificateTemplate } from "@/lib/types";
 import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
 import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { CheckCircle, Download, FileText, Clock } from "lucide-react";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { useEffect, useState } from "react";
 
 const StudentDashboard = () => {
-  const studentId = "S12345";
+  const { user } = useSession();
+  const [studentRequests, setStudentRequests] = useState<BonafideRequest[]>([]);
+  const [studentDetails, setStudentDetails] = useState<StudentDetails | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const studentRequests = dummyRequests.filter(
-    (req) => req.studentId === studentId
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      if (user?.id) {
+        setLoading(true);
+        const allRequests = await fetchRequests();
+        const filteredRequests = allRequests.filter((req) => req.student_id === user.id);
+        setStudentRequests(filteredRequests);
+
+        const details = await fetchStudentDetails(user.id);
+        setStudentDetails(details);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [user]);
 
   const totalRequests = studentRequests.length;
   const approvedRequests = studentRequests.filter(
@@ -34,15 +49,35 @@ const StudentDashboard = () => {
   )[0];
 
   const handleDownload = async (request: BonafideRequest) => {
-    const student = dummyStudents.find(
-      (s) => s.registerNumber === request.studentId
-    );
-    const template = dummyTemplates.find((t) => t.id === request.templateId);
+    if (!studentDetails) {
+      console.error("Student details not available for download.");
+      return;
+    }
+    const templates: CertificateTemplate[] = await fetchTemplates();
+    const template: CertificateTemplate | undefined = templates.find((t) => t.id === request.template_id);
 
-    const htmlContent = getCertificateHtml(request, student, template, true);
-    const fileName = `Bonafide-${request.studentId}.pdf`;
+    if (!template) {
+      console.error("Could not find template for download.");
+      return;
+    }
+
+    const htmlContent = getCertificateHtml(request, studentDetails, template, true);
+    const fileName = `Bonafide-${studentDetails.register_number}.pdf`;
     await generatePdf(htmlContent, fileName);
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Dashboard...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch your dashboard data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">

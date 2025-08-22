@@ -15,11 +15,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  batches as appBatches,
-  tutors as appTutors,
-  departments as appDepartments,
-} from "@/data/appData";
 import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -46,24 +41,60 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { showSuccess, showError } from "@/utils/toast";
-import { Batch } from "@/lib/types";
+import { Batch, Department, Profile } from "@/lib/types";
 import {
   calculateCurrentSemesterForBatch,
   getSemesterDateRange,
   formatDateToIndian,
 } from "@/lib/utils";
+import { createBatch, fetchBatches, fetchDepartments, fetchProfiles, updateBatch } from "@/data/appData";
+import { supabase } from "@/integrations/supabase/client";
 
 const BatchManagement = () => {
-  const [batches, setBatches] = useState<Batch[]>(appBatches);
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [tutors, setTutors] = useState<Profile[]>([]);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isSemesterDialogOpen, setIsSemesterDialogOpen] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
   const [newBatch, setNewBatch] = useState<Partial<Batch>>({
     name: "",
-    totalSections: 1,
-    departmentId: "", // New field for adding batch
+    total_sections: 1,
+    department_id: "",
   });
+  const [loading, setLoading] = useState(true);
+
+  const fetchAllData = async () => {
+    setLoading(true);
+    const fetchedBatches = await fetchBatches();
+    const fetchedDepartments = await fetchDepartments();
+    const fetchedTutors = await fetchProfiles('tutor');
+
+    // Process batches to update semester info if needed
+    const updatedBatches = fetchedBatches.map((batch) => {
+      const fullBatchName = batch.section
+        ? `${batch.name} ${batch.section}`
+        : batch.name;
+      const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
+      const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
+      return {
+        ...batch,
+        current_semester: currentSemester,
+        semester_from_date: from,
+        semester_to_date: to,
+      };
+    });
+
+    setBatches(updatedBatches);
+    setDepartments(fetchedDepartments);
+    setTutors(fetchedTutors);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
 
   const groupedBatches = useMemo(() => {
     return batches.reduce(
@@ -83,28 +114,10 @@ const BatchManagement = () => {
   >(() => {
     const initialState: Record<string, string> = {};
     for (const batchName in groupedBatches) {
-      initialState[batchName] = groupedBatches[batchName][0].id;
+      initialState[batchName] = groupedBatches[batchName][0]?.id || '';
     }
     return initialState;
   });
-
-  useEffect(() => {
-    const updatedBatches = batches.map((batch) => {
-      const fullBatchName = batch.section
-        ? `${batch.name} ${batch.section}`
-        : batch.name;
-      const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
-      const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
-      return {
-        ...batch,
-        currentSemester,
-        semesterFromDate: from,
-        semesterToDate: to,
-      };
-    });
-    setBatches(updatedBatches);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const handleSectionChange = (batchName: string, newBatchId: string) => {
     setSelectedSections((prev) => ({
@@ -113,17 +126,19 @@ const BatchManagement = () => {
     }));
   };
 
-  const handleToggleStatus = (batchId: string) => {
-    setBatches((prevBatches) =>
-      prevBatches.map((batch) => {
-        if (batch.id === batchId) {
-          const newStatus = batch.status === "Active" ? "Inactive" : "Active";
-          showSuccess(`Batch "${batch.name}" marked as ${newStatus}.`);
-          return { ...batch, status: newStatus };
-        }
-        return batch;
-      })
-    );
+  const handleToggleStatus = async (batchId: string) => {
+    const batchToUpdate = batches.find((b) => b.id === batchId);
+    if (!batchToUpdate) return;
+
+    const newStatus = batchToUpdate.status === "Active" ? "Inactive" : "Active";
+    const updated = await updateBatch(batchId, { status: newStatus });
+
+    if (updated) {
+      showSuccess(`Batch "${batchToUpdate.name}" marked as ${newStatus}.`);
+      fetchAllData(); // Refresh data
+    } else {
+      showError("Failed to update batch status.");
+    }
   };
 
   const handleOpenEditDialog = (batch: Batch) => {
@@ -136,138 +151,153 @@ const BatchManagement = () => {
     setIsSemesterDialogOpen(true);
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     if (!editingBatch) return;
 
     const originalBatch = batches.find((b) => b.id === editingBatch.id);
     if (!originalBatch) return;
 
-    const oldTotalSections = originalBatch.totalSections || 1;
-    const newTotalSections = editingBatch.totalSections || 1;
+    const oldTotalSections = originalBatch.total_sections || 1;
+    const newTotalSections = editingBatch.total_sections || 1;
 
-    let updatedBatches = batches.map((b) =>
-      b.id === editingBatch.id
-        ? { ...editingBatch, tutor: editingBatch.tutor || "Unassigned" }
-        : b
-    );
+    // Update the main batch entry
+    const updatedMainBatch = await updateBatch(editingBatch.id, {
+      total_sections: newTotalSections,
+    });
+
+    if (!updatedMainBatch) {
+      showError("Failed to update batch details.");
+      return;
+    }
 
     if (oldTotalSections !== newTotalSections) {
       const batchName = editingBatch.name;
-      const departmentId = editingBatch.departmentId; // Use departmentId from editingBatch
-      const existingSections = updatedBatches
-        .filter((b) => b.name === batchName && b.departmentId === departmentId)
-        .sort((a, b) => (a.section || "").localeCompare(b.section || ""));
-
-      updatedBatches = updatedBatches.map((b) =>
-        b.name === batchName && b.departmentId === departmentId
-          ? { ...b, totalSections: newTotalSections }
-          : b
-      );
-
+      const departmentId = editingBatch.department_id;
       const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
       if (newTotalSections > oldTotalSections) {
         for (let i = oldTotalSections; i < newTotalSections; i++) {
           const sectionName = alphabet[i];
           const fullBatchName = `${batchName} ${sectionName}`;
-          const currentSemester =
-            calculateCurrentSemesterForBatch(fullBatchName);
-          const { from, to } = getSemesterDateRange(
-            fullBatchName,
-            currentSemester
-          );
-          const newSection: Batch = {
-            id: `B${Date.now()}${i}`,
+          const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
+          const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
+          const newSection: Omit<Batch, 'id' | 'created_at'> = {
             name: batchName,
             section: sectionName,
-            tutor: "Unassigned",
-            totalSections: newTotalSections,
-            studentCount: 0,
+            tutor_id: null, // Unassigned by default
+            total_sections: newTotalSections,
+            student_count: 0,
             status: "Active",
-            currentSemester,
-            semesterFromDate: from,
-            semesterToDate: to,
-            departmentId: departmentId, // Assign departmentId
+            current_semester: currentSemester,
+            semester_from_date: from,
+            semester_to_date: to,
+            department_id: departmentId,
           };
-          updatedBatches.push(newSection);
+          await createBatch(newSection);
         }
       } else if (newTotalSections < oldTotalSections) {
-        const sectionsToRemove = existingSections.slice(newTotalSections);
-        const idsToRemove = new Set(sectionsToRemove.map((s) => s.id));
-        updatedBatches = updatedBatches.filter((b) => !idsToRemove.has(b.id));
+        // Remove excess sections
+        const sectionsToRemove = batches.filter(b =>
+          b.name === batchName &&
+          b.department_id === departmentId &&
+          b.section &&
+          alphabet.indexOf(b.section) >= newTotalSections
+        );
+        for (const section of sectionsToRemove) {
+          await supabase.from('batches').delete().eq('id', section.id);
+        }
       }
     }
 
-    appBatches.length = 0;
-    appBatches.push(...updatedBatches);
-    setBatches(updatedBatches);
     showSuccess(`Batch "${editingBatch.name}" updated successfully.`);
     setIsEditDialogOpen(false);
     setEditingBatch(null);
+    fetchAllData(); // Refresh all data
   };
 
-  const handleSaveSemesterChanges = () => {
+  const handleSaveSemesterChanges = async () => {
     if (!editingBatch) return;
-    const updatedBatches = batches.map((b) =>
-      b.id === editingBatch.id ? editingBatch : b
-    );
-    appBatches.length = 0;
-    appBatches.push(...updatedBatches);
-    setBatches(updatedBatches);
-    showSuccess(
-      `Semester details for "${editingBatch.name} - ${
-        editingBatch.section || ""
-      }" updated successfully.`
-    );
-    setIsSemesterDialogOpen(false);
-    setEditingBatch(null);
+
+    const updated = await updateBatch(editingBatch.id, {
+      tutor_id: editingBatch.tutor_id,
+      current_semester: editingBatch.current_semester,
+      semester_from_date: editingBatch.semester_from_date,
+      semester_to_date: editingBatch.semester_to_date,
+    });
+
+    if (updated) {
+      showSuccess(
+        `Semester details for "${editingBatch.name} - ${
+          editingBatch.section || ""
+        }" updated successfully.`
+      );
+      setIsSemesterDialogOpen(false);
+      setEditingBatch(null);
+      fetchAllData(); // Refresh data
+    } else {
+      showError("Failed to update semester details.");
+    }
   };
 
-  const handleAddNewBatch = () => {
-    const { name: batchName, totalSections, departmentId } = newBatch;
+  const handleAddNewBatch = async () => {
+    const { name: batchName, total_sections, department_id } = newBatch;
 
-    if (!batchName || !departmentId) {
+    if (!batchName || !department_id) {
       showError("Batch name and Department are required.");
       return;
     }
 
-    const newSections: Batch[] = [];
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const newSectionsToCreate: Omit<Batch, 'id' | 'created_at'>[] = [];
 
-    for (let i = 0; i < (totalSections || 1); i++) {
-      const sectionName = (totalSections || 1) > 1 ? alphabet[i] : undefined;
+    for (let i = 0; i < (total_sections || 1); i++) {
+      const sectionName = (total_sections || 1) > 1 ? alphabet[i] : undefined;
       const fullBatchName = sectionName
         ? `${batchName} ${sectionName}`
         : batchName;
       const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
       const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
 
-      const finalNewBatch: Batch = {
-        id: `B${Date.now()}${i}`,
+      newSectionsToCreate.push({
         name: batchName,
         section: sectionName,
-        tutor: "Unassigned",
-        totalSections: totalSections || 1,
-        studentCount: 0,
+        tutor_id: null, // Unassigned by default
+        total_sections: total_sections || 1,
+        student_count: 0,
         status: "Active",
-        currentSemester,
-        semesterFromDate: from,
-        semesterToDate: to,
-        departmentId: departmentId,
-      };
-      newSections.push(finalNewBatch);
+        current_semester: currentSemester,
+        semester_from_date: from,
+        semester_to_date: to,
+        department_id: department_id,
+      });
     }
 
-    const updatedBatches = [...batches, ...newSections];
-    appBatches.length = 0;
-    appBatches.push(...updatedBatches);
-    setBatches(updatedBatches);
-    showSuccess(
-      `Batch "${batchName}" with ${totalSections} section(s) created successfully.`
-    );
-    setIsAddDialogOpen(false);
-    setNewBatch({ name: "", totalSections: 1, departmentId: "" });
+    const { error } = await supabase.from('batches').insert(newSectionsToCreate);
+
+    if (error) {
+      showError("Failed to create new batch: " + error.message);
+    } else {
+      showSuccess(
+        `Batch "${batchName}" with ${total_sections} section(s) created successfully.`
+      );
+      setIsAddDialogOpen(false);
+      setNewBatch({ name: "", total_sections: 1, department_id: "" });
+      fetchAllData(); // Refresh all data
+    }
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Batches...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch batch data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -286,9 +316,9 @@ const BatchManagement = () => {
                 <div className="grid gap-2">
                   <Label htmlFor="new-batch-department">Department</Label>
                   <Select
-                    value={newBatch.departmentId}
+                    value={newBatch.department_id}
                     onValueChange={(value) =>
-                      setNewBatch({ ...newBatch, departmentId: value })
+                      setNewBatch({ ...newBatch, department_id: value })
                     }
                     required
                   >
@@ -296,7 +326,7 @@ const BatchManagement = () => {
                       <SelectValue placeholder="Select Department" />
                     </SelectTrigger>
                     <SelectContent>
-                      {appDepartments.map((dept) => (
+                      {departments.map((dept) => (
                         <SelectItem key={dept.id} value={dept.id}>
                           {dept.name}
                         </SelectItem>
@@ -323,11 +353,11 @@ const BatchManagement = () => {
                     id="new-total-sections"
                     type="number"
                     min="1"
-                    value={newBatch.totalSections}
+                    value={newBatch.total_sections}
                     onChange={(e) =>
                       setNewBatch({
                         ...newBatch,
-                        totalSections: Number(e.target.value),
+                        total_sections: Number(e.target.value),
                       })
                     }
                   />
@@ -346,7 +376,7 @@ const BatchManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Department</TableHead> {/* Added Department column */}
+                <TableHead>Department</TableHead>
                 <TableHead>Batch</TableHead>
                 <TableHead>Section</TableHead>
                 <TableHead>Total Sections</TableHead>
@@ -368,14 +398,14 @@ const BatchManagement = () => {
 
                 if (!selectedBatchData) return null;
 
-                const department = appDepartments.find(
-                  (d) => d.id === selectedBatchData.departmentId
+                const department = departments.find(
+                  (d) => d.id === selectedBatchData.department_id
                 );
+                const assignedTutor = tutors.find(t => t.id === selectedBatchData.tutor_id);
 
                 return (
                   <TableRow key={batchName}>
-                    <TableCell>{department?.name || "N/A"}</TableCell>{" "}
-                    {/* Display Department */}
+                    <TableCell>{department?.name || "N/A"}</TableCell>
                     <TableCell className="font-medium">{batchName}</TableCell>
                     <TableCell>
                       {sections.length > 1 ? (
@@ -403,15 +433,15 @@ const BatchManagement = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      {selectedBatchData.totalSections || 1}
+                      {selectedBatchData.total_sections || 1}
                     </TableCell>
-                    <TableCell>{selectedBatchData.tutor}</TableCell>
-                    <TableCell>{selectedBatchData.currentSemester}</TableCell>
+                    <TableCell>{assignedTutor ? `${assignedTutor.first_name} ${assignedTutor.last_name || ''}`.trim() : "Unassigned"}</TableCell>
+                    <TableCell>{selectedBatchData.current_semester}</TableCell>
                     <TableCell>
-                      {formatDateToIndian(selectedBatchData.semesterFromDate)}
+                      {formatDateToIndian(selectedBatchData.semester_from_date)}
                     </TableCell>
                     <TableCell>
-                      {formatDateToIndian(selectedBatchData.semesterToDate)}
+                      {formatDateToIndian(selectedBatchData.semester_to_date)}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -479,7 +509,7 @@ const BatchManagement = () => {
               <Input
                 id="edit-department"
                 value={
-                  appDepartments.find((d) => d.id === editingBatch?.departmentId)
+                  departments.find((d) => d.id === editingBatch?.department_id)
                     ?.name || "N/A"
                 }
                 disabled
@@ -491,11 +521,11 @@ const BatchManagement = () => {
                 id="total-sections"
                 type="number"
                 min="1"
-                value={editingBatch?.totalSections || ""}
+                value={editingBatch?.total_sections || ""}
                 onChange={(e) =>
                   setEditingBatch((prev) =>
                     prev
-                      ? { ...prev, totalSections: Number(e.target.value) }
+                      ? { ...prev, total_sections: Number(e.target.value) }
                       : null
                   )
                 }
@@ -525,10 +555,10 @@ const BatchManagement = () => {
             <div className="grid gap-2">
               <Label htmlFor="edit-tutor">Assign Tutor</Label>
               <Select
-                value={editingBatch?.tutor}
+                value={editingBatch?.tutor_id || "Unassigned"}
                 onValueChange={(value) =>
                   setEditingBatch((prev) =>
-                    prev ? { ...prev, tutor: value } : null
+                    prev ? { ...prev, tutor_id: value === "Unassigned" ? null : value } : null
                   )
                 }
               >
@@ -537,17 +567,14 @@ const BatchManagement = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Unassigned">Unassigned</SelectItem>
-                  {appTutors
+                  {tutors
                     .filter(
                       (tutor) =>
-                        tutor.department ===
-                        appDepartments.find(
-                          (d) => d.id === editingBatch?.departmentId
-                        )?.name
+                        tutor.department_id === editingBatch?.department_id
                     )
                     .map((tutor) => (
-                      <SelectItem key={tutor.username} value={tutor.name}>
-                        {tutor.name}
+                      <SelectItem key={tutor.id} value={tutor.id}>
+                        {`${tutor.first_name} ${tutor.last_name || ''}`.trim()}
                       </SelectItem>
                     ))}
                 </SelectContent>
@@ -556,10 +583,10 @@ const BatchManagement = () => {
             <div className="grid gap-2">
               <Label htmlFor="current-semester">Current Semester</Label>
               <Select
-                value={String(editingBatch?.currentSemester || "")}
+                value={String(editingBatch?.current_semester || "")}
                 onValueChange={(value) =>
                   setEditingBatch((prev) =>
-                    prev ? { ...prev, currentSemester: Number(value) } : null
+                    prev ? { ...prev, current_semester: Number(value) } : null
                   )
                 }
               >
@@ -580,10 +607,10 @@ const BatchManagement = () => {
               <Input
                 id="from-date"
                 type="date"
-                value={editingBatch?.semesterFromDate || ""}
+                value={editingBatch?.semester_from_date || ""}
                 onChange={(e) =>
                   setEditingBatch((prev) =>
-                    prev ? { ...prev, semesterFromDate: e.target.value } : null
+                    prev ? { ...prev, semester_from_date: e.target.value } : null
                   )
                 }
               />
@@ -593,10 +620,10 @@ const BatchManagement = () => {
               <Input
                 id="to-date"
                 type="date"
-                value={editingBatch?.semesterToDate || ""}
+                value={editingBatch?.semester_to_date || ""}
                 onChange={(e) =>
                   setEditingBatch((prev) =>
-                    prev ? { ...prev, semesterToDate: e.target.value } : null
+                    prev ? { ...prev, semester_to_date: e.target.value } : null
                   )
                 }
               />

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -51,105 +51,130 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  tutors as appTutors,
-  batches as appBatches,
-  departments as appDepartments,
+  fetchProfiles,
+  fetchBatches,
+  fetchDepartments,
+  createTutor,
+  updateTutor,
+  deleteTutor,
 } from "@/data/appData";
-import { TutorProfile } from "@/lib/types";
-import { showSuccess } from "@/utils/toast";
+import { Profile, Department, Batch } from "@/lib/types";
+import { showSuccess, showError } from "@/utils/toast";
 
 const ManageTutors = () => {
-  const [tutors, setTutors] = useState<TutorProfile[]>(appTutors);
+  const [tutors, setTutors] = useState<Profile[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [batches, setBatches] = useState<Batch[]>([]);
   const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
-  const [editingTutor, setEditingTutor] = useState<TutorProfile | null>(null);
-  const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [selectedBatchName, setSelectedBatchName] = useState("");
-  const [selectedSection, setSelectedSection] = useState("");
+  const [editingTutor, setEditingTutor] = useState<Profile | null>(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState("");
+  const [selectedBatchId, setSelectedBatchId] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  const fetchAllData = async () => {
+    setLoading(true);
+    const fetchedTutors = await fetchProfiles('tutor');
+    const fetchedDepartments = await fetchDepartments();
+    const fetchedBatches = await fetchBatches();
+
+    setTutors(fetchedTutors);
+    setDepartments(fetchedDepartments);
+    setBatches(fetchedBatches);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
 
   const uniqueBatchNames = useMemo(() => {
-    if (!selectedDepartment) return [];
-    const departmentBatches = appBatches.filter(
-      (b) =>
-        appDepartments.find((d) => d.id === b.departmentId)?.name ===
-        selectedDepartment
+    if (!selectedDepartmentId) return [];
+    const departmentBatches = batches.filter(
+      (b) => b.department_id === selectedDepartmentId
     );
     const names = departmentBatches.map((b) => b.name);
     return [...new Set(names)];
-  }, [selectedDepartment]);
+  }, [selectedDepartmentId, batches]);
 
   const availableSections = useMemo(() => {
-    if (!selectedBatchName || !selectedDepartment) return [];
-    return appBatches
-      .filter(
-        (b) =>
-          b.name === selectedBatchName &&
-          b.section &&
-          appDepartments.find((d) => d.id === b.departmentId)?.name ===
-            selectedDepartment
-      )
+    if (!selectedBatchId) return [];
+    return batches
+      .filter((b) => b.id === selectedBatchId && b.section)
       .map((b) => b.section!);
-  }, [selectedBatchName, selectedDepartment]);
+  }, [selectedBatchId, batches]);
 
-  const openEditDialog = (tutor: TutorProfile) => {
+  const openEditDialog = (tutor: Profile) => {
     setEditingTutor(tutor);
-    setSelectedDepartment(tutor.department);
-    const [batchName = "", section = ""] = tutor.batchAssigned.split(" ");
-    setSelectedBatchName(batchName);
-    setSelectedSection(section);
+    setSelectedDepartmentId(tutor.department_id || "");
+    setSelectedBatchId(tutor.batch_id || "");
     setIsAddEditDialogOpen(true);
   };
 
   const openAddDialog = () => {
     setEditingTutor(null);
-    setSelectedDepartment("");
-    setSelectedBatchName("");
-    setSelectedSection("");
+    setSelectedDepartmentId("");
+    setSelectedBatchId("");
     setIsAddEditDialogOpen(true);
   };
 
-  const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const batchAssigned = selectedSection
-      ? `${selectedBatchName} ${selectedSection}`
-      : selectedBatchName;
 
-    const updatedTutor = {
-      name: formData.get("name") as string,
-      username:
-        editingTutor?.username ||
-        (formData.get("name") as string).toLowerCase().replace(" ", "_"),
-      department: selectedDepartment, // Use selected department
-      batchAssigned,
+    const tutorData: Omit<Profile, 'id' | 'created_at' | 'updated_at' | 'role'> = {
+      first_name: formData.get("first_name") as string,
+      last_name: formData.get("last_name") as string,
+      username: formData.get("username") as string,
       email: formData.get("email") as string,
-      phoneNumber: formData.get("phoneNumber") as string,
+      phone_number: formData.get("phone_number") as string,
+      department_id: selectedDepartmentId,
+      batch_id: selectedBatchId || null, // Can be null if no batch assigned
     };
 
     if (editingTutor) {
-      const updatedTutors = appTutors.map((t) =>
-        t.username === editingTutor.username ? updatedTutor : t
-      );
-      appTutors.length = 0;
-      appTutors.push(...updatedTutors);
-      setTutors(updatedTutors);
-      showSuccess("Tutor details updated successfully.");
+      const updated = await updateTutor(editingTutor.id, tutorData, selectedBatchId || undefined);
+      if (updated) {
+        showSuccess("Tutor details updated successfully.");
+        fetchAllData();
+      } else {
+        showError("Failed to update tutor details.");
+      }
     } else {
-      appTutors.push(updatedTutor);
-      setTutors([...appTutors]);
-      showSuccess("New tutor added successfully.");
+      const created = await createTutor({ ...tutorData, role: 'tutor' }, selectedBatchId || undefined);
+      if (created) {
+        showSuccess("New tutor added successfully.");
+        fetchAllData();
+      } else {
+        showError("Failed to add new tutor.");
+      }
     }
 
     setIsAddEditDialogOpen(false);
     setEditingTutor(null);
   };
 
-  const handleDelete = (username: string) => {
-    const updatedTutors = appTutors.filter((t) => t.username !== username);
-    appTutors.length = 0;
-    appTutors.push(...updatedTutors);
-    setTutors(updatedTutors);
-    showSuccess("Tutor removed successfully.");
+  const handleDelete = async (tutorId: string, tutorName: string) => {
+    const deleted = await deleteTutor(tutorId);
+    if (deleted) {
+      showSuccess(`Tutor "${tutorName}" removed successfully.`);
+      fetchAllData();
+    } else {
+      showError("Failed to remove tutor.");
+    }
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Tutors...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch tutor data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -173,78 +198,74 @@ const ManageTutors = () => {
             </DialogHeader>
             <form onSubmit={handleSave}>
               <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="first_name">First Name</Label>
+                    <Input
+                      id="first_name"
+                      name="first_name"
+                      defaultValue={editingTutor?.first_name || ""}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="last_name">Last Name</Label>
+                    <Input
+                      id="last_name"
+                      name="last_name"
+                      defaultValue={editingTutor?.last_name || ""}
+                    />
+                  </div>
+                </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="username">Username</Label>
                   <Input
-                    id="name"
-                    name="name"
-                    defaultValue={editingTutor?.name}
+                    id="username"
+                    name="username"
+                    defaultValue={editingTutor?.username || ""}
                     required
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="department">Department</Label>
                   <Select
-                    value={selectedDepartment}
-                    onValueChange={setSelectedDepartment}
+                    value={selectedDepartmentId}
+                    onValueChange={setSelectedDepartmentId}
                     required
                   >
                     <SelectTrigger id="department">
                       <SelectValue placeholder="Select Department" />
                     </SelectTrigger>
                     <SelectContent>
-                      {appDepartments.map((dept) => (
-                        <SelectItem key={dept.id} value={dept.name}>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.id}>
                           {dept.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="batchName">Batch</Label>
-                    <Select
-                      value={selectedBatchName}
-                      onValueChange={(value) => {
-                        setSelectedBatchName(value);
-                        setSelectedSection("");
-                      }}
-                      disabled={!selectedDepartment}
-                    >
-                      <SelectTrigger id="batchName">
-                        <SelectValue placeholder="Select Batch" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {uniqueBatchNames.map((name) => (
-                          <SelectItem key={name} value={name}>
-                            {name}
+                <div className="grid gap-2">
+                  <Label htmlFor="batch">Assigned Batch (Optional)</Label>
+                  <Select
+                    value={selectedBatchId}
+                    onValueChange={setSelectedBatchId}
+                    disabled={!selectedDepartmentId}
+                  >
+                    <SelectTrigger id="batch">
+                      <SelectValue placeholder="Select Batch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None</SelectItem>
+                      {batches
+                        .filter(b => b.department_id === selectedDepartmentId)
+                        .map((batch) => (
+                          <SelectItem key={batch.id} value={batch.id}>
+                            {`${batch.name} ${batch.section || ''}`.trim()}
                           </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="section">Section</Label>
-                    <Select
-                      value={selectedSection}
-                      onValueChange={setSelectedSection}
-                      disabled={
-                        !selectedBatchName || availableSections.length === 0
-                      }
-                    >
-                      <SelectTrigger id="section">
-                        <SelectValue placeholder="Select Section" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableSections.map((section) => (
-                          <SelectItem key={section} value={section}>
-                            {section}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
@@ -252,16 +273,16 @@ const ManageTutors = () => {
                     id="email"
                     name="email"
                     type="email"
-                    defaultValue={editingTutor?.email}
+                    defaultValue={editingTutor?.email || ""}
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="phoneNumber">Phone Number</Label>
+                  <Label htmlFor="phone_number">Phone Number</Label>
                   <Input
-                    id="phoneNumber"
-                    name="phoneNumber"
-                    defaultValue={editingTutor?.phoneNumber}
+                    id="phone_number"
+                    name="phone_number"
+                    defaultValue={editingTutor?.phone_number || ""}
                     required
                   />
                 </div>
@@ -291,54 +312,68 @@ const ManageTutors = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {tutors.map((tutor) => (
-              <TableRow key={tutor.username}>
-                <TableCell className="font-medium">{tutor.name}</TableCell>
-                <TableCell>{tutor.department}</TableCell>
-                <TableCell>{tutor.batchAssigned}</TableCell>
-                <TableCell>{tutor.email}</TableCell>
-                <TableCell>{tutor.phoneNumber}</TableCell>
-                <TableCell className="text-right">
-                  <AlertDialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => openEditDialog(tutor)}>
-                          Edit Details
-                        </DropdownMenuItem>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem className="text-destructive">
-                            Remove Tutor
-                          </DropdownMenuItem>
-                        </AlertDialogTrigger>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          remove {tutor.name} from the records.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(tutor.username)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Confirm
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+            {tutors.length > 0 ? (
+              tutors.map((tutor) => {
+                const departmentName = departments.find(d => d.id === tutor.department_id)?.name || "N/A";
+                const batchAssignedName = batches.find(b => b.id === tutor.batch_id);
+                const fullBatchName = batchAssignedName ? `${batchAssignedName.name} ${batchAssignedName.section || ''}`.trim() : "N/A";
+
+                return (
+                  <TableRow key={tutor.id}>
+                    <TableCell className="font-medium">{`${tutor.first_name} ${tutor.last_name || ''}`.trim()}</TableCell>
+                    <TableCell>{departmentName}</TableCell>
+                    <TableCell>{fullBatchName}</TableCell>
+                    <TableCell>{tutor.email}</TableCell>
+                    <TableCell>{tutor.phone_number}</TableCell>
+                    <TableCell className="text-right">
+                      <AlertDialog>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => openEditDialog(tutor)}>
+                              Edit Details
+                            </DropdownMenuItem>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem className="text-destructive">
+                                Remove Tutor
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently
+                              remove {`${tutor.first_name} ${tutor.last_name || ''}`.trim()} from the records.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(tutor.id, `${tutor.first_name} ${tutor.last_name || ''}`.trim())}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Confirm
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  No tutors found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

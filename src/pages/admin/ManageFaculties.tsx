@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -50,55 +50,87 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { hods as appHods, departments as appDepartments } from "@/data/appData";
-import { HodProfile } from "@/lib/types";
-import { showSuccess } from "@/utils/toast";
+import { fetchProfiles, fetchDepartments, createHod, updateHod, deleteHod } from "@/data/appData";
+import { Profile, Department } from "@/lib/types";
+import { showSuccess, showError } from "@/utils/toast";
 
 const ManageFaculties = () => {
-  const [faculties, setFaculties] = useState<HodProfile[]>(appHods);
+  const [faculties, setFaculties] = useState<Profile[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
   const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
-  const [editingFaculty, setEditingFaculty] = useState<HodProfile | null>(null);
+  const [editingFaculty, setEditingFaculty] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
+  const fetchAllData = async () => {
+    setLoading(true);
+    const fetchedFaculties = await fetchProfiles('hod');
+    const fetchedDepartments = await fetchDepartments();
+
+    setFaculties(fetchedFaculties);
+    setDepartments(fetchedDepartments);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchAllData();
+  }, []);
+
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const updatedFaculty = {
-      name: formData.get("name") as string,
-      username:
-        editingFaculty?.username ||
-        (formData.get("name") as string).toLowerCase().replace(" ", "_"),
-      department: formData.get("department") as string,
+    const facultyData: Omit<Profile, 'id' | 'created_at' | 'updated_at' | 'role'> = {
+      first_name: formData.get("first_name") as string,
+      last_name: formData.get("last_name") as string,
+      username: formData.get("username") as string,
+      department_id: formData.get("department_id") as string,
       email: formData.get("email") as string,
-      mobileNumber: formData.get("mobileNumber") as string,
+      phone_number: formData.get("phone_number") as string,
     };
 
     if (editingFaculty) {
-      // Edit existing faculty
-      const updatedFaculties = appHods.map((f) =>
-        f.username === editingFaculty.username ? updatedFaculty : f
-      );
-      appHods.length = 0;
-      appHods.push(...updatedFaculties);
-      setFaculties(updatedFaculties);
-      showSuccess("Faculty details updated successfully.");
+      const updated = await updateHod(editingFaculty.id, facultyData);
+      if (updated) {
+        showSuccess("Faculty details updated successfully.");
+        fetchAllData();
+      } else {
+        showError("Failed to update faculty details.");
+      }
     } else {
-      // Add new faculty
-      appHods.push(updatedFaculty);
-      setFaculties([...appHods]);
-      showSuccess("New faculty added successfully.");
+      const created = await createHod({ ...facultyData, role: 'hod' });
+      if (created) {
+        showSuccess("New faculty added successfully.");
+        fetchAllData();
+      } else {
+        showError("Failed to add new faculty.");
+      }
     }
 
     setIsAddEditDialogOpen(false);
     setEditingFaculty(null);
   };
 
-  const handleDelete = (username: string) => {
-    const updatedFaculties = appHods.filter((f) => f.username !== username);
-    appHods.length = 0;
-    appHods.push(...updatedFaculties);
-    setFaculties(updatedFaculties);
-    showSuccess("Faculty removed successfully.");
+  const handleDelete = async (facultyId: string, facultyName: string) => {
+    const deleted = await deleteHod(facultyId);
+    if (deleted) {
+      showSuccess(`Faculty "${facultyName}" removed successfully.`);
+      fetchAllData();
+    } else {
+      showError("Failed to remove faculty.");
+    }
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Faculties...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch faculty data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -122,28 +154,47 @@ const ManageFaculties = () => {
             </DialogHeader>
             <form onSubmit={handleSave}>
               <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="first_name">First Name</Label>
+                    <Input
+                      id="first_name"
+                      name="first_name"
+                      defaultValue={editingFaculty?.first_name || ""}
+                      required
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="last_name">Last Name</Label>
+                    <Input
+                      id="last_name"
+                      name="last_name"
+                      defaultValue={editingFaculty?.last_name || ""}
+                    />
+                  </div>
+                </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="username">Username</Label>
                   <Input
-                    id="name"
-                    name="name"
-                    defaultValue={editingFaculty?.name}
+                    id="username"
+                    name="username"
+                    defaultValue={editingFaculty?.username || ""}
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="department">Department</Label>
+                  <Label htmlFor="department_id">Department</Label>
                   <Select
-                    name="department"
-                    defaultValue={editingFaculty?.department}
+                    name="department_id"
+                    defaultValue={editingFaculty?.department_id || ""}
                     required
                   >
-                    <SelectTrigger id="department">
+                    <SelectTrigger id="department_id">
                       <SelectValue placeholder="Select Department" />
                     </SelectTrigger>
                     <SelectContent>
-                      {appDepartments.map((dept) => (
-                        <SelectItem key={dept.id} value={dept.name}>
+                      {departments.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.id}>
                           {dept.name}
                         </SelectItem>
                       ))}
@@ -156,16 +207,16 @@ const ManageFaculties = () => {
                     id="email"
                     name="email"
                     type="email"
-                    defaultValue={editingFaculty?.email}
+                    defaultValue={editingFaculty?.email || ""}
                     required
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="mobileNumber">Mobile Number</Label>
+                  <Label htmlFor="phone_number">Phone Number</Label>
                   <Input
-                    id="mobileNumber"
-                    name="mobileNumber"
-                    defaultValue={editingFaculty?.mobileNumber}
+                    id="phone_number"
+                    name="phone_number"
+                    defaultValue={editingFaculty?.phone_number || ""}
                     required
                   />
                 </div>
@@ -194,58 +245,69 @@ const ManageFaculties = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {faculties.map((faculty) => (
-              <TableRow key={faculty.username}>
-                <TableCell className="font-medium">{faculty.name}</TableCell>
-                <TableCell>{faculty.department}</TableCell>
-                <TableCell>{faculty.email}</TableCell>
-                <TableCell>{faculty.mobileNumber}</TableCell>
-                <TableCell className="text-right">
-                  <AlertDialog>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setEditingFaculty(faculty);
-                            setIsAddEditDialogOpen(true);
-                          }}
-                        >
-                          Edit Details
-                        </DropdownMenuItem>
-                        <AlertDialogTrigger asChild>
-                          <DropdownMenuItem className="text-destructive">
-                            Remove HOD
-                          </DropdownMenuItem>
-                        </AlertDialogTrigger>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently
-                          remove {faculty.name} from the records.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => handleDelete(faculty.username)}
-                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                        >
-                          Confirm
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+            {faculties.length > 0 ? (
+              faculties.map((faculty) => {
+                const departmentName = departments.find(d => d.id === faculty.department_id)?.name || "N/A";
+                return (
+                  <TableRow key={faculty.id}>
+                    <TableCell className="font-medium">{`${faculty.first_name} ${faculty.last_name || ''}`.trim()}</TableCell>
+                    <TableCell>{departmentName}</TableCell>
+                    <TableCell>{faculty.email}</TableCell>
+                    <TableCell>{faculty.phone_number}</TableCell>
+                    <TableCell className="text-right">
+                      <AlertDialog>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setEditingFaculty(faculty);
+                                setIsAddEditDialogOpen(true);
+                              }}
+                            >
+                              Edit Details
+                            </DropdownMenuItem>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem className="text-destructive">
+                                Remove HOD
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. This will permanently
+                              remove {`${faculty.first_name} ${faculty.last_name || ''}`.trim()} from the records.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(faculty.id, `${faculty.first_name} ${faculty.last_name || ''}`.trim())}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Confirm
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  No HODs found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>

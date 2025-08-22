@@ -1,22 +1,94 @@
 import DashboardCard from "@/components/shared/DashboardCard";
 import BatchRequestChart from "@/components/shared/BatchRequestChart";
-import { dummyBatches, dummyStudents } from "@/data/dummyData";
-import { dummyRequests } from "@/data/dummyRequests";
 import { FileClock, Users, ClipboardList } from "lucide-react";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const HodDashboard = () => {
-  // Calculate pending requests for HOD
-  const pendingRequests = dummyRequests.filter(
-    (req) => req.status === "Pending HOD Approval"
-  ).length;
+  const { user, profile } = useSession();
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [activeBatches, setActiveBatches] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  // Calculate total students (assuming HOD oversees all students in the dummy data)
-  const totalStudents = dummyStudents.length;
+  useEffect(() => {
+    const fetchData = async () => {
+      if (user?.id && profile?.department_id) {
+        setLoading(true);
 
-  // Calculate total active batches
-  const activeBatches = dummyBatches.filter(
-    (batch) => batch.status === "Active"
-  ).length;
+        // Fetch batches for HOD's department
+        const { data: batchesData, error: batchesError } = await supabase
+          .from('batches')
+          .select('id, status')
+          .eq('department_id', profile.department_id);
+
+        if (batchesError) {
+          showError("Error fetching batches for department: " + batchesError.message);
+          setActiveBatches(0);
+          setTotalStudents(0);
+          setPendingRequests(0);
+          setLoading(false);
+          return;
+        }
+
+        const activeBatchesCount = batchesData?.filter(b => b.status === 'Active').length || 0;
+        setActiveBatches(activeBatchesCount);
+
+        const batchIdsInDepartment = batchesData?.map(b => b.id) || [];
+
+        // Fetch students in HOD's department
+        const { data: studentsData, error: studentsError } = await supabase
+          .from('students')
+          .select('id')
+          .in('batch_id', batchIdsInDepartment);
+
+        if (studentsError) {
+          showError("Error fetching students for department: " + studentsError.message);
+          setTotalStudents(0);
+        } else {
+          setTotalStudents(studentsData?.length || 0);
+        }
+
+        // Fetch pending requests for students in HOD's department
+        const studentIdsInDepartment = studentsData?.map(s => s.id) || [];
+        if (studentIdsInDepartment.length > 0) {
+          const { data: requestsData, error: requestsError } = await supabase
+            .from('requests')
+            .select('id')
+            .eq('status', 'Pending HOD Approval')
+            .in('student_id', studentIdsInDepartment);
+
+          if (requestsError) {
+            showError("Error fetching pending requests: " + requestsError.message);
+            setPendingRequests(0);
+          } else {
+            setPendingRequests(requestsData?.length || 0);
+          }
+        } else {
+          setPendingRequests(0);
+        }
+
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [user, profile?.department_id]);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Dashboard...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch your dashboard data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -39,6 +111,7 @@ const HodDashboard = () => {
         />
       </div>
       <div>
+        {/* BatchRequestChart will need to be updated to fetch data from Supabase */}
         <BatchRequestChart />
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,19 +32,31 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { dummyTemplates } from "@/data/dummyTemplates";
 import { CertificateTemplate } from "@/lib/types";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import RichTextEditor from "@/components/shared/RichTextEditor";
+import { createTemplate, deleteTemplate, fetchTemplates, updateTemplate } from "@/data/appData";
 
 const TemplateManagement = () => {
   const [templates, setTemplates] =
-    useState<CertificateTemplate[]>(dummyTemplates);
+    useState<CertificateTemplate[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
   const [currentTemplate, setCurrentTemplate] = useState<
     Partial<CertificateTemplate>
   >({});
+  const [loading, setLoading] = useState(true);
+
+  const fetchTemplatesData = async () => {
+    setLoading(true);
+    const fetchedTemplates = await fetchTemplates();
+    setTemplates(fetchedTemplates);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTemplatesData();
+  }, []);
 
   const handleOpenDialog = (
     mode: "create" | "edit",
@@ -55,31 +67,66 @@ const TemplateManagement = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSaveTemplate = () => {
+  const handleSaveTemplate = async () => {
+    if (!currentTemplate.name || !currentTemplate.content) {
+      showError("Template name and content are required.");
+      return;
+    }
+
     if (dialogMode === "create") {
-      const newTemplate: CertificateTemplate = {
-        id: `TPL${String(templates.length + 1).padStart(3, "0")}`,
-        name: currentTemplate.name || "Untitled",
-        content: currentTemplate.content || "",
+      const newTemplatePayload: Omit<CertificateTemplate, 'id' | 'created_at'> = {
+        name: currentTemplate.name,
+        content: currentTemplate.content,
       };
-      setTemplates([...templates, newTemplate]);
-      showSuccess(`Template "${newTemplate.name}" created successfully.`);
+      const created = await createTemplate(newTemplatePayload);
+      if (created) {
+        showSuccess(`Template "${created.name}" created successfully.`);
+        fetchTemplatesData();
+      } else {
+        showError("Failed to create template.");
+      }
     } else {
-      setTemplates(
-        templates.map((t) =>
-          t.id === currentTemplate.id ? { ...t, ...currentTemplate } : t
-        )
-      );
-      showSuccess(`Template "${currentTemplate.name}" updated successfully.`);
+      if (!currentTemplate.id) {
+        showError("Template ID is missing for update.");
+        return;
+      }
+      const updated = await updateTemplate(currentTemplate.id, {
+        name: currentTemplate.name,
+        content: currentTemplate.content,
+      });
+      if (updated) {
+        showSuccess(`Template "${updated.name}" updated successfully.`);
+        fetchTemplatesData();
+      } else {
+        showError("Failed to update template.");
+      }
     }
     setIsDialogOpen(false);
   };
 
-  const handleDeleteTemplate = (templateId: string) => {
+  const handleDeleteTemplate = async (templateId: string) => {
     const templateName = templates.find((t) => t.id === templateId)?.name;
-    setTemplates(templates.filter((t) => t.id !== templateId));
-    showSuccess(`Template "${templateName}" deleted successfully.`);
+    const deleted = await deleteTemplate(templateId);
+    if (deleted) {
+      showSuccess(`Template "${templateName}" deleted successfully.`);
+      fetchTemplatesData();
+    } else {
+      showError("Failed to delete template.");
+    }
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Templates...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch template data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -99,34 +146,42 @@ const TemplateManagement = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {templates.map((template) => (
-              <TableRow key={template.id}>
-                <TableCell className="font-medium">{template.id}</TableCell>
-                <TableCell>{template.name}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem
-                        onClick={() => handleOpenDialog("edit", template)}
-                      >
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        onClick={() => handleDeleteTemplate(template.id)}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+            {templates.length > 0 ? (
+              templates.map((template) => (
+                <TableRow key={template.id}>
+                  <TableCell className="font-medium">{template.id}</TableCell>
+                  <TableCell>{template.name}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onClick={() => handleOpenDialog("edit", template)}
+                        >
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => handleDeleteTemplate(template.id)}
+                        >
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center">
+                  No templates found.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </CardContent>
@@ -151,6 +206,7 @@ const TemplateManagement = () => {
                   })
                 }
                 placeholder="e.g., Standard Bonafide"
+                required
               />
             </div>
             <div className="grid gap-2">

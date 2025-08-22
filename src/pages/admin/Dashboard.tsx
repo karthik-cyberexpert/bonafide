@@ -1,17 +1,62 @@
 import DashboardCard from "@/components/shared/DashboardCard";
 import DepartmentRequestChart from "@/components/shared/DepartmentRequestChart";
-import { dummyHods } from "@/data/dummyData";
-import { dummyRequests } from "@/data/dummyRequests";
-import { FileClock, Building } from "lucide-react";
+import { Building, FileClock } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const AdminDashboard = () => {
-  // Calculate pending requests for Admin
-  const pendingRequests = dummyRequests.filter(
-    (req) => req.status === "Pending Admin Approval"
-  ).length;
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [totalDepartments, setTotalDepartments] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  // Calculate total departments from the number of HODs
-  const totalDepartments = dummyHods.length;
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      // Calculate pending requests for Admin
+      const { data: requestsData, error: requestsError } = await supabase
+        .from('requests')
+        .select('id')
+        .eq('status', 'Pending Admin Approval');
+
+      if (requestsError) {
+        showError("Error fetching pending requests: " + requestsError.message);
+        setPendingRequests(0);
+      } else {
+        setPendingRequests(requestsData?.length || 0);
+      }
+
+      // Calculate total departments
+      const { data: departmentsData, error: departmentsError } = await supabase
+        .from('departments')
+        .select('id');
+
+      if (departmentsError) {
+        showError("Error fetching departments: " + departmentsError.message);
+        setTotalDepartments(0);
+      } else {
+        setTotalDepartments(departmentsData?.length || 0);
+      }
+
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Dashboard...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch your dashboard data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -29,6 +74,7 @@ const AdminDashboard = () => {
         />
       </div>
       <div>
+        {/* DepartmentRequestChart will need to be updated to fetch data from Supabase */}
         <DepartmentRequestChart />
       </div>
     </div>

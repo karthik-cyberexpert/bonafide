@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -21,40 +21,144 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { requests as appRequests, students as appStudents, batches as appBatches } from "@/data/appData";
+import { fetchRequests, fetchBatches, fetchStudentDetails } from "@/data/appData";
 import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
+import { BonafideRequest, Batch, StudentDetails } from "@/lib/types";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
 
 const HodRequestHistory = () => {
+  const { user, profile } = useSession();
+  const [allRequests, setAllRequests] = useState<BonafideRequest[]>([]);
+  const [allBatches, setAllBatches] = useState<Batch[]>([]);
+  const [allStudents, setAllStudents] = useState<StudentDetails[]>([]);
   const [selectedBatch, setSelectedBatch] = useState("all");
   const [selectedSemester, setSelectedSemester] = useState("all");
+  const [loading, setLoading] = useState(true);
 
-  const requestHistory = appRequests.filter(
-    (req) =>
-      req.status !== "Pending HOD Approval" &&
-      req.status !== "Pending Tutor Approval"
-  );
+  useEffect(() => {
+    const fetchData = async () => {
+      if (user?.id && profile?.department_id) {
+        setLoading(true);
+
+        // Fetch batches for HOD's department
+        const { data: batchesData, error: batchesError } = await supabase
+          .from('batches')
+          .select('id, name, section, current_semester')
+          .eq('department_id', profile.department_id);
+
+        if (batchesError) {
+          showError("Error fetching batches for department: " + batchesError.message);
+          setAllBatches([]);
+          setAllStudents([]);
+          setAllRequests([]);
+          setLoading(false);
+          return;
+        }
+        setAllBatches(batchesData as Batch[]);
+
+        const batchIdsInDepartment = batchesData?.map(b => b.id) || [];
+        if (batchIdsInDepartment.length === 0) {
+          setAllStudents([]);
+          setAllRequests([]);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch students in these batches
+        const { data: studentsData, error: studentsError } = await supabase
+          .from('students')
+          .select(`
+            id,
+            register_number,
+            profiles(first_name, last_name, email, phone_number),
+            batches(name, section, current_semester)
+          `)
+          .in('batch_id', batchIdsInDepartment);
+
+        if (studentsError) {
+          showError("Error fetching students for department: " + studentsError.message);
+          setAllStudents([]);
+          setAllRequests([]);
+          setLoading(false);
+          return;
+        }
+
+        const mappedStudents: StudentDetails[] = studentsData.map((s: any) => ({
+          id: s.id,
+          register_number: s.register_number,
+          first_name: s.profiles.first_name,
+          last_name: s.profiles.last_name,
+          email: s.profiles.email,
+          phone_number: s.profiles.phone_number,
+          batch_id: s.batches?.id,
+          batch_name: s.batches ? `${s.batches.name} ${s.batches.section || ''}`.trim() : 'N/A',
+          current_semester: s.batches?.current_semester,
+        }));
+        setAllStudents(mappedStudents);
+
+        const studentIdsInDepartment = mappedStudents.map(s => s.id);
+        if (studentIdsInDepartment.length === 0) {
+          setAllRequests([]);
+          setLoading(false);
+          return;
+        }
+
+        // Fetch requests for these students, excluding pending tutor approval
+        const { data: requestsData, error: requestsError } = await supabase
+          .from('requests')
+          .select('*')
+          .in('student_id', studentIdsInDepartment)
+          .neq('status', 'Pending HOD Approval')
+          .neq('status', 'Pending Tutor Approval'); // HOD doesn't see tutor pending either
+
+        if (requestsError) {
+          showError("Error fetching request history: " + requestsError.message);
+          setAllRequests([]);
+        } else {
+          setAllRequests(requestsData as BonafideRequest[]);
+        }
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [user, profile?.department_id]);
 
   const uniqueBatches = useMemo(() => {
-    const batchNames = appBatches.map((b) =>
+    const batchNames = allBatches.map((b) =>
       b.section ? `${b.name} ${b.section}` : b.name
     );
     return [...new Set(batchNames)];
-  }, []);
+  }, [allBatches]);
 
-  const filteredHistory = requestHistory.filter((request) => {
-    const student = appStudents.find(
-      (s) => s.registerNumber === request.studentId
+  const filteredHistory = allRequests.filter((request) => {
+    const student = allStudents.find(
+      (s) => s.id === request.student_id
     );
     if (!student) return false;
 
     const batchMatch =
-      selectedBatch === "all" || student.batch === selectedBatch;
+      selectedBatch === "all" || student.batch_name === selectedBatch;
     const semesterMatch =
       selectedSemester === "all" ||
-      student.currentSemester === `${selectedSemester}th`;
+      student.current_semester === Number(selectedSemester);
 
     return batchMatch && semesterMatch;
   });
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Request History...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch the request history.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -94,7 +198,6 @@ const HodRequestHistory = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Student Name</TableHead>
-              <TableHead>Tutor</TableHead>
               <TableHead>Batch</TableHead>
               <TableHead>Semester</TableHead>
               <TableHead>Date</TableHead>
@@ -105,20 +208,19 @@ const HodRequestHistory = () => {
           <TableBody>
             {filteredHistory.length > 0 ? (
               filteredHistory.map((request) => {
-                const student = appStudents.find(
-                  (s) => s.registerNumber === request.studentId
+                const student = allStudents.find(
+                  (s) => s.id === request.student_id
                 );
                 return (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
-                      <div>{request.studentName}</div>
+                      <div>{student ? `${student.first_name} ${student.last_name || ''}`.trim() : "N/A"}</div>
                       <div className="text-xs text-muted-foreground">
-                        [{request.studentId}]
+                        [{student?.register_number || "N/A"}]
                       </div>
                     </TableCell>
-                    <TableCell>{student?.tutor || "N/A"}</TableCell>
-                    <TableCell>{student?.batch || "N/A"}</TableCell>
-                    <TableCell>{student?.currentSemester || "N/A"}</TableCell>
+                    <TableCell>{student?.batch_name || "N/A"}</TableCell>
+                    <TableCell>{student?.current_semester || "N/A"}</TableCell>
                     <TableCell>{formatDateToIndian(request.date)}</TableCell>
                     <TableCell>{request.type}</TableCell>
                     <TableCell>
@@ -131,7 +233,7 @@ const HodRequestHistory = () => {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center">
+                <TableCell colSpan={6} className="text-center">
                   No request history found for the selected filters.
                 </TableCell>
               </TableRow>

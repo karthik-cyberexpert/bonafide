@@ -1,20 +1,62 @@
 import DashboardCard from "@/components/shared/DashboardCard";
 import RequestAnalyticsChart from "@/components/shared/RequestAnalyticsChart";
-import { dummyStudents } from "@/data/dummyData";
-import { dummyTutorProfile } from "@/data/dummyProfiles";
-import { dummyRequests } from "@/data/dummyRequests";
+import { fetchRequests, fetchProfiles, fetchBatches } from "@/data/appData";
 import { FileClock, Users } from "lucide-react";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { useEffect, useState } from "react";
+import { BonafideRequest, Profile, Batch } from "@/lib/types";
 
 const TutorDashboard = () => {
-  // Calculate total students for the tutor
-  const totalStudents = dummyStudents.filter(
-    (student) => student.tutor === dummyTutorProfile.name
-  ).length;
+  const { user } = useSession();
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [loading, setLoading] = useState(true);
 
-  // Calculate pending requests for the tutor
-  const pendingRequests = dummyRequests.filter(
-    (req) => req.status === "Pending Tutor Approval"
-  ).length;
+  useEffect(() => {
+    const fetchData = async () => {
+      if (user?.id) {
+        setLoading(true);
+
+        // Fetch students assigned to this tutor
+        const { data: studentsData, error: studentsError } = await supabase
+          .from('students')
+          .select('id')
+          .eq('tutor_id', user.id);
+
+        if (studentsError) {
+          console.error("Error fetching students for tutor:", studentsError);
+          setTotalStudents(0);
+        } else {
+          setTotalStudents(studentsData?.length || 0);
+        }
+
+        // Fetch pending requests for students assigned to this tutor
+        const allRequests = await fetchRequests();
+        const tutorStudentsIds = studentsData?.map(s => s.id) || [];
+        const pendingForTutor = allRequests.filter(
+          (req) =>
+            req.status === "Pending Tutor Approval" &&
+            tutorStudentsIds.includes(req.student_id)
+        ).length;
+        setPendingRequests(pendingForTutor);
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Dashboard...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch your dashboard data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,16 +25,18 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { requests as appRequests, students as appStudents } from "@/data/appData";
-import { dummyTemplates } from "@/data/dummyTemplates";
-import { BonafideRequest } from "@/lib/types";
-import { showSuccess } from "@/utils/toast";
+import { fetchRequests, fetchStudentDetails, fetchTemplates, updateRequestStatus } from "@/data/appData";
+import { BonafideRequest, StudentDetails, CertificateTemplate } from "@/lib/types";
+import { showSuccess, showError } from "@/utils/toast";
 import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { formatDateToIndian } from "@/lib/utils";
 import RequestDetailsView from "@/components/shared/RequestDetailsView";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 const PrincipalPendingRequests = () => {
-  const [requests, setRequests] = useState<BonafideRequest[]>(appRequests);
+  const { user } = useSession();
+  const [requests, setRequests] = useState<BonafideRequest[]>([]);
   const [selectedRequest, setSelectedRequest] =
     useState<BonafideRequest | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -42,16 +44,44 @@ const PrincipalPendingRequests = () => {
   const [isApproveOpen, setIsApproveOpen] = useState(false);
   const [returnReason, setReturnReason] = useState("");
   const [addSignature, setAddSignature] = useState(true);
+  const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchPrincipalRequests = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('requests')
+      .select('*')
+      .eq('status', 'Pending Principal Approval');
+
+    if (error) {
+      showError("Error fetching pending requests: " + error.message);
+      setRequests([]);
+    } else {
+      setRequests(data as BonafideRequest[]);
+    }
+
+    const fetchedTemplates = await fetchTemplates();
+    setTemplates(fetchedTemplates);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchPrincipalRequests();
+  }, [user]);
 
   const handleApproveAndDownload = async () => {
     if (!selectedRequest) return;
 
-    const student = appStudents.find(
-      (s) => s.registerNumber === selectedRequest.studentId
+    const student: StudentDetails | null = await fetchStudentDetails(selectedRequest.student_id);
+    const template: CertificateTemplate | undefined = templates.find(
+      (t) => t.id === selectedRequest.template_id
     );
-    const template = dummyTemplates.find(
-      (t) => t.id === selectedRequest.templateId
-    );
+
+    if (!student || !template) {
+      showError("Could not fetch student or template for certificate generation.");
+      return;
+    }
 
     const htmlContent = getCertificateHtml(
       selectedRequest,
@@ -59,37 +89,34 @@ const PrincipalPendingRequests = () => {
       template,
       addSignature
     );
-    const fileName = `Bonafide-${selectedRequest.studentId}.pdf`;
+    const fileName = `Bonafide-${student.register_number}.pdf`;
 
     await generatePdf(htmlContent, fileName);
 
-    const updatedRequests = appRequests.map((req) =>
-      req.id === selectedRequest.id ? { ...req, status: "Approved" } : req
-    );
-    appRequests.length = 0;
-    appRequests.push(...updatedRequests);
-    setRequests(updatedRequests);
-
-    showSuccess(`Request ${selectedRequest.id} approved and PDF downloaded.`);
-    setIsApproveOpen(false);
-    setSelectedRequest(null);
-    setAddSignature(true);
+    const updated = await updateRequestStatus(selectedRequest.id, "Approved");
+    if (updated) {
+      showSuccess(`Request ${selectedRequest.id} approved and PDF downloaded.`);
+      fetchPrincipalRequests(); // Refresh list
+      setIsApproveOpen(false);
+      setSelectedRequest(null);
+      setAddSignature(true);
+    } else {
+      showError("Failed to approve request.");
+    }
   };
 
-  const handleReturn = () => {
+  const handleReturn = async () => {
     if (!selectedRequest || !returnReason) return;
-    const updatedRequests = appRequests.map((req) =>
-      req.id === selectedRequest.id
-        ? { ...req, status: "Returned by Principal", returnReason: returnReason }
-        : req
-    );
-    appRequests.length = 0;
-    appRequests.push(...updatedRequests);
-    setRequests(updatedRequests);
-    showSuccess(`Request ${selectedRequest.id} returned to HOD.`);
-    setIsReturnOpen(false);
-    setReturnReason("");
-    setSelectedRequest(null);
+    const updated = await updateRequestStatus(selectedRequest.id, "Returned by Principal", returnReason);
+    if (updated) {
+      showSuccess(`Request ${selectedRequest.id} returned to HOD.`);
+      fetchPrincipalRequests(); // Refresh list
+      setIsReturnOpen(false);
+      setReturnReason("");
+      setSelectedRequest(null);
+    } else {
+      showError("Failed to return request.");
+    }
   };
 
   const openReviewDialog = (request: BonafideRequest) => {
@@ -97,9 +124,18 @@ const PrincipalPendingRequests = () => {
     setIsReviewOpen(true);
   };
 
-  const pendingRequests = requests.filter(
-    (req) => req.status === "Pending Principal Approval"
-  );
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Requests...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch pending requests.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -111,21 +147,18 @@ const PrincipalPendingRequests = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Student Name</TableHead>
+                <TableHead>Student ID</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pendingRequests.length > 0 ? (
-                pendingRequests.map((request) => (
+              {requests.length > 0 ? (
+                requests.map((request) => (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
-                      <div>{request.studentName}</div>
-                      <div className="text-xs text-muted-foreground">
-                        [{request.studentId}]
-                      </div>
+                      <div>{request.student_id}</div>
                     </TableCell>
                     <TableCell>{formatDateToIndian(request.date)}</TableCell>
                     <TableCell>{request.type}</TableCell>
@@ -189,11 +222,9 @@ const PrincipalPendingRequests = () => {
                 dangerouslySetInnerHTML={{
                   __html: getCertificateHtml(
                     selectedRequest,
-                    appStudents.find(
-                      (s) => s.registerNumber === selectedRequest.studentId
-                    ),
-                    dummyTemplates.find(
-                      (t) => t.id === selectedRequest.templateId
+                    null, // Student details will be fetched inside getCertificateHtml
+                    templates.find(
+                      (t) => t.id === selectedRequest.template_id
                     ),
                     addSignature
                   ),

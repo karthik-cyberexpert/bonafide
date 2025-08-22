@@ -1,21 +1,89 @@
 import DashboardCard from "@/components/shared/DashboardCard";
 import DepartmentRequestChart from "@/components/shared/DepartmentRequestChart";
-import {
-  students as appStudents,
-  tutors as appTutors,
-  hods as appHods,
-  requests as appRequests,
-  departments as appDepartments,
-} from "@/data/appData";
-import { FileClock, Users, Building, Briefcase } from "lucide-react";
+import { Building, Briefcase, FileClock, Users } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { showError } from "@/utils/toast";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const PrincipalDashboard = () => {
-  const totalStudents = appStudents.length;
-  const totalStaff = appTutors.length + appHods.length;
-  const pendingRequests = appRequests.filter((req) =>
-    req.status.startsWith("Pending")
-  ).length;
-  const totalDepartments = appDepartments.length;
+  const [totalStudents, setTotalStudents] = useState(0);
+  const [totalStaff, setTotalStaff] = useState(0);
+  const [pendingRequests, setPendingRequests] = useState(0);
+  const [totalDepartments, setTotalDepartments] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      // Total Students
+      const { count: studentCount, error: studentError } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact' })
+        .eq('role', 'student');
+      if (studentError) showError("Error fetching student count: " + studentError.message);
+      setTotalStudents(studentCount || 0);
+
+      // Total Staff (Tutors + HODs + Admin + Principal)
+      const { count: tutorCount, error: tutorError } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact' })
+        .eq('role', 'tutor');
+      if (tutorError) showError("Error fetching tutor count: " + tutorError.message);
+
+      const { count: hodCount, error: hodError } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact' })
+        .eq('role', 'hod');
+      if (hodError) showError("Error fetching HOD count: " + hodError.message);
+
+      const { count: adminCount, error: adminError } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact' })
+        .eq('role', 'admin');
+      if (adminError) showError("Error fetching admin count: " + adminError.message);
+
+      const { count: principalCount, error: principalError } = await supabase
+        .from('profiles')
+        .select('id', { count: 'exact' })
+        .eq('role', 'principal');
+      if (principalError) showError("Error fetching principal count: " + principalError.message);
+
+      setTotalStaff((tutorCount || 0) + (hodCount || 0) + (adminCount || 0) + (principalCount || 0));
+
+      // Pending Requests (all statuses starting with 'Pending')
+      const { count: pendingReqCount, error: pendingReqError } = await supabase
+        .from('requests')
+        .select('id', { count: 'exact' })
+        .like('status', 'Pending%');
+      if (pendingReqError) showError("Error fetching pending requests count: " + pendingReqError.message);
+      setPendingRequests(pendingReqCount || 0);
+
+      // Total Departments
+      const { count: deptCount, error: deptError } = await supabase
+        .from('departments')
+        .select('id', { count: 'exact' });
+      if (deptError) showError("Error fetching department count: " + deptError.message);
+      setTotalDepartments(deptCount || 0);
+
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Dashboard...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch your dashboard data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -43,6 +111,7 @@ const PrincipalDashboard = () => {
         />
       </div>
       <div>
+        {/* DepartmentRequestChart will need to be updated to fetch data from Supabase */}
         <DepartmentRequestChart />
       </div>
     </div>

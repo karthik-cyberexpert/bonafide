@@ -14,30 +14,10 @@ import {
   ChartTooltipContent,
   ChartConfig,
 } from "@/components/ui/chart"
-import { dummyRequests } from "@/data/dummyRequests"
-import { dummyStudents } from "@/data/dummyData"
-
-// Process data to get request count per department
-const processChartData = () => {
-  const requestsWithDept = dummyRequests.map(request => {
-    const student = dummyStudents.find(s => s.registerNumber === request.studentId);
-    return { ...request, department: student?.department };
-  });
-
-  const deptCounts = requestsWithDept.reduce((acc, request) => {
-    if (request.department) {
-      acc[request.department] = (acc[request.department] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
-
-  return Object.entries(deptCounts).map(([department, requests]) => ({
-    department,
-    requests,
-  }));
-};
-
-const chartData = processChartData();
+import { useEffect, useState } from "react"
+import { supabase } from "@/integrations/supabase/client"
+import { showError } from "@/utils/toast"
+import { Batch, Department } from "@/lib/types"
 
 const chartConfig = {
   requests: {
@@ -47,6 +27,83 @@ const chartConfig = {
 } satisfies ChartConfig
 
 const DepartmentRequestChart = () => {
+  const [chartData, setChartData] = useState<Array<{ department: string; requests: number }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchChartData = async () => {
+      setLoading(true);
+      const { data: requestsData, error: requestsError } = await supabase
+        .from('requests')
+        .select('student_id');
+
+      if (requestsError) {
+        showError("Error fetching requests for chart: " + requestsError.message);
+        setLoading(false);
+        return;
+      }
+
+      const studentIds = requestsData.map(r => r.student_id);
+
+      if (studentIds.length === 0) {
+        setChartData([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: studentsData, error: studentsError } = await supabase
+        .from('students')
+        .select(`
+          id,
+          batches(departments(name))
+        `)
+        .in('id', studentIds);
+
+      if (studentsError) {
+        showError("Error fetching student data for chart: " + studentsError.message);
+        setLoading(false);
+        return;
+      }
+
+      const requestsWithDept = requestsData.map(request => {
+        const student = studentsData.find(s => s.id === request.student_id);
+        const department = (student?.batches as unknown as Batch)?.departments as unknown as Department;
+        return {
+          ...request,
+          department_name: department?.name
+        };
+      });
+
+      const deptCounts = requestsWithDept.reduce((acc, request) => {
+        if (request.department_name) {
+          acc[request.department_name] = (acc[request.department_name] || 0) + 1;
+        }
+        return acc;
+      }, {} as Record<string, number>);
+
+      setChartData(Object.entries(deptCounts).map(([department, requests]) => ({
+        department,
+        requests,
+      })));
+      setLoading(false);
+    };
+
+    fetchChartData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Chart...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we load the chart data.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,50 +24,92 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { requests as appRequests } from "@/data/appData";
+import { fetchRequests, updateRequestStatus } from "@/data/appData";
 import { formatDateToIndian } from "@/lib/utils";
 import { BonafideRequest } from "@/lib/types";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import RequestDetailsView from "@/components/shared/RequestDetailsView";
+import { useSession } from "@/components/auth/SessionContextProvider";
+import { supabase } from "@/integrations/supabase/client";
 
 const TutorPendingRequests = () => {
-  const [requests, setRequests] = useState<BonafideRequest[]>(appRequests);
+  const { user } = useSession();
+  const [requests, setRequests] = useState<BonafideRequest[]>([]);
   const [selectedRequest, setSelectedRequest] =
     useState<BonafideRequest | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [isReturnOpen, setIsReturnOpen] = useState(false);
   const [returnReason, setReturnReason] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleForward = () => {
-    if (!selectedRequest) return;
-    const updatedRequests = appRequests.map((req) =>
-      req.id === selectedRequest.id
-        ? { ...req, status: "Pending HOD Approval" }
-        : req
-    );
-    appRequests.length = 0;
-    appRequests.push(...updatedRequests);
-    setRequests(updatedRequests);
-    showSuccess(`Request ${selectedRequest.id} forwarded to HOD.`);
-    setIsReviewOpen(false);
-    setSelectedRequest(null);
+  const fetchTutorRequests = async () => {
+    if (user?.id) {
+      setLoading(true);
+      const { data: studentsData, error: studentsError } = await supabase
+        .from('students')
+        .select('id')
+        .eq('tutor_id', user.id);
+
+      if (studentsError) {
+        showError("Error fetching assigned students: " + studentsError.message);
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      const tutorStudentsIds = studentsData?.map(s => s.id) || [];
+      if (tutorStudentsIds.length === 0) {
+        setRequests([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: requestsData, error: requestsError } = await supabase
+        .from('requests')
+        .select('*')
+        .eq('status', 'Pending Tutor Approval')
+        .in('student_id', tutorStudentsIds);
+
+      if (requestsError) {
+        showError("Error fetching pending requests: " + requestsError.message);
+        setRequests([]);
+      } else {
+        setRequests(requestsData as BonafideRequest[]);
+      }
+      setLoading(false);
+    }
   };
 
-  const handleReturn = () => {
+  useEffect(() => {
+    fetchTutorRequests();
+  }, [user]);
+
+  const handleForward = async () => {
+    if (!selectedRequest) return;
+    const updated = await updateRequestStatus(selectedRequest.id, "Pending HOD Approval");
+    if (updated) {
+      showSuccess(`Request ${selectedRequest.id} forwarded to HOD.`);
+      fetchTutorRequests(); // Refresh list
+      setIsReviewOpen(false);
+      setSelectedRequest(null);
+    } else {
+      showError("Failed to forward request.");
+    }
+  };
+
+  const handleReturn = async () => {
     if (!selectedRequest || !returnReason) return;
-    const updatedRequests = appRequests.map((req) =>
-      req.id === selectedRequest.id
-        ? { ...req, status: "Returned by Tutor", returnReason: returnReason }
-        : req
-    );
-    appRequests.length = 0;
-    appRequests.push(...updatedRequests);
-    setRequests(updatedRequests);
-    showSuccess(`Request ${selectedRequest.id} returned to student.`);
-    setIsReturnOpen(false);
-    setIsReviewOpen(false);
-    setReturnReason("");
-    setSelectedRequest(null);
+    const updated = await updateRequestStatus(selectedRequest.id, "Returned by Tutor", returnReason);
+    if (updated) {
+      showSuccess(`Request ${selectedRequest.id} returned to student.`);
+      fetchTutorRequests(); // Refresh list
+      setIsReturnOpen(false);
+      setIsReviewOpen(false);
+      setReturnReason("");
+      setSelectedRequest(null);
+    } else {
+      showError("Failed to return request.");
+    }
   };
 
   const openReviewDialog = (request: BonafideRequest) => {
@@ -75,9 +117,18 @@ const TutorPendingRequests = () => {
     setIsReviewOpen(true);
   };
 
-  const pendingRequests = requests.filter(
-    (req) => req.status === "Pending Tutor Approval"
-  );
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading Requests...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p>Please wait while we fetch pending requests.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -89,21 +140,18 @@ const TutorPendingRequests = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Student Name</TableHead>
+                <TableHead>Student ID</TableHead>
                 <TableHead>Date</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {pendingRequests.length > 0 ? (
-                pendingRequests.map((request) => (
+              {requests.length > 0 ? (
+                requests.map((request) => (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
-                      <div>{request.studentName}</div>
-                      <div className="text-xs text-muted-foreground">
-                        [{request.studentId}]
-                      </div>
+                      <div>{request.student_id}</div>
                     </TableCell>
                     <TableCell>{formatDateToIndian(request.date)}</TableCell>
                     <TableCell>{request.type}</TableCell>

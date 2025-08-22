@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { LayoutDashboard, Menu, Bell, LogOut } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { NavItem } from "@/lib/types";
+import { useSession } from "@/components/auth/SessionContextProvider"; // Import useSession
 
 interface HeaderProps {
   navItems: NavItem[];
@@ -12,6 +13,8 @@ interface HeaderProps {
 }
 
 const Header = ({ navItems, portalName }: HeaderProps) => {
+  const { signOut } = useSession(); // Use the signOut function
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 sm:px-6">
       <div className="md:hidden">
@@ -44,6 +47,10 @@ const Header = ({ navItems, portalName }: HeaderProps) => {
                   {item.title}
                 </NavLink>
               ))}
+              <Button variant="ghost" className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground w-full justify-start" onClick={signOut}>
+                <LogOut className="h-5 w-5" />
+                Logout
+              </Button>
             </nav>
           </SheetContent>
         </Sheet>
@@ -58,7 +65,7 @@ const Header = ({ navItems, portalName }: HeaderProps) => {
           <span className="sr-only">View notifications</span>
         </Button>
         <ThemeToggle />
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" onClick={signOut}>
           <LogOut className="h-5 w-5" />
           <span className="sr-only">Logout</span>
         </Button>

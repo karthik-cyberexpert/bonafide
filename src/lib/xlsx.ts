@@ -1,18 +1,17 @@
 import * as xlsx from "xlsx";
-import { StudentProfile } from "./types";
+import { StudentDetails } from "./types";
 
 const studentTemplateHeaders = [
-  "name",
+  "first_name",
+  "last_name",
   "username",
-  "registerNumber",
   "email",
-  "phoneNumber",
-  "parentName",
-  "department", // Added department
-  "batch",
-  "currentSemester",
-  "tutor",
-  "hod",
+  "phone_number",
+  "register_number",
+  "parent_name",
+  "department_id", // Use department_id for linking
+  "batch_id", // Use batch_id for linking
+  // tutor_id and hod_id will be assigned by admin, not directly in template
 ];
 
 /**
@@ -28,9 +27,9 @@ export const downloadStudentTemplate = () => {
 /**
  * Parses an uploaded XLSX file and returns an array of student profiles.
  * @param file The uploaded file object.
- * @returns A promise that resolves to an array of StudentProfile objects.
+ * @returns A promise that resolves to an array of StudentDetails objects.
  */
-export const parseStudentFile = (file: File): Promise<StudentProfile[]> => {
+export const parseStudentFile = (file: File): Promise<Partial<StudentDetails>[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -39,7 +38,7 @@ export const parseStudentFile = (file: File): Promise<StudentProfile[]> => {
         const workbook = xlsx.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        const json = xlsx.utils.sheet_to_json<StudentProfile>(worksheet);
+        const json = xlsx.utils.sheet_to_json<Partial<StudentDetails>>(worksheet);
         resolve(json);
       } catch (error) {
         reject(error);
