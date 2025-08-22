@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,73 +30,82 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import { Batch } from "@/lib/types";
-import {
-  calculateCurrentSemesterForBatch,
-  getSemesterDateRange,
-  formatDateToIndian,
-} from "@/lib/utils";
+
+interface BatchGroup {
+  name: string;
+  totalSections: number;
+  status: "Active" | "Inactive" | "Mixed";
+}
 
 const BatchManagement = () => {
   const [batches, setBatches] = useState<Batch[]>(dummyBatches);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newBatchName, setNewBatchName] = useState("");
+  const [numSections, setNumSections] = useState(1);
 
-  useEffect(() => {
-    const updatedBatches = batches.map((batch) => {
-      const fullBatchName = batch.section
-        ? `${batch.name} ${batch.section}`
-        : batch.name;
-      const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
-      const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
+  const batchGroups = useMemo((): BatchGroup[] => {
+    const groups: Record<string, Batch[]> = batches.reduce((acc, batch) => {
+      acc[batch.name] = acc[batch.name] || [];
+      acc[batch.name].push(batch);
+      return acc;
+    }, {} as Record<string, Batch[]>);
+
+    return Object.entries(groups).map(([name, sectionDetails]) => {
+      const activeCount = sectionDetails.filter(
+        (s) => s.status === "Active"
+      ).length;
+      let status: "Active" | "Inactive" | "Mixed";
+      if (activeCount === sectionDetails.length) {
+        status = "Active";
+      } else if (activeCount === 0) {
+        status = "Inactive";
+      } else {
+        status = "Mixed";
+      }
+
       return {
-        ...batch,
-        currentSemester,
-        semesterFromDate: from,
-        semesterToDate: to,
+        name,
+        totalSections: sectionDetails.length,
+        status,
       };
     });
-    setBatches(updatedBatches);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [batches]);
 
-  const handleToggleStatus = (batchId: string) => {
-    setBatches((prevBatches) =>
-      prevBatches.map((batch) => {
-        if (batch.id === batchId) {
-          const newStatus = batch.status === "Active" ? "Inactive" : "Active";
-          showSuccess(`Batch "${batch.name}" marked as ${newStatus}.`);
-          return { ...batch, status: newStatus };
-        }
-        return batch;
-      })
-    );
-  };
+  const handleAddBatch = () => {
+    if (!newBatchName.match(/^\d{4}-\d{4}$/)) {
+      showError("Please use format YYYY-YYYY (e.g., 2024-2028).");
+      return;
+    }
+    if (numSections < 1 || numSections > 26) {
+      showError("Number of sections must be between 1 and 26.");
+      return;
+    }
 
-  const handleOpenEditDialog = (batch: Batch) => {
-    setEditingBatch({ ...batch });
-    setIsEditDialogOpen(true);
-  };
+    const newSections: Batch[] = [];
+    for (let i = 0; i < numSections; i++) {
+      const section = String.fromCharCode(65 + i);
+      newSections.push({
+        id: `B-${newBatchName}-${section}`,
+        name: newBatchName,
+        section: section,
+        tutor: "Unassigned",
+        studentCount: 0,
+        status: "Active",
+        currentSemester: 1,
+      });
+    }
 
-  const handleSaveChanges = () => {
-    if (!editingBatch) return;
-    setBatches(
-      batches.map((b) => (b.id === editingBatch.id ? editingBatch : b))
-    );
-    showSuccess(`Batch "${editingBatch.name}" updated successfully.`);
-    setIsEditDialogOpen(false);
-    setEditingBatch(null);
+    setBatches((prev) => [...prev, ...newSections]);
+    showSuccess(`Batch ${newBatchName} with ${numSections} section(s) created.`);
+    setIsAddDialogOpen(false);
+    setNewBatchName("");
+    setNumSections(1);
   };
 
   return (
@@ -104,42 +113,71 @@ const BatchManagement = () => {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Batch Management</CardTitle>
-          <Button>Add New Batch</Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>Add New Batch</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Batch</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="batch-name">Batch Name (Year Range)</Label>
+                  <Input
+                    id="batch-name"
+                    value={newBatchName}
+                    onChange={(e) => setNewBatchName(e.target.value)}
+                    placeholder="e.g., 2024-2028"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="num-sections">Number of Sections</Label>
+                  <Input
+                    id="num-sections"
+                    type="number"
+                    min="1"
+                    max="26"
+                    value={numSections}
+                    onChange={(e) => setNumSections(Number(e.target.value))}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleAddBatch}>Create Batch</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Batch</TableHead>
-                <TableHead>Section</TableHead>
-                <TableHead>Assigned Tutor</TableHead>
-                <TableHead>Current Sem</TableHead>
-                <TableHead>Semester Start</TableHead>
-                <TableHead>Semester End</TableHead>
+                <TableHead>Total Sections</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {batches.map((batch) => (
-                <TableRow key={batch.id}>
-                  <TableCell className="font-medium">{batch.name}</TableCell>
-                  <TableCell>{batch.section || "N/A"}</TableCell>
-                  <TableCell>{batch.tutor}</TableCell>
-                  <TableCell>{batch.currentSemester}</TableCell>
-                  <TableCell>
-                    {formatDateToIndian(batch.semesterFromDate)}
-                  </TableCell>
-                  <TableCell>
-                    {formatDateToIndian(batch.semesterToDate)}
-                  </TableCell>
+              {batchGroups.map((group) => (
+                <TableRow key={group.name}>
+                  <TableCell className="font-medium">{group.name}</TableCell>
+                  <TableCell>{group.totalSections}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
-                        batch.status === "Active" ? "success" : "secondary"
+                        group.status === "Active"
+                          ? "success"
+                          : group.status === "Inactive"
+                          ? "secondary"
+                          : "default"
                       }
                     >
-                      {batch.status}
+                      {group.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -150,18 +188,9 @@ const BatchManagement = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => handleOpenEditDialog(batch)}
-                        >
-                          Edit Batch
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>Assign Tutor</DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleToggleStatus(batch.id)}
-                        >
-                          {batch.status === "Active"
-                            ? "Mark as Inactive"
-                            : "Mark as Active"}
+                        <DropdownMenuItem>Manage Sections</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">
+                          Delete Batch
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -172,70 +201,6 @@ const BatchManagement = () => {
           </Table>
         </CardContent>
       </Card>
-
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Batch: {editingBatch?.name}</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="current-semester">Current Semester</Label>
-              <Select
-                value={String(editingBatch?.currentSemester || "")}
-                onValueChange={(value) =>
-                  setEditingBatch((prev) =>
-                    prev ? { ...prev, currentSemester: Number(value) } : null
-                  )
-                }
-              >
-                <SelectTrigger id="current-semester">
-                  <SelectValue placeholder="Select semester" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
-                    <SelectItem key={sem} value={String(sem)}>
-                      Semester {sem}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="from-date">Semester From Date</Label>
-              <Input
-                id="from-date"
-                type="date"
-                value={editingBatch?.semesterFromDate || ""}
-                onChange={(e) =>
-                  setEditingBatch((prev) =>
-                    prev ? { ...prev, semesterFromDate: e.target.value } : null
-                  )
-                }
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="to-date">Semester To Date</Label>
-              <Input
-                id="to-date"
-                type="date"
-                value={editingBatch?.semesterToDate || ""}
-                onChange={(e) =>
-                  setEditingBatch((prev) =>
-                    prev ? { ...prev, semesterToDate: e.target.value } : null
-                  )
-                }
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button onClick={handleSaveChanges}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   );
 };
