@@ -15,6 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { dummyRequests } from "@/data/dummyRequests";
 import { getStatusVariant } from "@/lib/utils";
+import { dummyStudents } from "@/data/dummyData";
 
 const HodRequestHistory = () => {
   const requestHistory = dummyRequests.filter(
@@ -32,29 +33,42 @@ const HodRequestHistory = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Request ID</TableHead>
               <TableHead>Student Name</TableHead>
+              <TableHead>Tutor</TableHead>
+              <TableHead>Batch</TableHead>
+              <TableHead>Semester</TableHead>
               <TableHead>Date</TableHead>
+              <TableHead>Reason</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {requestHistory.length > 0 ? (
-              requestHistory.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell className="font-medium">{request.id}</TableCell>
-                  <TableCell>{request.studentName}</TableCell>
-                  <TableCell>{request.date}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusVariant(request.status)}>
-                      {request.status}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              ))
+              requestHistory.map((request) => {
+                const student = dummyStudents.find(
+                  (s) => s.registerNumber === request.studentId
+                );
+                return (
+                  <TableRow key={request.id}>
+                    <TableCell className="font-medium">
+                      {request.studentName}
+                    </TableCell>
+                    <TableCell>{student?.tutor || "N/A"}</TableCell>
+                    <TableCell>{student?.batch || "N/A"}</TableCell>
+                    <TableCell>{student?.currentSemester || "N/A"}</TableCell>
+                    <TableCell>{request.date}</TableCell>
+                    <TableCell>{request.reason}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusVariant(request.status)}>
+                        {request.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
+                <TableCell colSpan={7} className="text-center">
                   No request history.
                 </TableCell>
               </TableRow>

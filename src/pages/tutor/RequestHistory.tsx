@@ -33,6 +33,7 @@ const TutorRequestHistory = () => {
               <TableHead>Request ID</TableHead>
               <TableHead>Student Name</TableHead>
               <TableHead>Date</TableHead>
+              <TableHead>Reason</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -43,6 +44,7 @@ const TutorRequestHistory = () => {
                   <TableCell className="font-medium">{request.id}</TableCell>
                   <TableCell>{request.studentName}</TableCell>
                   <TableCell>{request.date}</TableCell>
+                  <TableCell>{request.reason}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(request.status)}>
                       {request.status}
@@ -52,7 +54,7 @@ const TutorRequestHistory = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
+                <TableCell colSpan={5} className="text-center">
                   No request history.
                 </TableCell>
               </TableRow>
