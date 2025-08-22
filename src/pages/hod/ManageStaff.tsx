@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -43,7 +43,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { tutors as appTutors } from "@/data/appData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { tutors as appTutors, batches as appBatches } from "@/data/appData";
 import { TutorProfile } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
 
@@ -51,17 +58,50 @@ const ManageStaff = () => {
   const [tutors, setTutors] = useState<TutorProfile[]>(appTutors);
   const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
   const [editingTutor, setEditingTutor] = useState<TutorProfile | null>(null);
+  const [selectedBatchName, setSelectedBatchName] = useState("");
+  const [selectedSection, setSelectedSection] = useState("");
+
+  const uniqueBatchNames = useMemo(() => {
+    const names = appBatches.map((b) => b.name);
+    return [...new Set(names)];
+  }, []);
+
+  const availableSections = useMemo(() => {
+    if (!selectedBatchName) return [];
+    return appBatches
+      .filter((b) => b.name === selectedBatchName && b.section)
+      .map((b) => b.section!);
+  }, [selectedBatchName]);
+
+  const openEditDialog = (tutor: TutorProfile) => {
+    setEditingTutor(tutor);
+    const [batchName = "", section = ""] = tutor.batchAssigned.split(" ");
+    setSelectedBatchName(batchName);
+    setSelectedSection(section);
+    setIsAddEditDialogOpen(true);
+  };
+
+  const openAddDialog = () => {
+    setEditingTutor(null);
+    setSelectedBatchName("");
+    setSelectedSection("");
+    setIsAddEditDialogOpen(true);
+  };
 
   const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const batchAssigned = selectedSection
+      ? `${selectedBatchName} ${selectedSection}`
+      : selectedBatchName;
+
     const updatedTutor = {
       name: formData.get("name") as string,
       username:
         editingTutor?.username ||
         (formData.get("name") as string).toLowerCase().replace(" ", "_"),
-      department: "Computer Science", // Assuming HOD can only add to their dept
-      batchAssigned: formData.get("batchAssigned") as string,
+      department: "Computer Science",
+      batchAssigned,
       email: formData.get("email") as string,
       phoneNumber: formData.get("phoneNumber") as string,
     };
@@ -104,7 +144,7 @@ const ManageStaff = () => {
           }}
         >
           <DialogTrigger asChild>
-            <Button>Add New Tutor</Button>
+            <Button onClick={openAddDialog}>Add New Tutor</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -123,14 +163,49 @@ const ManageStaff = () => {
                     required
                   />
                 </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="batchAssigned">Batch Assigned</Label>
-                  <Input
-                    id="batchAssigned"
-                    name="batchAssigned"
-                    defaultValue={editingTutor?.batchAssigned}
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="batchName">Batch</Label>
+                    <Select
+                      value={selectedBatchName}
+                      onValueChange={(value) => {
+                        setSelectedBatchName(value);
+                        setSelectedSection("");
+                      }}
+                    >
+                      <SelectTrigger id="batchName">
+                        <SelectValue placeholder="Select Batch" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {uniqueBatchNames.map((name) => (
+                          <SelectItem key={name} value={name}>
+                            {name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="section">Section</Label>
+                    <Select
+                      value={selectedSection}
+                      onValueChange={setSelectedSection}
+                      disabled={
+                        !selectedBatchName || availableSections.length === 0
+                      }
+                    >
+                      <SelectTrigger id="section">
+                        <SelectValue placeholder="Select Section" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableSections.map((section) => (
+                          <SelectItem key={section} value={section}>
+                            {section}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>
@@ -191,12 +266,7 @@ const ManageStaff = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setEditingTutor(tutor);
-                            setIsAddEditDialogOpen(true);
-                          }}
-                        >
+                        <DropdownMenuItem onClick={() => openEditDialog(tutor)}>
                           Edit Details
                         </DropdownMenuItem>
                         <AlertDialogTrigger asChild>
