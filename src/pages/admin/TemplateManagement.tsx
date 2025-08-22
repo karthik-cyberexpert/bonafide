@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -36,12 +35,16 @@ import {
 import { dummyTemplates } from "@/data/dummyTemplates";
 import { CertificateTemplate } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
+import RichTextEditor from "@/components/shared/RichTextEditor";
 
 const TemplateManagement = () => {
-  const [templates, setTemplates] = useState<CertificateTemplate[]>(dummyTemplates);
+  const [templates, setTemplates] =
+    useState<CertificateTemplate[]>(dummyTemplates);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
-  const [currentTemplate, setCurrentTemplate] = useState<Partial<CertificateTemplate>>({});
+  const [currentTemplate, setCurrentTemplate] = useState<
+    Partial<CertificateTemplate>
+  >({});
 
   const handleOpenDialog = (
     mode: "create" | "edit",
@@ -73,7 +76,7 @@ const TemplateManagement = () => {
   };
 
   const handleDeleteTemplate = (templateId: string) => {
-    const templateName = templates.find(t => t.id === templateId)?.name;
+    const templateName = templates.find((t) => t.id === templateId)?.name;
     setTemplates(templates.filter((t) => t.id !== templateId));
     showSuccess(`Template "${templateName}" deleted successfully.`);
   };
@@ -129,7 +132,7 @@ const TemplateManagement = () => {
       </CardContent>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle>
               {dialogMode === "create" ? "Create New" : "Edit"} Template
@@ -142,25 +145,25 @@ const TemplateManagement = () => {
                 id="template-name"
                 value={currentTemplate.name || ""}
                 onChange={(e) =>
-                  setCurrentTemplate({ ...currentTemplate, name: e.target.value })
+                  setCurrentTemplate({
+                    ...currentTemplate,
+                    name: e.target.value,
+                  })
                 }
                 placeholder="e.g., Standard Bonafide"
               />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="template-content">Content</Label>
-              <Textarea
-                id="template-content"
-                value={currentTemplate.content || ""}
-                onChange={(e) =>
-                  setCurrentTemplate({
-                    ...currentTemplate,
-                    content: e.target.value,
-                  })
+              <RichTextEditor
+                content={currentTemplate.content || ""}
+                onChange={(content) =>
+                  setCurrentTemplate({ ...currentTemplate, content })
                 }
-                placeholder="Enter template content. Use placeholders like {studentName}, {studentId}, etc."
-                rows={8}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Use placeholders like {"{studentName}"}, {"{studentId}"}, etc.
+              </p>
             </div>
           </div>
           <DialogFooter>

@@ -50,16 +50,16 @@ const AdminPendingRequests = () => {
     const student = dummyStudents.find(
       (s) => s.registerNumber === request.studentId
     );
-    if (!template) return "Template not found.";
+    if (!template) return "<p>Template not found.</p>";
 
     let content = template.content
-      .replace("{studentName}", request.studentName)
-      .replace("{studentId}", request.studentId)
-      .replace("{reason}", request.reason)
-      .replace("{parentName}", student?.parentName || "N/A");
+      .replace(/{studentName}/g, request.studentName)
+      .replace(/{studentId}/g, request.studentId)
+      .replace(/{reason}/g, request.reason)
+      .replace(/{parentName}/g, student?.parentName || "N/A");
 
     if (addSignature) {
-      content += "\n\n\n--- E-Signed by Principal Thompson ---";
+      content += "<p><br/></p><p>--- E-Signed by Principal Thompson ---</p>";
     }
     return content;
   };
@@ -121,9 +121,12 @@ const AdminPendingRequests = () => {
                             <h3 className="font-semibold mb-2">
                               Certificate Preview
                             </h3>
-                            <div className="p-4 border rounded-md bg-muted whitespace-pre-wrap text-sm">
-                              {getCertificatePreview(request)}
-                            </div>
+                            <div
+                              className="p-4 border rounded-md bg-muted prose dark:prose-invert max-w-none"
+                              dangerouslySetInnerHTML={{
+                                __html: getCertificatePreview(request),
+                              }}
+                            />
                             <div className="flex items-center space-x-2 mt-4">
                               <Checkbox
                                 id="e-sign"
