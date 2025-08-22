@@ -18,7 +18,8 @@ const futureDateString = futureDate.toISOString().split("T")[0];
 export const dummyBatches: Batch[] = [
   {
     id: "B001A",
-    name: "2021-2025 A",
+    name: "2021-2025",
+    section: "A",
     tutor: "Dr. Evelyn Reed",
     studentCount: 32,
     status: "Active",
@@ -28,7 +29,8 @@ export const dummyBatches: Batch[] = [
   },
   {
     id: "B001B",
-    name: "2021-2025 B",
+    name: "2021-2025",
+    section: "B",
     tutor: "Dr. John Doe",
     studentCount: 30,
     status: "Active",
@@ -38,7 +40,8 @@ export const dummyBatches: Batch[] = [
   },
   {
     id: "B002A",
-    name: "2022-2026 A",
+    name: "2022-2026",
+    section: "A",
     tutor: "Dr. Samuel Chen",
     studentCount: 30,
     status: "Active",
@@ -48,7 +51,8 @@ export const dummyBatches: Batch[] = [
   },
   {
     id: "B002B",
-    name: "2022-2026 B",
+    name: "2022-2026",
+    section: "B",
     tutor: "Dr. Jane Smith",
     studentCount: 28,
     status: "Active",
@@ -58,7 +62,8 @@ export const dummyBatches: Batch[] = [
   },
   {
     id: "B003A",
-    name: "2023-2027 A",
+    name: "2023-2027",
+    section: "A",
     tutor: "Dr. Maria Garcia",
     studentCount: 35,
     status: "Active",

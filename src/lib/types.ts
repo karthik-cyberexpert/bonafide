@@ -80,6 +80,7 @@ export interface Department {
 export interface Batch {
   id: string;
   name: string;
+  section?: string;
   tutor: string;
   studentCount: number;
   status: "Active" | "Inactive";

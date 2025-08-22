@@ -83,11 +83,16 @@ const StudentManagement = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Batches</SelectItem>
-              {dummyBatches.map((batch) => (
-                <SelectItem key={batch.id} value={batch.name}>
-                  {batch.name}
-                </SelectItem>
-              ))}
+              {dummyBatches.map((batch) => {
+                const fullBatchName = batch.section
+                  ? `${batch.name} ${batch.section}`
+                  : batch.name;
+                return (
+                  <SelectItem key={batch.id} value={fullBatchName}>
+                    {fullBatchName}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
           <Button variant="outline" onClick={downloadStudentTemplate}>

@@ -55,8 +55,11 @@ const BatchManagement = () => {
 
   useEffect(() => {
     const updatedBatches = batches.map((batch) => {
-      const currentSemester = calculateCurrentSemesterForBatch(batch.name);
-      const { from, to } = getSemesterDateRange(batch.name, currentSemester);
+      const fullBatchName = batch.section
+        ? `${batch.name} ${batch.section}`
+        : batch.name;
+      const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
+      const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
       return {
         ...batch,
         currentSemester,
@@ -107,7 +110,8 @@ const BatchManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Batch Name</TableHead>
+                <TableHead>Batch</TableHead>
+                <TableHead>Section</TableHead>
                 <TableHead>Assigned Tutor</TableHead>
                 <TableHead>Current Sem</TableHead>
                 <TableHead>Semester Start</TableHead>
@@ -120,6 +124,7 @@ const BatchManagement = () => {
               {batches.map((batch) => (
                 <TableRow key={batch.id}>
                   <TableCell className="font-medium">{batch.name}</TableCell>
+                  <TableCell>{batch.section || "N/A"}</TableCell>
                   <TableCell>{batch.tutor}</TableCell>
                   <TableCell>{batch.currentSemester}</TableCell>
                   <TableCell>
