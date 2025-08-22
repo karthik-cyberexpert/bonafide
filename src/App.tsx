@@ -38,6 +38,13 @@ import ManageFaculties from "./pages/admin/ManageFaculties";
 import DepartmentManagement from "./pages/admin/DepartmentManagement";
 import TemplateManagement from "./pages/admin/TemplateManagement";
 
+import PrincipalLayout from "./components/layouts/PrincipalLayout";
+import PrincipalDashboard from "./pages/principal/Dashboard";
+import PrincipalProfile from "./pages/principal/Profile";
+import PrincipalRequestHistory from "./pages/principal/RequestHistory";
+import PrincipalManageHods from "./pages/principal/ManageHods";
+import PrincipalDepartmentManagement from "./pages/principal/DepartmentManagement";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -116,6 +123,26 @@ const App = () => (
                 element={<TemplateManagement />}
               />
               <Route path="/admin/profile" element={<AdminProfile />} />
+            </Route>
+
+            <Route element={<PrincipalLayout />}>
+              <Route
+                path="/principal/dashboard"
+                element={<PrincipalDashboard />}
+              />
+              <Route
+                path="/principal/request-history"
+                element={<PrincipalRequestHistory />}
+              />
+              <Route
+                path="/principal/manage-hods"
+                element={<PrincipalManageHods />}
+              />
+              <Route
+                path="/principal/department-management"
+                element={<PrincipalDepartmentManagement />}
+              />
+              <Route path="/principal/profile" element={<PrincipalProfile />} />
             </Route>
 
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

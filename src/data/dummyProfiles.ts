@@ -3,6 +3,7 @@ import {
   TutorProfile,
   HodProfile,
   AdminProfile,
+  PrincipalProfile,
 } from "@/lib/types";
 
 export const dummyStudentProfile: StudentProfile = {
@@ -41,4 +42,11 @@ export const dummyAdminProfile: AdminProfile = {
   username: "principal_t",
   email: "principal@example.com",
   phoneNumber: "+91 111 222 333",
+};
+
+export const dummyPrincipalProfile: PrincipalProfile = {
+  name: "Dr. Isabella Rossi",
+  username: "principal_rossi",
+  email: "principal.rossi@example.com",
+  phoneNumber: "+91 444 555 666",
 };

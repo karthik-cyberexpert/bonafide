@@ -66,6 +66,13 @@ export interface AdminProfile {
   phoneNumber: string;
 }
 
+export interface PrincipalProfile {
+  name: string;
+  username: string;
+  email: string;
+  phoneNumber: string;
+}
+
 export interface NavItem {
   title: string;
   href: string;

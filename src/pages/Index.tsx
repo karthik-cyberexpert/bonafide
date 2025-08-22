@@ -27,6 +27,9 @@ const Index = () => {
           <Button asChild variant="secondary">
             <Link to="/admin/dashboard">Admin Dashboard</Link>
           </Button>
+          <Button asChild variant="secondary">
+            <Link to="/principal/dashboard">Principal Dashboard</Link>
+          </Button>
         </CardContent>
       </Card>
     </div>
