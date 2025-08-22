@@ -30,38 +30,35 @@ import { dummyTemplates } from "@/data/dummyTemplates";
 import { dummyStudents } from "@/data/dummyData";
 import { BonafideRequest } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
+import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 
 const AdminPendingRequests = () => {
   const [requests, setRequests] = useState<BonafideRequest[]>(dummyRequests);
-  const [addSignature, setAddSignature] = useState(false);
+  const [addSignature, setAddSignature] = useState(true);
 
-  const handleApprove = (requestId: string) => {
-    setRequests((prevRequests) =>
-      prevRequests.map((req) =>
-        req.id === requestId ? { ...req, status: "Approved" } : req
-      )
-    );
-    showSuccess(`Request ${requestId} has been approved.`);
-    setAddSignature(false);
-  };
-
-  const getCertificatePreview = (request: BonafideRequest) => {
-    const template = dummyTemplates.find((t) => t.id === request.templateId);
+  const handleApproveAndDownload = async (request: BonafideRequest) => {
     const student = dummyStudents.find(
       (s) => s.registerNumber === request.studentId
     );
-    if (!template) return "<p>Template not found.</p>";
+    const template = dummyTemplates.find((t) => t.id === request.templateId);
 
-    let content = template.content
-      .replace(/{studentName}/g, request.studentName)
-      .replace(/{studentId}/g, request.studentId)
-      .replace(/{reason}/g, request.reason)
-      .replace(/{parentName}/g, student?.parentName || "N/A");
+    const htmlContent = getCertificateHtml(
+      request,
+      student,
+      template,
+      addSignature
+    );
+    const fileName = `Bonafide-${request.studentId}.pdf`;
 
-    if (addSignature) {
-      content += "<p><br/></p><p>--- E-Signed by Principal Thompson ---</p>";
-    }
-    return content;
+    await generatePdf(htmlContent, fileName);
+
+    setRequests((prevRequests) =>
+      prevRequests.map((req) =>
+        req.id === request.id ? { ...req, status: "Approved" } : req
+      )
+    );
+    showSuccess(`Request ${request.id} approved and PDF downloaded.`);
+    setAddSignature(true);
   };
 
   const pendingRequests = requests.filter(
@@ -92,6 +89,9 @@ const AdminPendingRequests = () => {
                 const student = dummyStudents.find(
                   (s) => s.registerNumber === request.studentId
                 );
+                const template = dummyTemplates.find(
+                  (t) => t.id === request.templateId
+                );
                 return (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
@@ -109,7 +109,7 @@ const AdminPendingRequests = () => {
                       <Button variant="outline" size="sm">
                         Return to HOD
                       </Button>
-                      <Dialog onOpenChange={() => setAddSignature(false)}>
+                      <Dialog onOpenChange={() => setAddSignature(true)}>
                         <DialogTrigger asChild>
                           <Button size="sm">Approve</Button>
                         </DialogTrigger>
@@ -124,7 +124,12 @@ const AdminPendingRequests = () => {
                             <div
                               className="p-4 border rounded-md bg-muted prose dark:prose-invert max-w-none"
                               dangerouslySetInnerHTML={{
-                                __html: getCertificatePreview(request),
+                                __html: getCertificateHtml(
+                                  request,
+                                  student,
+                                  template,
+                                  addSignature
+                                ),
                               }}
                             />
                             <div className="flex items-center space-x-2 mt-4">
@@ -141,9 +146,11 @@ const AdminPendingRequests = () => {
                           <DialogFooter>
                             <DialogClose asChild>
                               <Button
-                                onClick={() => handleApprove(request.id)}
+                                onClick={() =>
+                                  handleApproveAndDownload(request)
+                                }
                               >
-                                Approve and Issue
+                                Approve and Download PDF
                               </Button>
                             </DialogClose>
                           </DialogFooter>

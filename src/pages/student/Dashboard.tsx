@@ -8,12 +8,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { dummyStudents } from "@/data/dummyData";
 import { dummyRequests } from "@/data/dummyRequests";
+import { dummyTemplates } from "@/data/dummyTemplates";
+import { BonafideRequest } from "@/lib/types";
 import { getStatusVariant } from "@/lib/utils";
+import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { CheckCircle, Download, FileText, Clock } from "lucide-react";
 
 const StudentDashboard = () => {
-  // Hardcoding student ID for demonstration
   const studentId = "S12345";
 
   const studentRequests = dummyRequests.filter(
@@ -30,11 +33,21 @@ const StudentDashboard = () => {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )[0];
 
+  const handleDownload = async (request: BonafideRequest) => {
+    const student = dummyStudents.find(
+      (s) => s.registerNumber === request.studentId
+    );
+    const template = dummyTemplates.find((t) => t.id === request.templateId);
+
+    const htmlContent = getCertificateHtml(request, student, template, true);
+    const fileName = `Bonafide-${request.studentId}.pdf`;
+    await generatePdf(htmlContent, fileName);
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Dashboard</h1>
 
-      {/* Metric Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <DashboardCard
           title="Total Requests"
@@ -54,7 +67,6 @@ const StudentDashboard = () => {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {/* Latest Application Details */}
         <div className="lg:col-span-1">
           {latestRequest ? (
             <Card>
@@ -105,7 +117,6 @@ const StudentDashboard = () => {
           )}
         </div>
 
-        {/* Approved Bonafides for Download */}
         <div className="lg:col-span-2">
           <h2 className="text-2xl font-bold mb-4">Ready for Download</h2>
           {approvedRequests.length > 0 ? (
@@ -114,10 +125,15 @@ const StudentDashboard = () => {
                 <Card key={request.id}>
                   <CardHeader>
                     <CardTitle className="text-lg">{request.reason}</CardTitle>
-                    <CardDescription>Approved on {request.date}</CardDescription>
+                    <CardDescription>
+                      Approved on {request.date}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Button className="w-full">
+                    <Button
+                      className="w-full"
+                      onClick={() => handleDownload(request)}
+                    >
                       <Download className="mr-2 h-4 w-4" />
                       Download Certificate
                     </Button>

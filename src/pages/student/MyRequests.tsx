@@ -22,8 +22,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { dummyStudents } from "@/data/dummyData";
 import { dummyRequests } from "@/data/dummyRequests";
+import { dummyTemplates } from "@/data/dummyTemplates";
+import { BonafideRequest } from "@/lib/types";
 import { getStatusVariant } from "@/lib/utils";
+import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { Download } from "lucide-react";
 
 const studentRequests = dummyRequests.filter(
@@ -31,6 +35,17 @@ const studentRequests = dummyRequests.filter(
 );
 
 const MyRequests = () => {
+  const handleDownload = async (request: BonafideRequest) => {
+    const student = dummyStudents.find(
+      (s) => s.registerNumber === request.studentId
+    );
+    const template = dummyTemplates.find((t) => t.id === request.templateId);
+
+    const htmlContent = getCertificateHtml(request, student, template, true);
+    const fileName = `Bonafide-${request.studentId}.pdf`;
+    await generatePdf(htmlContent, fileName);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -60,7 +75,11 @@ const MyRequests = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   {request.status === "Approved" && (
-                    <Button variant="outline" size="icon">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleDownload(request)}
+                    >
                       <Download className="h-4 w-4" />
                       <span className="sr-only">Download</span>
                     </Button>
