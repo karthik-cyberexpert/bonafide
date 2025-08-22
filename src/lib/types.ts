@@ -84,6 +84,7 @@ export interface NavItem {
 export interface Department {
   id: string;
   name: string;
+  establishedYear: number;
 }
 
 export interface Batch {

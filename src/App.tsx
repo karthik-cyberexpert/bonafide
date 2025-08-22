@@ -41,6 +41,7 @@ import PrincipalDashboard from "./pages/principal/Dashboard";
 import PrincipalProfile from "./pages/principal/Profile";
 import PrincipalRequestHistory from "./pages/principal/RequestHistory";
 import PrincipalPendingRequests from "./pages/principal/PendingRequests";
+import DepartmentOverview from "./pages/principal/DepartmentOverview";
 
 const queryClient = new QueryClient();
 
@@ -129,6 +130,10 @@ const App = () => (
               <Route
                 path="/principal/request-history"
                 element={<PrincipalRequestHistory />}
+              />
+              <Route
+                path="/principal/department-overview"
+                element={<DepartmentOverview />}
               />
               <Route path="/principal/profile" element={<PrincipalProfile />} />
             </Route>

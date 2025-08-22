@@ -5,6 +5,7 @@ import {
   User,
   History,
   FileClock,
+  Building,
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
@@ -24,6 +25,11 @@ const navItems: NavItem[] = [
     title: "Request History",
     href: "/principal/request-history",
     icon: <History className="h-4 w-4" />,
+  },
+  {
+    title: "Departments",
+    href: "/principal/department-overview",
+    icon: <Building className="h-4 w-4" />,
   },
   {
     title: "Profile",

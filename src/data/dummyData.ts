@@ -90,10 +90,10 @@ export const dummyBatches: Batch[] = [
 ];
 
 export const dummyDepartments: Department[] = [
-  { id: "D001", name: "Computer Science" },
-  { id: "D002", name: "Mechanical Engineering" },
-  { id: "D003", name: "Civil Engineering" },
-  { id: "D004", name: "Electrical Engineering" },
+  { id: "D001", name: "Computer Science", establishedYear: 1998 },
+  { id: "D002", name: "Mechanical Engineering", establishedYear: 1995 },
+  { id: "D003", name: "Civil Engineering", establishedYear: 1996 },
+  { id: "D004", name: "Electrical Engineering", establishedYear: 1997 },
 ];
 
 export const dummyHods: HodProfile[] = [
