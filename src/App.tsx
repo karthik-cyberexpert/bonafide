@@ -36,6 +36,7 @@ import AdminRequestHistory from "./pages/admin/RequestHistory";
 import AdminPendingRequests from "./pages/admin/PendingRequests";
 import ManageFaculties from "./pages/admin/ManageFaculties";
 import DepartmentManagement from "./pages/admin/DepartmentManagement";
+import TemplateManagement from "./pages/admin/TemplateManagement";
 
 const queryClient = new QueryClient();
 
@@ -109,6 +110,10 @@ const App = () => (
               <Route
                 path="/admin/department-management"
                 element={<DepartmentManagement />}
+              />
+              <Route
+                path="/admin/template-management"
+                element={<TemplateManagement />}
               />
               <Route path="/admin/profile" element={<AdminProfile />} />
             </Route>

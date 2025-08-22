@@ -7,6 +7,7 @@ import {
   FileClock,
   Users,
   Building,
+  FileText,
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
@@ -36,6 +37,11 @@ const navItems: NavItem[] = [
     title: "Department Management",
     href: "/admin/department-management",
     icon: <Building className="h-4 w-4" />,
+  },
+  {
+    title: "Template Management",
+    href: "/admin/template-management",
+    icon: <FileText className="h-4 w-4" />,
   },
   {
     title: "Profile",
