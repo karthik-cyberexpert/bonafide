@@ -4,8 +4,6 @@ import {
   LayoutDashboard,
   User,
   History,
-  Users,
-  Building,
   FileClock,
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
@@ -26,16 +24,6 @@ const navItems: NavItem[] = [
     title: "Request History",
     href: "/principal/request-history",
     icon: <History className="h-4 w-4" />,
-  },
-  {
-    title: "Manage HODs",
-    href: "/principal/manage-hods",
-    icon: <Users className="h-4 w-4" />,
-  },
-  {
-    title: "Department Management",
-    href: "/principal/department-management",
-    icon: <Building className="h-4 w-4" />,
   },
   {
     title: "Profile",

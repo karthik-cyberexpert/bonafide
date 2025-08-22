@@ -40,8 +40,6 @@ import PrincipalLayout from "./components/layouts/PrincipalLayout";
 import PrincipalDashboard from "./pages/principal/Dashboard";
 import PrincipalProfile from "./pages/principal/Profile";
 import PrincipalRequestHistory from "./pages/principal/RequestHistory";
-import PrincipalManageHods from "./pages/principal/ManageHods";
-import PrincipalDepartmentManagement from "./pages/principal/DepartmentManagement";
 import PrincipalPendingRequests from "./pages/principal/PendingRequests";
 
 const queryClient = new QueryClient();
@@ -131,14 +129,6 @@ const App = () => (
               <Route
                 path="/principal/request-history"
                 element={<PrincipalRequestHistory />}
-              />
-              <Route
-                path="/principal/manage-hods"
-                element={<PrincipalManageHods />}
-              />
-              <Route
-                path="/principal/department-management"
-                element={<PrincipalDepartmentManagement />}
               />
               <Route path="/principal/profile" element={<PrincipalProfile />} />
             </Route>
