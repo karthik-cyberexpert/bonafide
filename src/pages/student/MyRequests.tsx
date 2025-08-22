@@ -55,7 +55,6 @@ const MyRequests = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Request ID</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Reason</TableHead>
               <TableHead>Status</TableHead>
@@ -65,7 +64,6 @@ const MyRequests = () => {
           <TableBody>
             {studentRequests.map((request) => (
               <TableRow key={request.id}>
-                <TableCell className="font-medium">{request.id}</TableCell>
                 <TableCell>{formatDateToIndian(request.date)}</TableCell>
                 <TableCell>{request.reason}</TableCell>
                 <TableCell>
