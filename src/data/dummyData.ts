@@ -25,10 +25,6 @@ export const dummyBatches: Batch[] = [
     currentSemester: 7,
     semesterFromDate: "2024-01-15",
     semesterToDate: yesterdayString, // This semester has ended
-    sections: [
-      { id: "S001A", name: "A", tutor: "Prof. John Doe", studentCount: 31 },
-      { id: "S001B", name: "B", tutor: "Prof. Jane Smith", studentCount: 31 },
-    ],
   },
   {
     id: "B002",
@@ -39,10 +35,6 @@ export const dummyBatches: Batch[] = [
     currentSemester: 5,
     semesterFromDate: "2024-07-01",
     semesterToDate: futureDateString,
-    sections: [
-      { id: "S002A", name: "A", tutor: "Prof. Alan Turing", studentCount: 29 },
-      { id: "S002B", name: "B", tutor: "Prof. Ada Lovelace", studentCount: 29 },
-    ],
   },
   {
     id: "B003",
@@ -53,15 +45,6 @@ export const dummyBatches: Batch[] = [
     currentSemester: 3,
     semesterFromDate: "2024-07-01",
     semesterToDate: futureDateString,
-    sections: [
-      { id: "S003A", name: "A", tutor: "Prof. Grace Hopper", studentCount: 32 },
-      {
-        id: "S003B",
-        name: "B",
-        tutor: "Prof. Charles Babbage",
-        studentCount: 33,
-      },
-    ],
   },
   {
     id: "B004",
@@ -72,15 +55,6 @@ export const dummyBatches: Batch[] = [
     currentSemester: 8,
     semesterFromDate: "2023-12-01",
     semesterToDate: "2024-05-15",
-    sections: [
-      { id: "S004A", name: "A", tutor: "Prof. Ian Malcolm", studentCount: 27 },
-      {
-        id: "S004B",
-        name: "B",
-        tutor: "Prof. Ellie Sattler",
-        studentCount: 28,
-      },
-    ],
   },
 ];
 
