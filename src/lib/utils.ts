@@ -15,10 +15,12 @@ export const getStatusVariant = (
     case "Pending Tutor Approval":
     case "Pending HOD Approval":
     case "Pending Admin Approval":
+    case "Pending Principal Approval":
       return "secondary";
     case "Returned by Tutor":
     case "Returned by HOD":
     case "Returned by Admin":
+    case "Returned by Principal":
       return "destructive";
     default:
       return "default";

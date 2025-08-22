@@ -29,8 +29,6 @@ import HodPendingRequests from "./pages/hod/PendingRequests";
 import AdminLayout from "./components/layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProfile from "./pages/admin/Profile";
-import AdminRequestHistory from "./pages/admin/RequestHistory";
-import AdminPendingRequests from "./pages/admin/PendingRequests";
 import ManageFaculties from "./pages/admin/ManageFaculties";
 import DepartmentManagement from "./pages/admin/DepartmentManagement";
 import TemplateManagement from "./pages/admin/TemplateManagement";
@@ -44,6 +42,7 @@ import PrincipalProfile from "./pages/principal/Profile";
 import PrincipalRequestHistory from "./pages/principal/RequestHistory";
 import PrincipalManageHods from "./pages/principal/ManageHods";
 import PrincipalDepartmentManagement from "./pages/principal/DepartmentManagement";
+import PrincipalPendingRequests from "./pages/principal/PendingRequests";
 
 const queryClient = new QueryClient();
 
@@ -94,14 +93,6 @@ const App = () => (
             <Route element={<AdminLayout />}>
               <Route path="/admin/dashboard" element={<AdminDashboard />} />
               <Route
-                path="/admin/pending-requests"
-                element={<AdminPendingRequests />}
-              />
-              <Route
-                path="/admin/request-history"
-                element={<AdminRequestHistory />}
-              />
-              <Route
                 path="/admin/manage-faculties"
                 element={<ManageFaculties />}
               />
@@ -132,6 +123,10 @@ const App = () => (
               <Route
                 path="/principal/dashboard"
                 element={<PrincipalDashboard />}
+              />
+              <Route
+                path="/principal/pending-requests"
+                element={<PrincipalPendingRequests />}
               />
               <Route
                 path="/principal/request-history"

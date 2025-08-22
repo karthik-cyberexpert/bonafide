@@ -33,7 +33,7 @@ import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { formatDateToIndian } from "@/lib/utils";
 import RequestDetailsView from "@/components/shared/RequestDetailsView";
 
-const AdminPendingRequests = () => {
+const PrincipalPendingRequests = () => {
   const [requests, setRequests] = useState<BonafideRequest[]>(appRequests);
   const [selectedRequest, setSelectedRequest] =
     useState<BonafideRequest | null>(null);
@@ -80,7 +80,7 @@ const AdminPendingRequests = () => {
     if (!selectedRequest || !returnReason) return;
     const updatedRequests = appRequests.map((req) =>
       req.id === selectedRequest.id
-        ? { ...req, status: "Returned by Admin", returnReason: returnReason }
+        ? { ...req, status: "Returned by Principal", returnReason: returnReason }
         : req
     );
     appRequests.length = 0;
@@ -98,7 +98,7 @@ const AdminPendingRequests = () => {
   };
 
   const pendingRequests = requests.filter(
-    (req) => req.status === "Pending Admin Approval"
+    (req) => req.status === "Pending Principal Approval"
   );
 
   return (
@@ -251,4 +251,4 @@ const AdminPendingRequests = () => {
   );
 };
 
-export default AdminPendingRequests;
+export default PrincipalPendingRequests;

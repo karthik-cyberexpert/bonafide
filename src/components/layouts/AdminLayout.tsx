@@ -3,8 +3,6 @@ import Header from "@/components/shared/Header";
 import {
   LayoutDashboard,
   User,
-  History,
-  FileClock,
   Users,
   Building,
   FileText,
@@ -19,16 +17,6 @@ const navItems: NavItem[] = [
     title: "Dashboard",
     href: "/admin/dashboard",
     icon: <LayoutDashboard className="h-4 w-4" />,
-  },
-  {
-    title: "Pending Requests",
-    href: "/admin/pending-requests",
-    icon: <FileClock className="h-4 w-4" />,
-  },
-  {
-    title: "Request History",
-    href: "/admin/request-history",
-    icon: <History className="h-4 w-4" />,
   },
   {
     title: "Student Management",

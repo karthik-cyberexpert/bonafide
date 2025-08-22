@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { requests as appRequests, students as appStudents } from "@/data/appData";
+import { requests as appRequests } from "@/data/appData";
 import { dummyTemplates } from "@/data/dummyTemplates";
 import { BonafideRequest } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
@@ -54,7 +54,7 @@ const HodPendingRequests = () => {
       req.id === selectedRequest.id
         ? {
             ...req,
-            status: "Pending Admin Approval",
+            status: "Pending Principal Approval",
             templateId: selectedTemplate,
           }
         : req
@@ -62,7 +62,7 @@ const HodPendingRequests = () => {
     appRequests.length = 0;
     appRequests.push(...updatedRequests);
     setRequests(updatedRequests);
-    showSuccess(`Request ${selectedRequest.id} forwarded to Admin.`);
+    showSuccess(`Request ${selectedRequest.id} forwarded to Principal.`);
     setIsForwardOpen(false);
     setSelectedRequest(null);
     setSelectedTemplate("");
@@ -162,7 +162,7 @@ const HodPendingRequests = () => {
                 setIsForwardOpen(true);
               }}
             >
-              Forward to Admin
+              Forward to Principal
             </Button>
           </DialogFooter>
         </DialogContent>

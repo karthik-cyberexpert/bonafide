@@ -4,10 +4,12 @@ export type RequestStatus =
   | "Pending Tutor Approval"
   | "Pending HOD Approval"
   | "Pending Admin Approval"
+  | "Pending Principal Approval"
   | "Approved"
   | "Returned by Tutor"
   | "Returned by HOD"
-  | "Returned by Admin";
+  | "Returned by Admin"
+  | "Returned by Principal";
 
 export interface BonafideRequest {
   id: string;
