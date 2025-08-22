@@ -53,6 +53,7 @@ const BatchManagement = () => {
   const [batches, setBatches] = useState<Batch[]>(dummyBatches);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isSemesterDialogOpen, setIsSemesterDialogOpen] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
   const [newBatch, setNewBatch] = useState<Partial<Batch>>({
     name: "",
@@ -125,6 +126,11 @@ const BatchManagement = () => {
     setIsEditDialogOpen(true);
   };
 
+  const handleOpenSemesterDialog = (batch: Batch) => {
+    setEditingBatch({ ...batch });
+    setIsSemesterDialogOpen(true);
+  };
+
   const handleSaveChanges = () => {
     if (!editingBatch) return;
 
@@ -156,7 +162,8 @@ const BatchManagement = () => {
         for (let i = oldTotalSections; i < newTotalSections; i++) {
           const sectionName = alphabet[i];
           const fullBatchName = `${batchName} ${sectionName}`;
-          const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
+          const currentSemester =
+            calculateCurrentSemesterForBatch(fullBatchName);
           const { from, to } = getSemesterDateRange(
             fullBatchName,
             currentSemester
@@ -188,6 +195,20 @@ const BatchManagement = () => {
     setEditingBatch(null);
   };
 
+  const handleSaveSemesterChanges = () => {
+    if (!editingBatch) return;
+    setBatches(
+      batches.map((b) => (b.id === editingBatch.id ? editingBatch : b))
+    );
+    showSuccess(
+      `Semester details for "${editingBatch.name} - ${
+        editingBatch.section || ""
+      }" updated successfully.`
+    );
+    setIsSemesterDialogOpen(false);
+    setEditingBatch(null);
+  };
+
   const handleAddNewBatch = () => {
     const batchName = newBatch.name;
     const totalSections = newBatch.totalSections || 1;
@@ -202,7 +223,9 @@ const BatchManagement = () => {
 
     for (let i = 0; i < totalSections; i++) {
       const sectionName = totalSections > 1 ? alphabet[i] : undefined;
-      const fullBatchName = sectionName ? `${batchName} ${sectionName}` : batchName;
+      const fullBatchName = sectionName
+        ? `${batchName} ${sectionName}`
+        : batchName;
       const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
       const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
 
@@ -368,7 +391,14 @@ const BatchManagement = () => {
                               handleOpenEditDialog(selectedBatchData)
                             }
                           >
-                            Edit Section
+                            Edit Section Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleOpenSemesterDialog(selectedBatchData)
+                            }
+                          >
+                            Edit Semester
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() =>
@@ -403,7 +433,9 @@ const BatchManagement = () => {
               <Select
                 value={editingBatch?.tutor}
                 onValueChange={(value) =>
-                  setEditingBatch((prev) => (prev ? { ...prev, tutor: value } : null))
+                  setEditingBatch((prev) =>
+                    prev ? { ...prev, tutor: value } : null
+                  )
                 }
               >
                 <SelectTrigger id="edit-tutor">
@@ -441,6 +473,75 @@ const BatchManagement = () => {
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <Button onClick={handleSaveChanges}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isSemesterDialogOpen}
+        onOpenChange={setIsSemesterDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              Edit Semester: {editingBatch?.name} - {editingBatch?.section}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="current-semester">Current Semester</Label>
+              <Select
+                value={String(editingBatch?.currentSemester || "")}
+                onValueChange={(value) =>
+                  setEditingBatch((prev) =>
+                    prev ? { ...prev, currentSemester: Number(value) } : null
+                  )
+                }
+              >
+                <SelectTrigger id="current-semester">
+                  <SelectValue placeholder="Select semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                    <SelectItem key={sem} value={String(sem)}>
+                      Semester {sem}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="from-date">Semester Start Date</Label>
+              <Input
+                id="from-date"
+                type="date"
+                value={editingBatch?.semesterFromDate || ""}
+                onChange={(e) =>
+                  setEditingBatch((prev) =>
+                    prev ? { ...prev, semesterFromDate: e.target.value } : null
+                  )
+                }
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="to-date">Semester End Date</Label>
+              <Input
+                id="to-date"
+                type="date"
+                value={editingBatch?.semesterToDate || ""}
+                onChange={(e) =>
+                  setEditingBatch((prev) =>
+                    prev ? { ...prev, semesterToDate: e.target.value } : null
+                  )
+                }
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleSaveSemesterChanges}>Save Changes</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
