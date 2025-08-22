@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LayoutDashboard, Menu } from "lucide-react";
+import { LayoutDashboard, Menu, Bell } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { NavItem } from "@/lib/types";
 
@@ -48,11 +48,17 @@ const Header = ({ navItems, portalName }: HeaderProps) => {
           </SheetContent>
         </Sheet>
       </div>
-      
+
       {/* This empty div is a trick to push the theme toggle to the far right on desktop */}
       <div className="hidden md:block" />
 
-      <ThemeToggle />
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon">
+          <Bell className="h-5 w-5" />
+          <span className="sr-only">View notifications</span>
+        </Button>
+        <ThemeToggle />
+      </div>
     </header>
   );
 };
