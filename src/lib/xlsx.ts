@@ -8,7 +8,7 @@ const studentTemplateHeaders = [
   "email",
   "phoneNumber",
   "parentName",
-  "department",
+  "department", // Added department
   "batch",
   "currentSemester",
   "tutor",

@@ -32,7 +32,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { dummyStudents, dummyBatches } from "@/data/dummyData";
+import {
+  students as appStudents,
+  batches as appBatches,
+  departments as appDepartments,
+} from "@/data/appData";
 import { Download, MoreHorizontal, Upload } from "lucide-react";
 import {
   DropdownMenu,
@@ -44,14 +48,18 @@ import { downloadStudentTemplate, parseStudentFile } from "@/lib/xlsx";
 import { showSuccess, showError } from "@/utils/toast";
 
 const StudentManagement = () => {
+  const [selectedDepartment, setSelectedDepartment] = useState("all");
   const [selectedBatch, setSelectedBatch] = useState("all");
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
 
-  const filteredStudents =
-    selectedBatch === "all"
-      ? dummyStudents
-      : dummyStudents.filter((student) => student.batch === selectedBatch);
+  const filteredStudents = appStudents.filter((student) => {
+    const departmentMatch =
+      selectedDepartment === "all" || student.department === selectedDepartment;
+    const batchMatch =
+      selectedBatch === "all" || student.batch === selectedBatch;
+    return departmentMatch && batchMatch;
+  });
 
   const handleFileUpload = async () => {
     if (!uploadFile) {
@@ -74,16 +82,29 @@ const StudentManagement = () => {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row items-center justify-between flex-wrap gap-2">
         <CardTitle>Student Management</CardTitle>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Select onValueChange={setSelectedDepartment} defaultValue="all">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by department" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Departments</SelectItem>
+              {appDepartments.map((dept) => (
+                <SelectItem key={dept.id} value={dept.name}>
+                  {dept.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select onValueChange={setSelectedBatch} defaultValue="all">
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Filter by batch" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Batches</SelectItem>
-              {dummyBatches.map((batch) => {
+              {appBatches.map((batch) => {
                 const fullBatchName = batch.section
                   ? `${batch.name} ${batch.section}`
                   : batch.name;
@@ -143,6 +164,7 @@ const StudentManagement = () => {
             <TableRow>
               <TableHead>Register No.</TableHead>
               <TableHead>Student Name</TableHead>
+              <TableHead>Department</TableHead> {/* Added Department column */}
               <TableHead>Batch</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -155,6 +177,8 @@ const StudentManagement = () => {
                   {student.registerNumber}
                 </TableCell>
                 <TableCell>{student.name}</TableCell>
+                <TableCell>{student.department}</TableCell>{" "}
+                {/* Display Department */}
                 <TableCell>{student.batch}</TableCell>
                 <TableCell>{student.tutor}</TableCell>
                 <TableCell className="text-right">

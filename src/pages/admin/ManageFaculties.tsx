@@ -43,7 +43,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { hods as appHods } from "@/data/appData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { hods as appHods, departments as appDepartments } from "@/data/appData";
 import { HodProfile } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
 
@@ -126,12 +133,22 @@ const ManageFaculties = () => {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="department">Department</Label>
-                  <Input
-                    id="department"
+                  <Select
                     name="department"
                     defaultValue={editingFaculty?.department}
                     required
-                  />
+                  >
+                    <SelectTrigger id="department">
+                      <SelectValue placeholder="Select Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {appDepartments.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.name}>
+                          {dept.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="email">Email</Label>

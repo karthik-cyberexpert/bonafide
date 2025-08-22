@@ -15,7 +15,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { dummyBatches, dummyTutors } from "@/data/dummyData";
+import {
+  batches as appBatches,
+  tutors as appTutors,
+  departments as appDepartments,
+} from "@/data/appData";
 import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -50,7 +54,7 @@ import {
 } from "@/lib/utils";
 
 const BatchManagement = () => {
-  const [batches, setBatches] = useState<Batch[]>(dummyBatches);
+  const [batches, setBatches] = useState<Batch[]>(appBatches);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isSemesterDialogOpen, setIsSemesterDialogOpen] = useState(false);
@@ -58,6 +62,7 @@ const BatchManagement = () => {
   const [newBatch, setNewBatch] = useState<Partial<Batch>>({
     name: "",
     totalSections: 1,
+    departmentId: "", // New field for adding batch
   });
 
   const groupedBatches = useMemo(() => {
@@ -148,12 +153,15 @@ const BatchManagement = () => {
 
     if (oldTotalSections !== newTotalSections) {
       const batchName = editingBatch.name;
+      const departmentId = editingBatch.departmentId; // Use departmentId from editingBatch
       const existingSections = updatedBatches
-        .filter((b) => b.name === batchName)
+        .filter((b) => b.name === batchName && b.departmentId === departmentId)
         .sort((a, b) => (a.section || "").localeCompare(b.section || ""));
 
       updatedBatches = updatedBatches.map((b) =>
-        b.name === batchName ? { ...b, totalSections: newTotalSections } : b
+        b.name === batchName && b.departmentId === departmentId
+          ? { ...b, totalSections: newTotalSections }
+          : b
       );
 
       const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -179,6 +187,7 @@ const BatchManagement = () => {
             currentSemester,
             semesterFromDate: from,
             semesterToDate: to,
+            departmentId: departmentId, // Assign departmentId
           };
           updatedBatches.push(newSection);
         }
@@ -189,6 +198,8 @@ const BatchManagement = () => {
       }
     }
 
+    appBatches.length = 0;
+    appBatches.push(...updatedBatches);
     setBatches(updatedBatches);
     showSuccess(`Batch "${editingBatch.name}" updated successfully.`);
     setIsEditDialogOpen(false);
@@ -197,9 +208,12 @@ const BatchManagement = () => {
 
   const handleSaveSemesterChanges = () => {
     if (!editingBatch) return;
-    setBatches(
-      batches.map((b) => (b.id === editingBatch.id ? editingBatch : b))
+    const updatedBatches = batches.map((b) =>
+      b.id === editingBatch.id ? editingBatch : b
     );
+    appBatches.length = 0;
+    appBatches.push(...updatedBatches);
+    setBatches(updatedBatches);
     showSuccess(
       `Semester details for "${editingBatch.name} - ${
         editingBatch.section || ""
@@ -210,19 +224,18 @@ const BatchManagement = () => {
   };
 
   const handleAddNewBatch = () => {
-    const batchName = newBatch.name;
-    const totalSections = newBatch.totalSections || 1;
+    const { name: batchName, totalSections, departmentId } = newBatch;
 
-    if (!batchName) {
-      showError("Batch name is required.");
+    if (!batchName || !departmentId) {
+      showError("Batch name and Department are required.");
       return;
     }
 
     const newSections: Batch[] = [];
     const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    for (let i = 0; i < totalSections; i++) {
-      const sectionName = totalSections > 1 ? alphabet[i] : undefined;
+    for (let i = 0; i < (totalSections || 1); i++) {
+      const sectionName = (totalSections || 1) > 1 ? alphabet[i] : undefined;
       const fullBatchName = sectionName
         ? `${batchName} ${sectionName}`
         : batchName;
@@ -234,22 +247,26 @@ const BatchManagement = () => {
         name: batchName,
         section: sectionName,
         tutor: "Unassigned",
-        totalSections: totalSections,
+        totalSections: totalSections || 1,
         studentCount: 0,
         status: "Active",
         currentSemester,
         semesterFromDate: from,
         semesterToDate: to,
+        departmentId: departmentId,
       };
       newSections.push(finalNewBatch);
     }
 
-    setBatches([...batches, ...newSections]);
+    const updatedBatches = [...batches, ...newSections];
+    appBatches.length = 0;
+    appBatches.push(...updatedBatches);
+    setBatches(updatedBatches);
     showSuccess(
       `Batch "${batchName}" with ${totalSections} section(s) created successfully.`
     );
     setIsAddDialogOpen(false);
-    setNewBatch({ name: "", totalSections: 1 });
+    setNewBatch({ name: "", totalSections: 1, departmentId: "" });
   };
 
   return (
@@ -267,6 +284,27 @@ const BatchManagement = () => {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
+                  <Label htmlFor="new-batch-department">Department</Label>
+                  <Select
+                    value={newBatch.departmentId}
+                    onValueChange={(value) =>
+                      setNewBatch({ ...newBatch, departmentId: value })
+                    }
+                    required
+                  >
+                    <SelectTrigger id="new-batch-department">
+                      <SelectValue placeholder="Select Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {appDepartments.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.id}>
+                          {dept.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid gap-2">
                   <Label htmlFor="new-batch-name">
                     Batch (e.g., 2024-2028)
                   </Label>
@@ -276,6 +314,7 @@ const BatchManagement = () => {
                     onChange={(e) =>
                       setNewBatch({ ...newBatch, name: e.target.value })
                     }
+                    required
                   />
                 </div>
                 <div className="grid gap-2">
@@ -307,6 +346,7 @@ const BatchManagement = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Department</TableHead> {/* Added Department column */}
                 <TableHead>Batch</TableHead>
                 <TableHead>Section</TableHead>
                 <TableHead>Total Sections</TableHead>
@@ -328,8 +368,14 @@ const BatchManagement = () => {
 
                 if (!selectedBatchData) return null;
 
+                const department = appDepartments.find(
+                  (d) => d.id === selectedBatchData.departmentId
+                );
+
                 return (
                   <TableRow key={batchName}>
+                    <TableCell>{department?.name || "N/A"}</TableCell>{" "}
+                    {/* Display Department */}
                     <TableCell className="font-medium">{batchName}</TableCell>
                     <TableCell>
                       {sections.length > 1 ? (
@@ -429,6 +475,17 @@ const BatchManagement = () => {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
+              <Label htmlFor="edit-department">Department</Label>
+              <Input
+                id="edit-department"
+                value={
+                  appDepartments.find((d) => d.id === editingBatch?.departmentId)
+                    ?.name || "N/A"
+                }
+                disabled
+              />
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="total-sections">Total Sections for Batch</Label>
               <Input
                 id="total-sections"
@@ -480,11 +537,19 @@ const BatchManagement = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Unassigned">Unassigned</SelectItem>
-                  {dummyTutors.map((tutor) => (
-                    <SelectItem key={tutor.username} value={tutor.name}>
-                      {tutor.name}
-                    </SelectItem>
-                  ))}
+                  {appTutors
+                    .filter(
+                      (tutor) =>
+                        tutor.department ===
+                        appDepartments.find(
+                          (d) => d.id === editingBatch?.departmentId
+                        )?.name
+                    )
+                    .map((tutor) => (
+                      <SelectItem key={tutor.username} value={tutor.name}>
+                        {tutor.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>

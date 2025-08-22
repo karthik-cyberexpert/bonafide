@@ -50,7 +50,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { tutors as appTutors, batches as appBatches } from "@/data/appData";
+import {
+  tutors as appTutors,
+  batches as appBatches,
+  departments as appDepartments,
+} from "@/data/appData";
 import { TutorProfile } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
 
@@ -58,23 +62,37 @@ const ManageTutors = () => {
   const [tutors, setTutors] = useState<TutorProfile[]>(appTutors);
   const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
   const [editingTutor, setEditingTutor] = useState<TutorProfile | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = useState("");
   const [selectedBatchName, setSelectedBatchName] = useState("");
   const [selectedSection, setSelectedSection] = useState("");
 
   const uniqueBatchNames = useMemo(() => {
-    const names = appBatches.map((b) => b.name);
+    if (!selectedDepartment) return [];
+    const departmentBatches = appBatches.filter(
+      (b) =>
+        appDepartments.find((d) => d.id === b.departmentId)?.name ===
+        selectedDepartment
+    );
+    const names = departmentBatches.map((b) => b.name);
     return [...new Set(names)];
-  }, []);
+  }, [selectedDepartment]);
 
   const availableSections = useMemo(() => {
-    if (!selectedBatchName) return [];
+    if (!selectedBatchName || !selectedDepartment) return [];
     return appBatches
-      .filter((b) => b.name === selectedBatchName && b.section)
+      .filter(
+        (b) =>
+          b.name === selectedBatchName &&
+          b.section &&
+          appDepartments.find((d) => d.id === b.departmentId)?.name ===
+            selectedDepartment
+      )
       .map((b) => b.section!);
-  }, [selectedBatchName]);
+  }, [selectedBatchName, selectedDepartment]);
 
   const openEditDialog = (tutor: TutorProfile) => {
     setEditingTutor(tutor);
+    setSelectedDepartment(tutor.department);
     const [batchName = "", section = ""] = tutor.batchAssigned.split(" ");
     setSelectedBatchName(batchName);
     setSelectedSection(section);
@@ -83,6 +101,7 @@ const ManageTutors = () => {
 
   const openAddDialog = () => {
     setEditingTutor(null);
+    setSelectedDepartment("");
     setSelectedBatchName("");
     setSelectedSection("");
     setIsAddEditDialogOpen(true);
@@ -100,7 +119,7 @@ const ManageTutors = () => {
       username:
         editingTutor?.username ||
         (formData.get("name") as string).toLowerCase().replace(" ", "_"),
-      department: "Computer Science",
+      department: selectedDepartment, // Use selected department
       batchAssigned,
       email: formData.get("email") as string,
       phoneNumber: formData.get("phoneNumber") as string,
@@ -163,6 +182,25 @@ const ManageTutors = () => {
                     required
                   />
                 </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="department">Department</Label>
+                  <Select
+                    value={selectedDepartment}
+                    onValueChange={setSelectedDepartment}
+                    required
+                  >
+                    <SelectTrigger id="department">
+                      <SelectValue placeholder="Select Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {appDepartments.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.name}>
+                          {dept.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="batchName">Batch</Label>
@@ -172,6 +210,7 @@ const ManageTutors = () => {
                         setSelectedBatchName(value);
                         setSelectedSection("");
                       }}
+                      disabled={!selectedDepartment}
                     >
                       <SelectTrigger id="batchName">
                         <SelectValue placeholder="Select Batch" />
@@ -244,6 +283,7 @@ const ManageTutors = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Department</TableHead>
               <TableHead>Batch Assigned</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone Number</TableHead>
@@ -254,6 +294,7 @@ const ManageTutors = () => {
             {tutors.map((tutor) => (
               <TableRow key={tutor.username}>
                 <TableCell className="font-medium">{tutor.name}</TableCell>
+                <TableCell>{tutor.department}</TableCell>
                 <TableCell>{tutor.batchAssigned}</TableCell>
                 <TableCell>{tutor.email}</TableCell>
                 <TableCell>{tutor.phoneNumber}</TableCell>

@@ -27,6 +27,7 @@ export const dummyBatches: Batch[] = [
     currentSemester: 7,
     semesterFromDate: "2024-01-15",
     semesterToDate: yesterdayString,
+    departmentId: "D001", // Computer Science
   },
   {
     id: "B001B",
@@ -39,6 +40,7 @@ export const dummyBatches: Batch[] = [
     currentSemester: 7,
     semesterFromDate: "2024-01-15",
     semesterToDate: yesterdayString,
+    departmentId: "D001", // Computer Science
   },
   {
     id: "B002A",
@@ -51,6 +53,7 @@ export const dummyBatches: Batch[] = [
     currentSemester: 5,
     semesterFromDate: "2024-07-01",
     semesterToDate: futureDateString,
+    departmentId: "D001", // Computer Science
   },
   {
     id: "B002B",
@@ -63,6 +66,7 @@ export const dummyBatches: Batch[] = [
     currentSemester: 5,
     semesterFromDate: "2024-07-01",
     semesterToDate: futureDateString,
+    departmentId: "D001", // Computer Science
   },
   {
     id: "B003A",
@@ -75,6 +79,7 @@ export const dummyBatches: Batch[] = [
     currentSemester: 3,
     semesterFromDate: "2024-07-01",
     semesterToDate: futureDateString,
+    departmentId: "D001", // Computer Science
   },
   {
     id: "B004",
@@ -86,6 +91,7 @@ export const dummyBatches: Batch[] = [
     currentSemester: 8,
     semesterFromDate: "2023-12-01",
     semesterToDate: "2024-05-15",
+    departmentId: "D001", // Computer Science
   },
 ];
 

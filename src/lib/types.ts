@@ -98,4 +98,5 @@ export interface Batch {
   currentSemester?: number;
   semesterFromDate?: string;
   semesterToDate?: string;
+  departmentId: string; // Added departmentId
 }
