@@ -62,3 +62,38 @@ export const calculateCurrentSemesterForBatch = (batchName: string): number => {
 
   return semester;
 };
+
+/**
+ * Calculates the start and end dates for a given semester of a batch.
+ * @param batchName The name of the batch (e.g., "2023-2027").
+ * @param currentSemester The semester to calculate dates for.
+ * @returns An object with `from` and `to` date strings.
+ */
+export const getSemesterDateRange = (
+  batchName: string,
+  currentSemester: number
+): { from: string; to: string } => {
+  const startYear = parseInt(batchName.split("-")[0], 10);
+  const academicYearOffset = Math.floor((currentSemester - 1) / 2);
+  const isOddSemester = currentSemester % 2 !== 0;
+
+  let fromDate: Date;
+  let toDate: Date;
+
+  if (isOddSemester) {
+    // Odd semesters: July 1st to Dec 31st
+    const year = startYear + academicYearOffset;
+    fromDate = new Date(year, 6, 1); // July 1st
+    toDate = new Date(year, 11, 31); // Dec 31st
+  } else {
+    // Even semesters: Jan 1st to June 30th
+    const year = startYear + academicYearOffset + 1;
+    fromDate = new Date(year, 0, 1); // Jan 1st
+    toDate = new Date(year, 5, 30); // June 30th
+  }
+
+  return {
+    from: fromDate.toISOString().split("T")[0],
+    to: toDate.toISOString().split("T")[0],
+  };
+};

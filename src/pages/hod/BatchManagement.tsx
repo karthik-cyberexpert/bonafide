@@ -25,17 +25,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { showSuccess } from "@/utils/toast";
 import { Batch } from "@/lib/types";
-import { calculateCurrentSemesterForBatch } from "@/lib/utils";
+import {
+  calculateCurrentSemesterForBatch,
+  getSemesterDateRange,
+} from "@/lib/utils";
 
 const BatchManagement = () => {
   const [batches, setBatches] = useState<Batch[]>(dummyBatches);
 
   useEffect(() => {
-    // Calculate and update the semester for each batch on component load
-    const updatedBatches = batches.map((batch) => ({
-      ...batch,
-      currentSemester: calculateCurrentSemesterForBatch(batch.name),
-    }));
+    // Calculate and update the semester and its date range for each batch on component load
+    const updatedBatches = batches.map((batch) => {
+      const currentSemester = calculateCurrentSemesterForBatch(batch.name);
+      const { from, to } = getSemesterDateRange(batch.name, currentSemester);
+      return {
+        ...batch,
+        currentSemester,
+        semesterFromDate: from,
+        semesterToDate: to,
+      };
+    });
     setBatches(updatedBatches);
     // The empty dependency array ensures this runs only once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -66,7 +75,9 @@ const BatchManagement = () => {
             <TableRow>
               <TableHead>Batch Name</TableHead>
               <TableHead>Assigned Tutor</TableHead>
-              <TableHead>Current Sem (Calculated)</TableHead>
+              <TableHead>Current Sem</TableHead>
+              <TableHead>Semester Start</TableHead>
+              <TableHead>Semester End</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -77,6 +88,16 @@ const BatchManagement = () => {
                 <TableCell className="font-medium">{batch.name}</TableCell>
                 <TableCell>{batch.tutor}</TableCell>
                 <TableCell>{batch.currentSemester}</TableCell>
+                <TableCell>
+                  {batch.semesterFromDate
+                    ? new Date(batch.semesterFromDate).toLocaleDateString()
+                    : "N/A"}
+                </TableCell>
+                <TableCell>
+                  {batch.semesterToDate
+                    ? new Date(batch.semesterToDate).toLocaleDateString()
+                    : "N/A"}
+                </TableCell>
                 <TableCell>
                   <Badge
                     variant={batch.status === "Active" ? "success" : "secondary"}
