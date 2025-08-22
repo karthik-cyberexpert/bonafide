@@ -39,7 +39,12 @@ const TutorPendingRequests = () => {
             {pendingRequests.length > 0 ? (
               pendingRequests.map((request) => (
                 <TableRow key={request.id}>
-                  <TableCell>{request.studentName}</TableCell>
+                  <TableCell className="font-medium">
+                    <div>{request.studentName}</div>
+                    <div className="text-xs text-muted-foreground">
+                      [{request.studentId}]
+                    </div>
+                  </TableCell>
                   <TableCell>{request.date}</TableCell>
                   <TableCell>{request.reason}</TableCell>
                   <TableCell className="text-right space-x-2">

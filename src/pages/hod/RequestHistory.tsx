@@ -51,7 +51,10 @@ const HodRequestHistory = () => {
                 return (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
-                      {request.studentName}
+                      <div>{request.studentName}</div>
+                      <div className="text-xs text-muted-foreground">
+                        [{request.studentId}]
+                      </div>
                     </TableCell>
                     <TableCell>{student?.tutor || "N/A"}</TableCell>
                     <TableCell>{student?.batch || "N/A"}</TableCell>

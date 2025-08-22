@@ -95,7 +95,10 @@ const AdminPendingRequests = () => {
                 return (
                   <TableRow key={request.id}>
                     <TableCell className="font-medium">
-                      {request.studentName}
+                      <div>{request.studentName}</div>
+                      <div className="text-xs text-muted-foreground">
+                        [{request.studentId}]
+                      </div>
                     </TableCell>
                     <TableCell>{student?.hod || "N/A"}</TableCell>
                     <TableCell>{student?.batch || "N/A"}</TableCell>

@@ -40,7 +40,12 @@ const TutorRequestHistory = () => {
             {requestHistory.length > 0 ? (
               requestHistory.map((request) => (
                 <TableRow key={request.id}>
-                  <TableCell>{request.studentName}</TableCell>
+                  <TableCell className="font-medium">
+                    <div>{request.studentName}</div>
+                    <div className="text-xs text-muted-foreground">
+                      [{request.studentId}]
+                    </div>
+                  </TableCell>
                   <TableCell>{request.date}</TableCell>
                   <TableCell>{request.reason}</TableCell>
                   <TableCell>
