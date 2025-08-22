@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LayoutDashboard, Menu, Bell } from "lucide-react";
+import { LayoutDashboard, Menu, Bell, LogOut } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { NavItem } from "@/lib/types";
 
@@ -58,6 +58,10 @@ const Header = ({ navItems, portalName }: HeaderProps) => {
           <span className="sr-only">View notifications</span>
         </Button>
         <ThemeToggle />
+        <Button variant="ghost" size="icon">
+          <LogOut className="h-5 w-5" />
+          <span className="sr-only">Logout</span>
+        </Button>
       </div>
     </header>
   );
