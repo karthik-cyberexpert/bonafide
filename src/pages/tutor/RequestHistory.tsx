@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { dummyRequests } from "@/data/dummyRequests";
-import { getStatusVariant } from "@/lib/utils";
+import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
 
 const TutorRequestHistory = () => {
   const requestHistory = dummyRequests.filter(
@@ -46,7 +46,7 @@ const TutorRequestHistory = () => {
                       [{request.studentId}]
                     </div>
                   </TableCell>
-                  <TableCell>{request.date}</TableCell>
+                  <TableCell>{formatDateToIndian(request.date)}</TableCell>
                   <TableCell>{request.reason}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(request.status)}>

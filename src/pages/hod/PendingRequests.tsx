@@ -36,6 +36,7 @@ import { dummyTemplates } from "@/data/dummyTemplates";
 import { dummyStudents } from "@/data/dummyData";
 import { BonafideRequest } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
+import { formatDateToIndian } from "@/lib/utils";
 
 const HodPendingRequests = () => {
   const [requests, setRequests] = useState<BonafideRequest[]>(dummyRequests);
@@ -100,7 +101,7 @@ const HodPendingRequests = () => {
                     <TableCell>{student?.tutor || "N/A"}</TableCell>
                     <TableCell>{student?.batch || "N/A"}</TableCell>
                     <TableCell>{student?.currentSemester || "N/A"}</TableCell>
-                    <TableCell>{request.date}</TableCell>
+                    <TableCell>{formatDateToIndian(request.date)}</TableCell>
                     <TableCell>{request.reason}</TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button variant="outline" size="sm">

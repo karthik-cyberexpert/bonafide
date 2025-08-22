@@ -45,6 +45,7 @@ import { Batch } from "@/lib/types";
 import {
   calculateCurrentSemesterForBatch,
   getSemesterDateRange,
+  formatDateToIndian,
 } from "@/lib/utils";
 
 const BatchManagement = () => {
@@ -122,14 +123,10 @@ const BatchManagement = () => {
                   <TableCell>{batch.tutor}</TableCell>
                   <TableCell>{batch.currentSemester}</TableCell>
                   <TableCell>
-                    {batch.semesterFromDate
-                      ? new Date(batch.semesterFromDate).toLocaleDateString()
-                      : "N/A"}
+                    {formatDateToIndian(batch.semesterFromDate)}
                   </TableCell>
                   <TableCell>
-                    {batch.semesterToDate
-                      ? new Date(batch.semesterToDate).toLocaleDateString()
-                      : "N/A"}
+                    {formatDateToIndian(batch.semesterToDate)}
                   </TableCell>
                   <TableCell>
                     <Badge

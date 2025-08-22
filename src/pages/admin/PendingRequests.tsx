@@ -31,6 +31,7 @@ import { dummyStudents } from "@/data/dummyData";
 import { BonafideRequest } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
 import { generatePdf, getCertificateHtml } from "@/lib/pdf";
+import { formatDateToIndian } from "@/lib/utils";
 
 const AdminPendingRequests = () => {
   const [requests, setRequests] = useState<BonafideRequest[]>(dummyRequests);
@@ -103,7 +104,7 @@ const AdminPendingRequests = () => {
                     <TableCell>{student?.hod || "N/A"}</TableCell>
                     <TableCell>{student?.batch || "N/A"}</TableCell>
                     <TableCell>{student?.currentSemester || "N/A"}</TableCell>
-                    <TableCell>{request.date}</TableCell>
+                    <TableCell>{formatDateToIndian(request.date)}</TableCell>
                     <TableCell>{request.reason}</TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button variant="outline" size="sm">

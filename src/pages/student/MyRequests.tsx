@@ -26,7 +26,7 @@ import { dummyStudents } from "@/data/dummyData";
 import { dummyRequests } from "@/data/dummyRequests";
 import { dummyTemplates } from "@/data/dummyTemplates";
 import { BonafideRequest } from "@/lib/types";
-import { getStatusVariant } from "@/lib/utils";
+import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
 import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { Download } from "lucide-react";
 
@@ -66,7 +66,7 @@ const MyRequests = () => {
             {studentRequests.map((request) => (
               <TableRow key={request.id}>
                 <TableCell className="font-medium">{request.id}</TableCell>
-                <TableCell>{request.date}</TableCell>
+                <TableCell>{formatDateToIndian(request.date)}</TableCell>
                 <TableCell>{request.reason}</TableCell>
                 <TableCell>
                   <Badge variant={getStatusVariant(request.status)}>

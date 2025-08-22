@@ -26,6 +26,23 @@ export const getStatusVariant = (
 };
 
 /**
+ * Formats a date string to dd/mm/yyyy format.
+ * @param dateString The date string to format (e.g., "yyyy-mm-dd").
+ * @returns The formatted date string or "N/A".
+ */
+export const formatDateToIndian = (dateString: string | undefined): string => {
+  if (!dateString) return "N/A";
+  try {
+    const date = new Date(dateString);
+    // en-GB locale formats as dd/mm/yyyy
+    return date.toLocaleDateString("en-GB");
+  } catch (error) {
+    console.error("Invalid date string:", dateString);
+    return "Invalid Date";
+  }
+};
+
+/**
  * Calculates the current semester for a batch based on its name (e.g., "2023-2027") and the current date.
  * Assumes the academic year starts in July.
  * @param batchName The name of the batch.

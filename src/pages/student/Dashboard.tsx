@@ -12,7 +12,7 @@ import { dummyStudents } from "@/data/dummyData";
 import { dummyRequests } from "@/data/dummyRequests";
 import { dummyTemplates } from "@/data/dummyTemplates";
 import { BonafideRequest } from "@/lib/types";
-import { getStatusVariant } from "@/lib/utils";
+import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
 import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { CheckCircle, Download, FileText, Clock } from "lucide-react";
 
@@ -93,7 +93,9 @@ const StudentDashboard = () => {
                   <p className="text-sm font-medium text-muted-foreground">
                     Date Submitted
                   </p>
-                  <p className="font-semibold">{latestRequest.date}</p>
+                  <p className="font-semibold">
+                    {formatDateToIndian(latestRequest.date)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
@@ -126,7 +128,7 @@ const StudentDashboard = () => {
                   <CardHeader>
                     <CardTitle className="text-lg">{request.reason}</CardTitle>
                     <CardDescription>
-                      Approved on {request.date}
+                      Approved on {formatDateToIndian(request.date)}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>

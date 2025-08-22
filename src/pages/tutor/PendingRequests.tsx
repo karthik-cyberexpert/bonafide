@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { dummyRequests } from "@/data/dummyRequests";
+import { formatDateToIndian } from "@/lib/utils";
 
 const TutorPendingRequests = () => {
   const pendingRequests = dummyRequests.filter(
@@ -45,7 +46,7 @@ const TutorPendingRequests = () => {
                       [{request.studentId}]
                     </div>
                   </TableCell>
-                  <TableCell>{request.date}</TableCell>
+                  <TableCell>{formatDateToIndian(request.date)}</TableCell>
                   <TableCell>{request.reason}</TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="outline" size="sm">
