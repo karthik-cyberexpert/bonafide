@@ -7,6 +7,14 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -15,7 +23,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { dummyRequests } from "@/data/dummyRequests";
-import { BonafideRequest } from "@/lib/types";
 import { getStatusVariant } from "@/lib/utils";
 import { Download } from "lucide-react";
 
@@ -57,6 +64,29 @@ const MyRequests = () => {
                       <Download className="h-4 w-4" />
                       <span className="sr-only">Download</span>
                     </Button>
+                  )}
+                  {request.status.startsWith("Returned by") && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          Review
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Reason for Return</DialogTitle>
+                          <DialogDescription>
+                            Your request was returned for the following reason.
+                            Please address the issue and resubmit if necessary.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                          <p className="text-sm font-medium bg-muted p-4 rounded-md">
+                            {request.returnReason || "No reason provided."}
+                          </p>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   )}
                 </TableCell>
               </TableRow>

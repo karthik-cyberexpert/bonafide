@@ -40,5 +40,6 @@ export const dummyRequests: BonafideRequest[] = [
     date: "2023-10-30",
     reason: "Visa Application",
     status: "Returned by Tutor",
+    returnReason: "The attached documents are not clear. Please re-upload with better quality scans.",
   },
 ];

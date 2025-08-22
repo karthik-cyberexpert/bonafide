@@ -17,6 +17,7 @@ export interface BonafideRequest {
   reason: string;
   status: RequestStatus;
   templateId?: string;
+  returnReason?: string;
 }
 
 export interface CertificateTemplate {
