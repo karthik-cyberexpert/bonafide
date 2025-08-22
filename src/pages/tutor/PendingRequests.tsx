@@ -29,7 +29,6 @@ const TutorPendingRequests = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Request ID</TableHead>
               <TableHead>Student Name</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Reason</TableHead>
@@ -40,7 +39,6 @@ const TutorPendingRequests = () => {
             {pendingRequests.length > 0 ? (
               pendingRequests.map((request) => (
                 <TableRow key={request.id}>
-                  <TableCell className="font-medium">{request.id}</TableCell>
                   <TableCell>{request.studentName}</TableCell>
                   <TableCell>{request.date}</TableCell>
                   <TableCell>{request.reason}</TableCell>
@@ -54,7 +52,7 @@ const TutorPendingRequests = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
+                <TableCell colSpan={4} className="text-center">
                   No pending requests.
                 </TableCell>
               </TableRow>

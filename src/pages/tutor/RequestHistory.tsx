@@ -30,7 +30,6 @@ const TutorRequestHistory = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Request ID</TableHead>
               <TableHead>Student Name</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Reason</TableHead>
@@ -41,7 +40,6 @@ const TutorRequestHistory = () => {
             {requestHistory.length > 0 ? (
               requestHistory.map((request) => (
                 <TableRow key={request.id}>
-                  <TableCell className="font-medium">{request.id}</TableCell>
                   <TableCell>{request.studentName}</TableCell>
                   <TableCell>{request.date}</TableCell>
                   <TableCell>{request.reason}</TableCell>
@@ -54,7 +52,7 @@ const TutorRequestHistory = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
+                <TableCell colSpan={4} className="text-center">
                   No request history.
                 </TableCell>
               </TableRow>
