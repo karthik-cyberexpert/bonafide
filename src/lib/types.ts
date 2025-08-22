@@ -83,6 +83,7 @@ export interface Batch {
   section?: string;
   tutor: string;
   studentCount: number;
+  totalSections?: number;
   status: "Active" | "Inactive";
   currentSemester?: number;
   semesterFromDate?: string;

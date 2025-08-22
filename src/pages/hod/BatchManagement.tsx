@@ -15,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { dummyBatches } from "@/data/dummyData";
+import { dummyBatches, dummyTutors } from "@/data/dummyData";
 import { MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -30,6 +30,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogClose,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -51,7 +52,14 @@ import {
 const BatchManagement = () => {
   const [batches, setBatches] = useState<Batch[]>(dummyBatches);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
+  const [newBatch, setNewBatch] = useState<Partial<Batch>>({
+    name: "",
+    section: "",
+    tutor: "",
+    totalSections: 1,
+  });
 
   useEffect(() => {
     const updatedBatches = batches.map((batch) => {
@@ -99,12 +107,109 @@ const BatchManagement = () => {
     setEditingBatch(null);
   };
 
+  const handleAddNewBatch = () => {
+    const fullBatchName = newBatch.section
+      ? `${newBatch.name} ${newBatch.section}`
+      : newBatch.name || "";
+    const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
+    const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
+
+    const finalNewBatch: Batch = {
+      id: `B${String(batches.length + 1).padStart(3, "0")}`,
+      name: newBatch.name || "Unnamed Batch",
+      section: newBatch.section || undefined,
+      tutor: newBatch.tutor || "Unassigned",
+      totalSections: newBatch.totalSections || 1,
+      studentCount: 0,
+      status: "Active",
+      currentSemester,
+      semesterFromDate: from,
+      semesterToDate: to,
+    };
+
+    setBatches([...batches, finalNewBatch]);
+    showSuccess(`Batch "${finalNewBatch.name}" created successfully.`);
+    setIsAddDialogOpen(false);
+    setNewBatch({ name: "", section: "", tutor: "", totalSections: 1 });
+  };
+
   return (
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Batch Management</CardTitle>
-          <Button>Add New Batch</Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>Add New Batch</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add New Batch</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="new-batch-name">Batch (e.g., 2024-2028)</Label>
+                  <Input
+                    id="new-batch-name"
+                    value={newBatch.name}
+                    onChange={(e) =>
+                      setNewBatch({ ...newBatch, name: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="new-section">Section (e.g., A)</Label>
+                  <Input
+                    id="new-section"
+                    value={newBatch.section}
+                    onChange={(e) =>
+                      setNewBatch({ ...newBatch, section: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="new-total-sections">Total Sections</Label>
+                  <Input
+                    id="new-total-sections"
+                    type="number"
+                    min="1"
+                    value={newBatch.totalSections}
+                    onChange={(e) =>
+                      setNewBatch({
+                        ...newBatch,
+                        totalSections: Number(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="new-tutor">Assign Tutor</Label>
+                  <Select
+                    onValueChange={(value) =>
+                      setNewBatch({ ...newBatch, tutor: value })
+                    }
+                  >
+                    <SelectTrigger id="new-tutor">
+                      <SelectValue placeholder="Select a tutor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {dummyTutors.map((tutor) => (
+                        <SelectItem key={tutor.username} value={tutor.name}>
+                          {tutor.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button onClick={handleAddNewBatch}>Create Batch</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </CardHeader>
         <CardContent>
           <Table>
@@ -112,6 +217,7 @@ const BatchManagement = () => {
               <TableRow>
                 <TableHead>Batch</TableHead>
                 <TableHead>Section</TableHead>
+                <TableHead>Total Sections</TableHead>
                 <TableHead>Assigned Tutor</TableHead>
                 <TableHead>Current Sem</TableHead>
                 <TableHead>Semester Start</TableHead>
@@ -125,6 +231,7 @@ const BatchManagement = () => {
                 <TableRow key={batch.id}>
                   <TableCell className="font-medium">{batch.name}</TableCell>
                   <TableCell>{batch.section || "N/A"}</TableCell>
+                  <TableCell>{batch.totalSections || 1}</TableCell>
                   <TableCell>{batch.tutor}</TableCell>
                   <TableCell>{batch.currentSemester}</TableCell>
                   <TableCell>
@@ -179,6 +286,22 @@ const BatchManagement = () => {
             <DialogTitle>Edit Batch: {editingBatch?.name}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="total-sections">Total Sections</Label>
+              <Input
+                id="total-sections"
+                type="number"
+                min="1"
+                value={editingBatch?.totalSections || ""}
+                onChange={(e) =>
+                  setEditingBatch((prev) =>
+                    prev
+                      ? { ...prev, totalSections: Number(e.target.value) }
+                      : null
+                  )
+                }
+              />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="current-semester">Current Semester</Label>
               <Select
