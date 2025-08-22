@@ -43,13 +43,14 @@ export const formatDateToIndian = (dateString: string | undefined): string => {
 };
 
 /**
- * Calculates the current semester for a batch based on its name (e.g., "2023-2027") and the current date.
+ * Calculates the current semester for a batch based on its name (e.g., "2023-2027 A") and the current date.
  * Assumes the academic year starts in July.
  * @param batchName The name of the batch.
  * @returns The calculated current semester (1-8).
  */
 export const calculateCurrentSemesterForBatch = (batchName: string): number => {
-  const nameParts = batchName.split("-");
+  const yearPart = batchName.split(" ")[0]; // "2023-2027 A" -> "2023-2027"
+  const nameParts = yearPart.split("-");
   if (nameParts.length !== 2) return 0; // Invalid format
 
   const startYear = parseInt(nameParts[0], 10);
@@ -82,7 +83,7 @@ export const calculateCurrentSemesterForBatch = (batchName: string): number => {
 
 /**
  * Calculates the start and end dates for a given semester of a batch.
- * @param batchName The name of the batch (e.g., "2023-2027").
+ * @param batchName The name of the batch (e.g., "2023-2027 A").
  * @param currentSemester The semester to calculate dates for.
  * @returns An object with `from` and `to` date strings.
  */
@@ -90,7 +91,8 @@ export const getSemesterDateRange = (
   batchName: string,
   currentSemester: number
 ): { from: string; to: string } => {
-  const startYear = parseInt(batchName.split("-")[0], 10);
+  const yearPart = batchName.split(" ")[0]; // "2023-2027 A" -> "2023-2027"
+  const startYear = parseInt(yearPart.split("-")[0], 10);
   const academicYearOffset = Math.floor((currentSemester - 1) / 2);
   const isOddSemester = currentSemester % 2 !== 0;
 

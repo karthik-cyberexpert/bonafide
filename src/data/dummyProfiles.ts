@@ -13,7 +13,7 @@ export const dummyStudentProfile: StudentProfile = {
   phoneNumber: "+91 234 567 890",
   parentName: "David Johnson",
   department: "Computer Science",
-  batch: "2021-2025",
+  batch: "2021-2025 A",
   currentSemester: "7th",
   tutor: "Dr. Evelyn Reed",
   hod: "Dr. Robert Clark",
@@ -23,7 +23,7 @@ export const dummyTutorProfile: TutorProfile = {
   name: "Dr. Evelyn Reed",
   username: "evelyn_r",
   department: "Computer Science",
-  batchAssigned: "2021-2025",
+  batchAssigned: "2021-2025 A",
   email: "evelyn.r@example.com",
   phoneNumber: "+91 987 654 321",
 };
