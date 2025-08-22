@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -61,6 +61,29 @@ const BatchManagement = () => {
     totalSections: 1,
   });
 
+  const groupedBatches = useMemo(() => {
+    return batches.reduce(
+      (acc, batch) => {
+        if (!acc[batch.name]) {
+          acc[batch.name] = [];
+        }
+        acc[batch.name].push(batch);
+        return acc;
+      },
+      {} as Record<string, Batch[]>
+    );
+  }, [batches]);
+
+  const [selectedSections, setSelectedSections] = useState<
+    Record<string, string>
+  >(() => {
+    const initialState: Record<string, string> = {};
+    for (const batchName in groupedBatches) {
+      initialState[batchName] = groupedBatches[batchName][0].id;
+    }
+    return initialState;
+  });
+
   useEffect(() => {
     const updatedBatches = batches.map((batch) => {
       const fullBatchName = batch.section
@@ -78,6 +101,13 @@ const BatchManagement = () => {
     setBatches(updatedBatches);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleSectionChange = (batchName: string, newBatchId: string) => {
+    setSelectedSections((prev) => ({
+      ...prev,
+      [batchName]: newBatchId,
+    }));
+  };
 
   const handleToggleStatus = (batchId: string) => {
     setBatches((prevBatches) =>
@@ -148,7 +178,9 @@ const BatchManagement = () => {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="new-batch-name">Batch (e.g., 2024-2028)</Label>
+                  <Label htmlFor="new-batch-name">
+                    Batch (e.g., 2024-2028)
+                  </Label>
                   <Input
                     id="new-batch-name"
                     value={newBatch.name}
@@ -227,54 +259,89 @@ const BatchManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {batches.map((batch) => (
-                <TableRow key={batch.id}>
-                  <TableCell className="font-medium">{batch.name}</TableCell>
-                  <TableCell>{batch.section || "N/A"}</TableCell>
-                  <TableCell>{batch.totalSections || 1}</TableCell>
-                  <TableCell>{batch.tutor}</TableCell>
-                  <TableCell>{batch.currentSemester}</TableCell>
-                  <TableCell>
-                    {formatDateToIndian(batch.semesterFromDate)}
-                  </TableCell>
-                  <TableCell>
-                    {formatDateToIndian(batch.semesterToDate)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        batch.status === "Active" ? "success" : "secondary"
-                      }
-                    >
-                      {batch.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onClick={() => handleOpenEditDialog(batch)}
+              {Object.keys(groupedBatches).map((batchName) => {
+                const sections = groupedBatches[batchName];
+                const selectedBatchId = selectedSections[batchName];
+                const selectedBatchData =
+                  batches.find((b) => b.id === selectedBatchId) || sections[0];
+
+                return (
+                  <TableRow key={batchName}>
+                    <TableCell className="font-medium">{batchName}</TableCell>
+                    <TableCell>
+                      {sections.length > 1 ? (
+                        <Select
+                          value={selectedBatchData.id}
+                          onValueChange={(value) =>
+                            handleSectionChange(batchName, value)
+                          }
                         >
-                          Edit Batch
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>Assign Tutor</DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleToggleStatus(batch.id)}
-                        >
-                          {batch.status === "Active"
-                            ? "Mark as Inactive"
-                            : "Mark as Active"}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
+                          <SelectTrigger className="w-[80px]">
+                            <SelectValue>
+                              {selectedBatchData.section}
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {sections.map((section) => (
+                              <SelectItem key={section.id} value={section.id}>
+                                {section.section}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        selectedBatchData.section || "N/A"
+                      )}
+                    </TableCell>
+                    <TableCell>{selectedBatchData.totalSections || 1}</TableCell>
+                    <TableCell>{selectedBatchData.tutor}</TableCell>
+                    <TableCell>{selectedBatchData.currentSemester}</TableCell>
+                    <TableCell>
+                      {formatDateToIndian(selectedBatchData.semesterFromDate)}
+                    </TableCell>
+                    <TableCell>
+                      {formatDateToIndian(selectedBatchData.semesterToDate)}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          selectedBatchData.status === "Active"
+                            ? "success"
+                            : "secondary"
+                        }
+                      >
+                        {selectedBatchData.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            onClick={() => handleOpenEditDialog(selectedBatchData)}
+                          >
+                            Edit Batch
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>Assign Tutor</DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleToggleStatus(selectedBatchData.id)
+                            }
+                          >
+                            {selectedBatchData.status === "Active"
+                              ? "Mark as Inactive"
+                              : "Mark as Active"}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
