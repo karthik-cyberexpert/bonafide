@@ -41,7 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { showSuccess } from "@/utils/toast";
+import { showSuccess, showError } from "@/utils/toast";
 import { Batch } from "@/lib/types";
 import {
   calculateCurrentSemesterForBatch,
@@ -56,8 +56,6 @@ const BatchManagement = () => {
   const [editingBatch, setEditingBatch] = useState<Batch | null>(null);
   const [newBatch, setNewBatch] = useState<Partial<Batch>>({
     name: "",
-    section: "",
-    tutor: "",
     totalSections: 1,
   });
 
@@ -129,38 +127,106 @@ const BatchManagement = () => {
 
   const handleSaveChanges = () => {
     if (!editingBatch) return;
-    setBatches(
-      batches.map((b) => (b.id === editingBatch.id ? editingBatch : b))
+
+    const originalBatch = batches.find((b) => b.id === editingBatch.id);
+    if (!originalBatch) return;
+
+    const oldTotalSections = originalBatch.totalSections || 1;
+    const newTotalSections = editingBatch.totalSections || 1;
+
+    let updatedBatches = batches.map((b) =>
+      b.id === editingBatch.id
+        ? { ...editingBatch, tutor: editingBatch.tutor || "Unassigned" }
+        : b
     );
+
+    if (oldTotalSections !== newTotalSections) {
+      const batchName = editingBatch.name;
+      const existingSections = updatedBatches
+        .filter((b) => b.name === batchName)
+        .sort((a, b) => (a.section || "").localeCompare(b.section || ""));
+
+      updatedBatches = updatedBatches.map((b) =>
+        b.name === batchName ? { ...b, totalSections: newTotalSections } : b
+      );
+
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+      if (newTotalSections > oldTotalSections) {
+        for (let i = oldTotalSections; i < newTotalSections; i++) {
+          const sectionName = alphabet[i];
+          const fullBatchName = `${batchName} ${sectionName}`;
+          const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
+          const { from, to } = getSemesterDateRange(
+            fullBatchName,
+            currentSemester
+          );
+          const newSection: Batch = {
+            id: `B${Date.now()}${i}`,
+            name: batchName,
+            section: sectionName,
+            tutor: "Unassigned",
+            totalSections: newTotalSections,
+            studentCount: 0,
+            status: "Active",
+            currentSemester,
+            semesterFromDate: from,
+            semesterToDate: to,
+          };
+          updatedBatches.push(newSection);
+        }
+      } else if (newTotalSections < oldTotalSections) {
+        const sectionsToRemove = existingSections.slice(newTotalSections);
+        const idsToRemove = new Set(sectionsToRemove.map((s) => s.id));
+        updatedBatches = updatedBatches.filter((b) => !idsToRemove.has(b.id));
+      }
+    }
+
+    setBatches(updatedBatches);
     showSuccess(`Batch "${editingBatch.name}" updated successfully.`);
     setIsEditDialogOpen(false);
     setEditingBatch(null);
   };
 
   const handleAddNewBatch = () => {
-    const fullBatchName = newBatch.section
-      ? `${newBatch.name} ${newBatch.section}`
-      : newBatch.name || "";
-    const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
-    const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
+    const batchName = newBatch.name;
+    const totalSections = newBatch.totalSections || 1;
 
-    const finalNewBatch: Batch = {
-      id: `B${String(batches.length + 1).padStart(3, "0")}`,
-      name: newBatch.name || "Unnamed Batch",
-      section: newBatch.section || undefined,
-      tutor: newBatch.tutor || "Unassigned",
-      totalSections: newBatch.totalSections || 1,
-      studentCount: 0,
-      status: "Active",
-      currentSemester,
-      semesterFromDate: from,
-      semesterToDate: to,
-    };
+    if (!batchName) {
+      showError("Batch name is required.");
+      return;
+    }
 
-    setBatches([...batches, finalNewBatch]);
-    showSuccess(`Batch "${finalNewBatch.name}" created successfully.`);
+    const newSections: Batch[] = [];
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    for (let i = 0; i < totalSections; i++) {
+      const sectionName = totalSections > 1 ? alphabet[i] : undefined;
+      const fullBatchName = sectionName ? `${batchName} ${sectionName}` : batchName;
+      const currentSemester = calculateCurrentSemesterForBatch(fullBatchName);
+      const { from, to } = getSemesterDateRange(fullBatchName, currentSemester);
+
+      const finalNewBatch: Batch = {
+        id: `B${Date.now()}${i}`,
+        name: batchName,
+        section: sectionName,
+        tutor: "Unassigned",
+        totalSections: totalSections,
+        studentCount: 0,
+        status: "Active",
+        currentSemester,
+        semesterFromDate: from,
+        semesterToDate: to,
+      };
+      newSections.push(finalNewBatch);
+    }
+
+    setBatches([...batches, ...newSections]);
+    showSuccess(
+      `Batch "${batchName}" with ${totalSections} section(s) created successfully.`
+    );
     setIsAddDialogOpen(false);
-    setNewBatch({ name: "", section: "", tutor: "", totalSections: 1 });
+    setNewBatch({ name: "", totalSections: 1 });
   };
 
   return (
@@ -190,16 +256,6 @@ const BatchManagement = () => {
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="new-section">Section (e.g., A)</Label>
-                  <Input
-                    id="new-section"
-                    value={newBatch.section}
-                    onChange={(e) =>
-                      setNewBatch({ ...newBatch, section: e.target.value })
-                    }
-                  />
-                </div>
-                <div className="grid gap-2">
                   <Label htmlFor="new-total-sections">Total Sections</Label>
                   <Input
                     id="new-total-sections"
@@ -213,25 +269,6 @@ const BatchManagement = () => {
                       })
                     }
                   />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="new-tutor">Assign Tutor</Label>
-                  <Select
-                    onValueChange={(value) =>
-                      setNewBatch({ ...newBatch, tutor: value })
-                    }
-                  >
-                    <SelectTrigger id="new-tutor">
-                      <SelectValue placeholder="Select a tutor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {dummyTutors.map((tutor) => (
-                        <SelectItem key={tutor.username} value={tutor.name}>
-                          {tutor.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
               <DialogFooter>
@@ -261,9 +298,12 @@ const BatchManagement = () => {
             <TableBody>
               {Object.keys(groupedBatches).map((batchName) => {
                 const sections = groupedBatches[batchName];
-                const selectedBatchId = selectedSections[batchName];
+                const selectedBatchId =
+                  selectedSections[batchName] || sections[0]?.id;
                 const selectedBatchData =
                   batches.find((b) => b.id === selectedBatchId) || sections[0];
+
+                if (!selectedBatchData) return null;
 
                 return (
                   <TableRow key={batchName}>
@@ -293,7 +333,9 @@ const BatchManagement = () => {
                         selectedBatchData.section || "N/A"
                       )}
                     </TableCell>
-                    <TableCell>{selectedBatchData.totalSections || 1}</TableCell>
+                    <TableCell>
+                      {selectedBatchData.totalSections || 1}
+                    </TableCell>
                     <TableCell>{selectedBatchData.tutor}</TableCell>
                     <TableCell>{selectedBatchData.currentSemester}</TableCell>
                     <TableCell>
@@ -322,11 +364,12 @@ const BatchManagement = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                           <DropdownMenuItem
-                            onClick={() => handleOpenEditDialog(selectedBatchData)}
+                            onClick={() =>
+                              handleOpenEditDialog(selectedBatchData)
+                            }
                           >
-                            Edit Batch
+                            Edit Section
                           </DropdownMenuItem>
-                          <DropdownMenuItem>Assign Tutor</DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() =>
                               handleToggleStatus(selectedBatchData.id)
@@ -350,11 +393,34 @@ const BatchManagement = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Batch: {editingBatch?.name}</DialogTitle>
+            <DialogTitle>
+              Edit Section: {editingBatch?.name} - {editingBatch?.section}
+            </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="total-sections">Total Sections</Label>
+              <Label htmlFor="edit-tutor">Assign Tutor</Label>
+              <Select
+                value={editingBatch?.tutor}
+                onValueChange={(value) =>
+                  setEditingBatch((prev) => (prev ? { ...prev, tutor: value } : null))
+                }
+              >
+                <SelectTrigger id="edit-tutor">
+                  <SelectValue placeholder="Select a tutor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Unassigned">Unassigned</SelectItem>
+                  {dummyTutors.map((tutor) => (
+                    <SelectItem key={tutor.username} value={tutor.name}>
+                      {tutor.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="total-sections">Total Sections for Batch</Label>
               <Input
                 id="total-sections"
                 type="number"
@@ -365,54 +431,6 @@ const BatchManagement = () => {
                     prev
                       ? { ...prev, totalSections: Number(e.target.value) }
                       : null
-                  )
-                }
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="current-semester">Current Semester</Label>
-              <Select
-                value={String(editingBatch?.currentSemester || "")}
-                onValueChange={(value) =>
-                  setEditingBatch((prev) =>
-                    prev ? { ...prev, currentSemester: Number(value) } : null
-                  )
-                }
-              >
-                <SelectTrigger id="current-semester">
-                  <SelectValue placeholder="Select semester" />
-                </SelectTrigger>
-                <SelectContent>
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
-                    <SelectItem key={sem} value={String(sem)}>
-                      Semester {sem}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="from-date">Semester From Date</Label>
-              <Input
-                id="from-date"
-                type="date"
-                value={editingBatch?.semesterFromDate || ""}
-                onChange={(e) =>
-                  setEditingBatch((prev) =>
-                    prev ? { ...prev, semesterFromDate: e.target.value } : null
-                  )
-                }
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="to-date">Semester To Date</Label>
-              <Input
-                id="to-date"
-                type="date"
-                value={editingBatch?.semesterToDate || ""}
-                onChange={(e) =>
-                  setEditingBatch((prev) =>
-                    prev ? { ...prev, semesterToDate: e.target.value } : null
                   )
                 }
               />
