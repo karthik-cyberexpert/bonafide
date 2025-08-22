@@ -32,7 +32,7 @@ const TutorPendingRequests = () => {
             <TableRow>
               <TableHead>Student Name</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Reason</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -47,7 +47,7 @@ const TutorPendingRequests = () => {
                     </div>
                   </TableCell>
                   <TableCell>{formatDateToIndian(request.date)}</TableCell>
-                  <TableCell>{request.reason}</TableCell>
+                  <TableCell>{request.type}</TableCell>
                   <TableCell className="text-right space-x-2">
                     <Button variant="outline" size="sm">
                       Return to Student

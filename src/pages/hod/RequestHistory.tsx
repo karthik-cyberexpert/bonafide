@@ -38,7 +38,7 @@ const HodRequestHistory = () => {
               <TableHead>Batch</TableHead>
               <TableHead>Semester</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Reason</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -60,7 +60,7 @@ const HodRequestHistory = () => {
                     <TableCell>{student?.batch || "N/A"}</TableCell>
                     <TableCell>{student?.currentSemester || "N/A"}</TableCell>
                     <TableCell>{formatDateToIndian(request.date)}</TableCell>
-                    <TableCell>{request.reason}</TableCell>
+                    <TableCell>{request.type}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(request.status)}>
                         {request.status}

@@ -55,7 +55,8 @@ const MyRequests = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Date</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Sub-type</TableHead>
               <TableHead>Reason</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -64,8 +65,11 @@ const MyRequests = () => {
           <TableBody>
             {studentRequests.map((request) => (
               <TableRow key={request.id}>
-                <TableCell>{formatDateToIndian(request.date)}</TableCell>
-                <TableCell>{request.reason}</TableCell>
+                <TableCell>{request.type}</TableCell>
+                <TableCell>{request.subType || "N/A"}</TableCell>
+                <TableCell className="max-w-xs truncate">
+                  {request.reason}
+                </TableCell>
                 <TableCell>
                   <Badge variant={getStatusVariant(request.status)}>
                     {request.status}

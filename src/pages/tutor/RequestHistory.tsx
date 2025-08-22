@@ -32,7 +32,7 @@ const TutorRequestHistory = () => {
             <TableRow>
               <TableHead>Student Name</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Reason</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -47,7 +47,7 @@ const TutorRequestHistory = () => {
                     </div>
                   </TableCell>
                   <TableCell>{formatDateToIndian(request.date)}</TableCell>
-                  <TableCell>{request.reason}</TableCell>
+                  <TableCell>{request.type}</TableCell>
                   <TableCell>
                     <Badge variant={getStatusVariant(request.status)}>
                       {request.status}

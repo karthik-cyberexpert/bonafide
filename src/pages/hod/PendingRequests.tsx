@@ -80,7 +80,7 @@ const HodPendingRequests = () => {
               <TableHead>Batch</TableHead>
               <TableHead>Semester</TableHead>
               <TableHead>Date</TableHead>
-              <TableHead>Reason</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -102,7 +102,7 @@ const HodPendingRequests = () => {
                     <TableCell>{student?.batch || "N/A"}</TableCell>
                     <TableCell>{student?.currentSemester || "N/A"}</TableCell>
                     <TableCell>{formatDateToIndian(request.date)}</TableCell>
-                    <TableCell>{request.reason}</TableCell>
+                    <TableCell>{request.type}</TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button variant="outline" size="sm">
                         Return to Student

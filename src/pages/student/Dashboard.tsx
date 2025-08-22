@@ -85,9 +85,9 @@ const StudentDashboard = () => {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
-                    Reason
+                    Type
                   </p>
-                  <p className="font-semibold">{latestRequest.reason}</p>
+                  <p className="font-semibold">{latestRequest.type}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">
@@ -126,7 +126,7 @@ const StudentDashboard = () => {
               {approvedRequests.map((request) => (
                 <Card key={request.id}>
                   <CardHeader>
-                    <CardTitle className="text-lg">{request.reason}</CardTitle>
+                    <CardTitle className="text-lg">{request.type}</CardTitle>
                     <CardDescription>
                       Approved on {formatDateToIndian(request.date)}
                     </CardDescription>

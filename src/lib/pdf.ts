@@ -26,7 +26,7 @@ export const getCertificateHtml = (
   let content = template.content
     .replace(/{studentName}/g, student.name)
     .replace(/{studentId}/g, student.registerNumber)
-    .replace(/{reason}/g, request.reason)
+    .replace(/{reason}/g, request.type)
     .replace(/{parentName}/g, student.parentName)
     .replace(/{department}/g, student.department)
     .replace(/{batch}/g, student.batch)

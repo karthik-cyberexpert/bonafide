@@ -14,6 +14,8 @@ export interface BonafideRequest {
   studentName: string;
   studentId: string;
   date: string;
+  type: string;
+  subType?: string;
   reason: string;
   status: RequestStatus;
   templateId?: string;

@@ -6,15 +6,20 @@ export const dummyRequests: BonafideRequest[] = [
     studentName: "Alice Johnson",
     studentId: "S12345",
     date: "2023-10-26",
-    reason: "Passport Application",
+    type: "Passport Application",
+    reason:
+      "Applying for a new passport for an upcoming international conference.",
     status: "Approved",
+    templateId: "TPL002",
   },
   {
     id: "REQ002",
     studentName: "Bob Smith",
     studentId: "S67890",
     date: "2023-10-27",
-    reason: "Bank Loan",
+    type: "Bank Loan",
+    reason:
+      "Need to apply for an education loan to cover tuition fees for the next academic year.",
     status: "Pending Tutor Approval",
   },
   {
@@ -22,7 +27,8 @@ export const dummyRequests: BonafideRequest[] = [
     studentName: "Charlie Brown",
     studentId: "S11223",
     date: "2023-10-28",
-    reason: "Scholarship",
+    type: "Scholarship",
+    reason: "Applying for the National Merit Scholarship.",
     status: "Pending HOD Approval",
   },
   {
@@ -30,7 +36,8 @@ export const dummyRequests: BonafideRequest[] = [
     studentName: "Diana Prince",
     studentId: "S44556",
     date: "2023-10-29",
-    reason: "Internship Application",
+    type: "Internship Application",
+    reason: "Required by the company for a summer internship application.",
     status: "Pending Admin Approval",
   },
   {
@@ -38,8 +45,10 @@ export const dummyRequests: BonafideRequest[] = [
     studentName: "Alice Johnson",
     studentId: "S12345",
     date: "2023-10-30",
-    reason: "Visa Application",
+    type: "Visa Application",
+    reason: "Applying for a student visa for an exchange program.",
     status: "Returned by Tutor",
-    returnReason: "The attached documents are not clear. Please re-upload with better quality scans.",
+    returnReason:
+      "The attached documents are not clear. Please re-upload with better quality scans.",
   },
 ];
