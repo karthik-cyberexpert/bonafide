@@ -19,7 +19,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
@@ -29,20 +28,29 @@ import { requests as appRequests } from "@/data/appData";
 import { formatDateToIndian } from "@/lib/utils";
 import { BonafideRequest } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
+import RequestDetailsView from "@/components/shared/RequestDetailsView";
 
 const TutorPendingRequests = () => {
   const [requests, setRequests] = useState<BonafideRequest[]>(appRequests);
+  const [selectedRequest, setSelectedRequest] =
+    useState<BonafideRequest | null>(null);
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [isReturnOpen, setIsReturnOpen] = useState(false);
   const [returnReason, setReturnReason] = useState("");
-  const [selectedRequest, setSelectedRequest] = useState<BonafideRequest | null>(null);
 
-  const handleForward = (requestId: string) => {
+  const handleForward = () => {
+    if (!selectedRequest) return;
     const updatedRequests = appRequests.map((req) =>
-      req.id === requestId ? { ...req, status: "Pending HOD Approval" } : req
+      req.id === selectedRequest.id
+        ? { ...req, status: "Pending HOD Approval" }
+        : req
     );
     appRequests.length = 0;
     appRequests.push(...updatedRequests);
     setRequests(updatedRequests);
-    showSuccess(`Request ${requestId} forwarded to HOD.`);
+    showSuccess(`Request ${selectedRequest.id} forwarded to HOD.`);
+    setIsReviewOpen(false);
+    setSelectedRequest(null);
   };
 
   const handleReturn = () => {
@@ -56,8 +64,15 @@ const TutorPendingRequests = () => {
     appRequests.push(...updatedRequests);
     setRequests(updatedRequests);
     showSuccess(`Request ${selectedRequest.id} returned to student.`);
+    setIsReturnOpen(false);
+    setIsReviewOpen(false);
     setReturnReason("");
     setSelectedRequest(null);
+  };
+
+  const openReviewDialog = (request: BonafideRequest) => {
+    setSelectedRequest(request);
+    setIsReviewOpen(true);
   };
 
   const pendingRequests = requests.filter(
@@ -65,86 +80,93 @@ const TutorPendingRequests = () => {
   );
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Pending Requests</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Student Name</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {pendingRequests.length > 0 ? (
-              pendingRequests.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell className="font-medium">
-                    <div>{request.studentName}</div>
-                    <div className="text-xs text-muted-foreground">
-                      [{request.studentId}]
-                    </div>
-                  </TableCell>
-                  <TableCell>{formatDateToIndian(request.date)}</TableCell>
-                  <TableCell>{request.type}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Dialog onOpenChange={(isOpen) => !isOpen && setSelectedRequest(null)}>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setSelectedRequest(request)}
-                        >
-                          Return to Student
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Reason for Return</DialogTitle>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                          <Label htmlFor="return-reason">
-                            Please provide a reason for returning this request.
-                          </Label>
-                          <Textarea
-                            id="return-reason"
-                            value={returnReason}
-                            onChange={(e) => setReturnReason(e.target.value)}
-                          />
-                        </div>
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button
-                              onClick={handleReturn}
-                              disabled={!returnReason}
-                            >
-                              Confirm Return
-                            </Button>
-                          </DialogClose>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                    <Button size="sm" onClick={() => handleForward(request.id)}>
-                      Forward to HOD
-                    </Button>
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Pending Requests</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Student Name</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {pendingRequests.length > 0 ? (
+                pendingRequests.map((request) => (
+                  <TableRow key={request.id}>
+                    <TableCell className="font-medium">
+                      <div>{request.studentName}</div>
+                      <div className="text-xs text-muted-foreground">
+                        [{request.studentId}]
+                      </div>
+                    </TableCell>
+                    <TableCell>{formatDateToIndian(request.date)}</TableCell>
+                    <TableCell>{request.type}</TableCell>
+                    <TableCell className="text-right">
+                      <Button size="sm" onClick={() => openReviewDialog(request)}>
+                        Review
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center">
+                    No pending requests.
                   </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center">
-                  No pending requests.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Review Request</DialogTitle>
+          </DialogHeader>
+          {selectedRequest && <RequestDetailsView request={selectedRequest} />}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsReturnOpen(true)}>
+              Return to Student
+            </Button>
+            <Button onClick={handleForward}>Forward to HOD</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isReturnOpen} onOpenChange={setIsReturnOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reason for Return</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <Label htmlFor="return-reason">
+              Please provide a reason for returning this request.
+            </Label>
+            <Textarea
+              id="return-reason"
+              value={returnReason}
+              onChange={(e) => setReturnReason(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button onClick={handleReturn} disabled={!returnReason}>
+              Confirm Return
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
