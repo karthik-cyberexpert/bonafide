@@ -37,23 +37,29 @@ const NewRequest = () => {
             <Label htmlFor="student-id">Student ID</Label>
             <Input id="student-id" defaultValue="S12345" disabled />
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="bonafide-type">Type</Label>
-            <Select>
-              <SelectTrigger id="bonafide-type">
-                <SelectValue placeholder="Select a bonafide type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="passport">Passport Application</SelectItem>
-                <SelectItem value="bank-loan">Bank Loan</SelectItem>
-                <SelectItem value="scholarship">Scholarship</SelectItem>
-                <SelectItem value="internship">
-                  Internship Application
-                </SelectItem>
-                <SelectItem value="visa">Visa Application</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="bonafide-type">Type</Label>
+              <Select>
+                <SelectTrigger id="bonafide-type">
+                  <SelectValue placeholder="Select a bonafide type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="passport">Passport Application</SelectItem>
+                  <SelectItem value="bank-loan">Bank Loan</SelectItem>
+                  <SelectItem value="scholarship">Scholarship</SelectItem>
+                  <SelectItem value="internship">
+                    Internship Application
+                  </SelectItem>
+                  <SelectItem value="visa">Visa Application</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="sub-type">Sub-type (Optional)</Label>
+              <Input id="sub-type" placeholder="e.g., Education Loan" />
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="reason">Reason for Certificate</Label>
