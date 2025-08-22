@@ -8,6 +8,8 @@ import {
   Users,
   Building,
   FileText,
+  ClipboardList,
+  Briefcase,
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
@@ -29,9 +31,24 @@ const navItems: NavItem[] = [
     icon: <History className="h-4 w-4" />,
   },
   {
+    title: "Student Management",
+    href: "/admin/student-management",
+    icon: <Users className="h-4 w-4" />,
+  },
+  {
+    title: "Batch Management",
+    href: "/admin/batch-management",
+    icon: <ClipboardList className="h-4 w-4" />,
+  },
+  {
     title: "Manage Faculties",
     href: "/admin/manage-faculties",
     icon: <Users className="h-4 w-4" />,
+  },
+  {
+    title: "Manage Tutors",
+    href: "/admin/manage-tutors",
+    icon: <Briefcase className="h-4 w-4" />,
   },
   {
     title: "Department Management",

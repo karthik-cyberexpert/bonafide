@@ -25,9 +25,6 @@ import HodDashboard from "./pages/hod/Dashboard";
 import HodProfile from "./pages/hod/Profile";
 import HodRequestHistory from "./pages/hod/RequestHistory";
 import HodPendingRequests from "./pages/hod/PendingRequests";
-import BatchManagement from "./pages/hod/BatchManagement";
-import StudentManagement from "./pages/hod/StudentManagement";
-import ManageStaff from "./pages/hod/ManageStaff";
 
 import AdminLayout from "./components/layouts/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -37,6 +34,9 @@ import AdminPendingRequests from "./pages/admin/PendingRequests";
 import ManageFaculties from "./pages/admin/ManageFaculties";
 import DepartmentManagement from "./pages/admin/DepartmentManagement";
 import TemplateManagement from "./pages/admin/TemplateManagement";
+import StudentManagement from "./pages/admin/StudentManagement";
+import BatchManagement from "./pages/admin/BatchManagement";
+import ManageTutors from "./pages/admin/ManageTutors";
 
 import PrincipalLayout from "./components/layouts/PrincipalLayout";
 import PrincipalDashboard from "./pages/principal/Dashboard";
@@ -88,15 +88,6 @@ const App = () => (
                 path="/hod/request-history"
                 element={<HodRequestHistory />}
               />
-              <Route
-                path="/hod/student-management"
-                element={<StudentManagement />}
-              />
-              <Route
-                path="/hod/batch-management"
-                element={<BatchManagement />}
-              />
-              <Route path="/hod/manage-staff" element={<ManageStaff />} />
               <Route path="/hod/profile" element={<HodProfile />} />
             </Route>
 
@@ -113,6 +104,18 @@ const App = () => (
               <Route
                 path="/admin/manage-faculties"
                 element={<ManageFaculties />}
+              />
+              <Route
+                path="/admin/manage-tutors"
+                element={<ManageTutors />}
+              />
+              <Route
+                path="/admin/student-management"
+                element={<StudentManagement />}
+              />
+              <Route
+                path="/admin/batch-management"
+                element={<BatchManagement />}
               />
               <Route
                 path="/admin/department-management"

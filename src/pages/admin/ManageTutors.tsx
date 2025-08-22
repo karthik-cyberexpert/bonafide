@@ -54,7 +54,7 @@ import { tutors as appTutors, batches as appBatches } from "@/data/appData";
 import { TutorProfile } from "@/lib/types";
 import { showSuccess } from "@/utils/toast";
 
-const ManageStaff = () => {
+const ManageTutors = () => {
   const [tutors, setTutors] = useState<TutorProfile[]>(appTutors);
   const [isAddEditDialogOpen, setIsAddEditDialogOpen] = useState(false);
   const [editingTutor, setEditingTutor] = useState<TutorProfile | null>(null);
@@ -305,4 +305,4 @@ const ManageStaff = () => {
   );
 };
 
-export default ManageStaff;
+export default ManageTutors;

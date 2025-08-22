@@ -29,21 +29,6 @@ const navItems: NavItem[] = [
     icon: <History className="h-4 w-4" />,
   },
   {
-    title: "Student Management",
-    href: "/hod/student-management",
-    icon: <Users className="h-4 w-4" />,
-  },
-  {
-    title: "Batch Management",
-    href: "/hod/batch-management",
-    icon: <ClipboardList className="h-4 w-4" />,
-  },
-  {
-    title: "Manage Staff",
-    href: "/hod/manage-staff",
-    icon: <Briefcase className="h-4 w-4" />,
-  },
-  {
     title: "Profile",
     href: "/hod/profile",
     icon: <User className="h-4 w-4" />,
