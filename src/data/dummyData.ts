@@ -1,12 +1,19 @@
-import { StudentProfile, HodProfile, TutorProfile, Department } from "@/lib/types";
+import {
+  StudentProfile,
+  HodProfile,
+  TutorProfile,
+  Department,
+  Batch,
+} from "@/lib/types";
 
-export interface Batch {
-  id: string;
-  name: string;
-  tutor: string;
-  studentCount: number;
-  status: "Active" | "Inactive";
-}
+// Set one date to the past to demonstrate auto-progression
+const yesterday = new Date();
+yesterday.setDate(yesterday.getDate() - 1);
+const yesterdayString = yesterday.toISOString().split("T")[0];
+
+const futureDate = new Date();
+futureDate.setMonth(futureDate.getMonth() + 4);
+const futureDateString = futureDate.toISOString().split("T")[0];
 
 export const dummyBatches: Batch[] = [
   {
@@ -15,6 +22,9 @@ export const dummyBatches: Batch[] = [
     tutor: "Dr. Evelyn Reed",
     studentCount: 62,
     status: "Active",
+    currentSemester: 7,
+    semesterFromDate: "2024-01-15",
+    semesterToDate: yesterdayString, // This semester has ended
   },
   {
     id: "B002",
@@ -22,6 +32,9 @@ export const dummyBatches: Batch[] = [
     tutor: "Dr. Samuel Chen",
     studentCount: 58,
     status: "Active",
+    currentSemester: 5,
+    semesterFromDate: "2024-07-01",
+    semesterToDate: futureDateString,
   },
   {
     id: "B003",
@@ -29,6 +42,9 @@ export const dummyBatches: Batch[] = [
     tutor: "Dr. Maria Garcia",
     studentCount: 65,
     status: "Active",
+    currentSemester: 3,
+    semesterFromDate: "2024-07-01",
+    semesterToDate: futureDateString,
   },
   {
     id: "B004",
@@ -36,6 +52,9 @@ export const dummyBatches: Batch[] = [
     tutor: "Dr. Alan Grant",
     studentCount: 55,
     status: "Inactive",
+    currentSemester: 8,
+    semesterFromDate: "2023-12-01",
+    semesterToDate: "2024-05-15",
   },
 ];
 
