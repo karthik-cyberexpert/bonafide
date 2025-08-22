@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -13,21 +14,80 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { dummyRequests } from "@/data/dummyRequests";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { requests as appRequests, students as appStudents, batches as appBatches } from "@/data/appData";
 import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
-import { dummyStudents } from "@/data/dummyData";
 
 const HodRequestHistory = () => {
-  const requestHistory = dummyRequests.filter(
+  const [selectedBatch, setSelectedBatch] = useState("all");
+  const [selectedSemester, setSelectedSemester] = useState("all");
+
+  const requestHistory = appRequests.filter(
     (req) =>
       req.status !== "Pending HOD Approval" &&
       req.status !== "Pending Tutor Approval"
   );
 
+  const uniqueBatches = useMemo(() => {
+    const batchNames = appBatches.map((b) =>
+      b.section ? `${b.name} ${b.section}` : b.name
+    );
+    return [...new Set(batchNames)];
+  }, []);
+
+  const filteredHistory = requestHistory.filter((request) => {
+    const student = appStudents.find(
+      (s) => s.registerNumber === request.studentId
+    );
+    if (!student) return false;
+
+    const batchMatch =
+      selectedBatch === "all" || student.batch === selectedBatch;
+    const semesterMatch =
+      selectedSemester === "all" ||
+      student.currentSemester === `${selectedSemester}th`;
+
+    return batchMatch && semesterMatch;
+  });
+
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Request History</CardTitle>
+        <div className="flex items-center gap-2">
+          <Select onValueChange={setSelectedBatch} defaultValue="all">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by batch" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Batches</SelectItem>
+              {uniqueBatches.map((batch) => (
+                <SelectItem key={batch} value={batch}>
+                  {batch}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select onValueChange={setSelectedSemester} defaultValue="all">
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filter by semester" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Semesters</SelectItem>
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((sem) => (
+                <SelectItem key={sem} value={String(sem)}>
+                  Semester {sem}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </CardHeader>
       <CardContent>
         <Table>
@@ -43,9 +103,9 @@ const HodRequestHistory = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {requestHistory.length > 0 ? (
-              requestHistory.map((request) => {
-                const student = dummyStudents.find(
+            {filteredHistory.length > 0 ? (
+              filteredHistory.map((request) => {
+                const student = appStudents.find(
                   (s) => s.registerNumber === request.studentId
                 );
                 return (
@@ -72,7 +132,7 @@ const HodRequestHistory = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="text-center">
-                  No request history.
+                  No request history found for the selected filters.
                 </TableCell>
               </TableRow>
             )}
