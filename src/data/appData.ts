@@ -1,5 +1,5 @@
+import { dummyRequests } from "@/data/dummyRequests";
 import {
-  dummyRequests,
   dummyHods,
   dummyTutors,
   dummyStudents,
