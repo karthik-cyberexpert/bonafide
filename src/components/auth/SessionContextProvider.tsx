@@ -52,7 +52,7 @@ export const SessionContextProvider = ({ children }: { children: React.ReactNode
           await fetchProfile(session.user.id);
         } else {
           setProfile(null);
-          navigate('/login'); // Redirect to login on sign out
+          navigate('/login', { replace: true }); // Redirect to login on sign out
         }
         setLoading(false);
       }
@@ -71,27 +71,28 @@ export const SessionContextProvider = ({ children }: { children: React.ReactNode
     if (error) {
       showError('Failed to fetch profile: ' + error.message);
       setProfile(null);
+      navigate('/login', { replace: true }); // Redirect to login if profile fetch fails
     } else if (data) {
       setProfile(data as Profile);
       // Redirect based on role
       switch (data.role) {
         case 'student':
-          navigate('/student/dashboard');
+          navigate('/student/dashboard', { replace: true });
           break;
         case 'tutor':
-          navigate('/tutor/dashboard');
+          navigate('/tutor/dashboard', { replace: true });
           break;
         case 'hod':
-          navigate('/hod/dashboard');
+          navigate('/hod/dashboard', { replace: true });
           break;
         case 'admin':
-          navigate('/admin/dashboard');
+          navigate('/admin/dashboard', { replace: true });
           break;
         case 'principal':
-          navigate('/principal/dashboard');
+          navigate('/principal/dashboard', { replace: true });
           break;
         default:
-          navigate('/'); // Default to home if role is unknown
+          navigate('/', { replace: true }); // Default to home if role is unknown
       }
     }
   };
@@ -105,7 +106,7 @@ export const SessionContextProvider = ({ children }: { children: React.ReactNode
       setSession(null);
       setUser(null);
       setProfile(null);
-      navigate('/login');
+      navigate('/login', { replace: true });
     }
   };
 

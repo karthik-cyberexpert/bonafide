@@ -10,34 +10,16 @@ const Index = () => {
 
   useEffect(() => {
     if (!loading && session && profile) {
-      // Redirect based on role
-      switch (profile.role) {
-        case 'student':
-          navigate('/student/dashboard');
-          break;
-        case 'tutor':
-          navigate('/tutor/dashboard');
-          break;
-        case 'hod':
-          navigate('/hod/dashboard');
-          break;
-        case 'admin':
-          navigate('/admin/dashboard');
-          break;
-        case 'principal':
-          navigate('/principal/dashboard');
-          break;
-        default:
-          // If role is unknown or not handled, stay on index or redirect to a generic page
-          break;
-      }
-    } else if (!loading && !session) {
-      // If not logged in, stay on this page or redirect to login
-      // For now, stay on this page to show options
+      // If session and profile are loaded, SessionContextProvider should have already redirected.
+      // This component will be unmounted.
+    } else if (!loading && session && !profile) {
+      // If session exists but profile is not yet loaded, wait for SessionContextProvider to handle it.
+      // This might happen for new users before the profile trigger runs or if there's a delay.
+      // For now, we'll just show a loading state.
     }
   }, [session, loading, profile, navigate]);
 
-  if (loading) {
+  if (loading || (session && !profile)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-muted/40">
         <Card className="w-full max-w-md">
@@ -52,6 +34,11 @@ const Index = () => {
     );
   }
 
+  if (session && profile) {
+    // If already logged in and profile is available, render nothing as a redirect is expected.
+    return null;
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted/40">
       <Card className="w-full max-w-md">
@@ -62,31 +49,11 @@ const Index = () => {
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
           <p className="text-center text-muted-foreground">
-            Please select your dashboard or login
+            Please login to access your portal.
           </p>
-          {!session ? (
-            <Button asChild>
-              <Link to="/login">Login</Link>
-            </Button>
-          ) : (
-            <>
-              <Button asChild>
-                <Link to="/student/dashboard">Student Dashboard</Link>
-              </Button>
-              <Button asChild variant="secondary">
-                <Link to="/tutor/dashboard">Tutor Dashboard</Link>
-              </Button>
-              <Button asChild variant="secondary">
-                <Link to="/hod/dashboard">HOD Dashboard</Link>
-              </Button>
-              <Button asChild variant="secondary">
-                <Link to="/admin/dashboard">Admin Dashboard</Link>
-              </Button>
-              <Button asChild variant="secondary">
-                <Link to="/principal/dashboard">Principal Dashboard</Link>
-              </Button>
-            </>
-          )}
+          <Button asChild>
+            <Link to="/login">Login</Link>
+          </Button>
         </CardContent>
       </Card>
     </div>

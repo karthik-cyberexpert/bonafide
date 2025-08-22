@@ -14,36 +14,16 @@ const Login = () => {
 
   useEffect(() => {
     if (!loading && session && profile) {
-      // Already logged in and profile fetched, redirect based on role
-      switch (profile.role) {
-        case 'student':
-          navigate('/student/dashboard');
-          break;
-        case 'tutor':
-          navigate('/tutor/dashboard');
-          break;
-        case 'hod':
-          navigate('/hod/dashboard');
-          break;
-        case 'admin':
-          navigate('/admin/dashboard');
-          break;
-        case 'principal':
-          navigate('/principal/dashboard');
-          break;
-        default:
-          navigate('/');
-      }
+      // If session and profile are loaded, SessionContextProvider should have already redirected.
+      // This component will be unmounted.
     } else if (!loading && session && !profile) {
-      // Logged in but profile not yet fetched or created (should be handled by handle_new_user trigger)
-      // This might indicate a delay or an issue with profile creation.
-      // For now, we can redirect to a generic dashboard or wait for profile.
-      // In a real app, you might show a loading spinner or an error.
-      navigate('/');
+      // If session exists but profile is not yet loaded, wait for SessionContextProvider to handle it.
+      // This might happen for new users before the profile trigger runs or if there's a delay.
+      // For now, we'll just show a loading state.
     }
   }, [session, loading, profile, navigate]);
 
-  if (loading || (session && profile)) {
+  if (loading || (session && !profile)) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-muted/40">
         <Card className="w-full max-w-md">
@@ -56,6 +36,11 @@ const Login = () => {
         </Card>
       </div>
     );
+  }
+
+  if (session && profile) {
+    // If already logged in and profile is available, render nothing as a redirect is expected.
+    return null;
   }
 
   return (
