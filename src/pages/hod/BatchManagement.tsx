@@ -391,7 +391,7 @@ const BatchManagement = () => {
                               handleOpenEditDialog(selectedBatchData)
                             }
                           >
-                            Edit Section Details
+                            Edit Batch Details
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() =>
@@ -424,33 +424,10 @@ const BatchManagement = () => {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              Edit Section: {editingBatch?.name} - {editingBatch?.section}
+              Edit Batch: {editingBatch?.name}
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="edit-tutor">Assign Tutor</Label>
-              <Select
-                value={editingBatch?.tutor}
-                onValueChange={(value) =>
-                  setEditingBatch((prev) =>
-                    prev ? { ...prev, tutor: value } : null
-                  )
-                }
-              >
-                <SelectTrigger id="edit-tutor">
-                  <SelectValue placeholder="Select a tutor" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Unassigned">Unassigned</SelectItem>
-                  {dummyTutors.map((tutor) => (
-                    <SelectItem key={tutor.username} value={tutor.name}>
-                      {tutor.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <div className="grid gap-2">
               <Label htmlFor="total-sections">Total Sections for Batch</Label>
               <Input
@@ -488,6 +465,29 @@ const BatchManagement = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="edit-tutor">Assign Tutor</Label>
+              <Select
+                value={editingBatch?.tutor}
+                onValueChange={(value) =>
+                  setEditingBatch((prev) =>
+                    prev ? { ...prev, tutor: value } : null
+                  )
+                }
+              >
+                <SelectTrigger id="edit-tutor">
+                  <SelectValue placeholder="Select a tutor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Unassigned">Unassigned</SelectItem>
+                  {dummyTutors.map((tutor) => (
+                    <SelectItem key={tutor.username} value={tutor.name}>
+                      {tutor.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="current-semester">Current Semester</Label>
               <Select
