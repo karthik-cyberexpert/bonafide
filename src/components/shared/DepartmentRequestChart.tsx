@@ -26,6 +26,16 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
+// Define a type for the data returned by this specific Supabase query
+interface StudentChartData {
+  id: string;
+  batches: {
+    departments: {
+      name: string;
+    } | null;
+  } | null;
+}
+
 const DepartmentRequestChart = () => {
   const [chartData, setChartData] = useState<Array<{ department: string; requests: number }>>([]);
   const [loading, setLoading] = useState(true);
@@ -51,12 +61,13 @@ const DepartmentRequestChart = () => {
         return;
       }
 
-      const { data: studentsData, error: studentsError } = await supabase
+      const { data: studentsRawData, error: studentsError } = await supabase
         .from('students')
         .select(`
           id,
           batches(departments(name))
-        `); // Removed .in('id', studentIds) as it's not needed here and can cause issues if studentIds is empty
+        `)
+        .in('id', studentIds); // Keep .in filter for efficiency
 
       if (studentsError) {
         showError("Error fetching student data for chart: " + studentsError.message);
@@ -64,9 +75,12 @@ const DepartmentRequestChart = () => {
         return;
       }
 
+      // Explicitly cast the raw data to our defined interface
+      const studentsData: StudentChartData[] = studentsRawData || [];
+
       const requestsWithDept = requestsData.map(request => {
         const student = studentsData.find(s => s.id === request.student_id);
-        // Directly access the nested department name without casting to Batch or Department
+        // Directly access the nested department name using the defined type
         const departmentName = student?.batches?.departments?.name;
         return {
           ...request,
