@@ -114,6 +114,7 @@ const StudentManagement = () => {
             phone_number: student.phone_number,
             department_id: department.id,
             batch_id: batch.id,
+            role: 'student', // Explicitly set role
           },
           {
             register_number: student.register_number!,

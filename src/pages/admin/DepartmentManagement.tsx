@@ -62,7 +62,6 @@ const DepartmentManagement = () => {
     }
 
     const newDepartmentPayload: Omit<Department, 'id' | 'created_at'> = {
-      id: `D${String(departments.length + 1).padStart(3, '0')}`, // Simple ID generation, consider UUID in real app
       name: newDepartmentName,
       established_year: newEstablishedYear === '' ? undefined : newEstablishedYear,
     };

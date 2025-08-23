@@ -63,6 +63,7 @@ const TutorRequestHistory = () => {
           first_name: s.profiles.first_name,
           last_name: s.profiles.last_name,
           current_semester: s.batches?.current_semester,
+          role: 'student', // Added missing role property
         }));
         setStudentsInCharge(mappedStudents);
 

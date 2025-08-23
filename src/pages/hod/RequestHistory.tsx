@@ -95,6 +95,7 @@ const HodRequestHistory = () => {
           batch_id: s.batches?.id,
           batch_name: s.batches ? `${s.batches.name} ${s.batches.section || ''}`.trim() : 'N/A',
           current_semester: s.batches?.current_semester,
+          role: 'student', // Added missing role property
         }));
         setAllStudents(mappedStudents);
 

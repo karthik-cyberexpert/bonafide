@@ -67,7 +67,7 @@ const DepartmentRequestChart = () => {
 
       const requestsWithDept = requestsData.map(request => {
         const student = studentsData.find(s => s.id === request.student_id);
-        const department = (student?.batches as unknown as Batch)?.departments as unknown as Department;
+        const department = (student?.batches as Batch)?.departments as Department; // Corrected type assertion
         return {
           ...request,
           department_name: department?.name

@@ -49,6 +49,7 @@ const TutorStudents = () => {
             email: s.profiles.email,
             phone_number: s.profiles.phone_number,
             batch_name: s.batches ? `${s.batches.name} ${s.batches.section || ''}`.trim() : 'N/A',
+            role: 'student', // Added missing role property
           }));
           setAssignedStudents(mappedStudents);
         }

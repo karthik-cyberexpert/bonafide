@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Imported CardTitle
 import { Separator } from "@/components/ui/separator";
 import ProfileHeader from "@/components/shared/ProfileHeader";
 import ProfileField from "@/components/shared/ProfileField";

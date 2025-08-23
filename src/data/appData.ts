@@ -8,6 +8,7 @@ import {
   StudentDetails,
   TutorDetails,
   HodDetails,
+  RequestStatus, // Imported RequestStatus
 } from "@/lib/types";
 
 // This file will now contain functions to interact with Supabase.
@@ -64,7 +65,7 @@ export const fetchStudentDetails = async (studentId: string): Promise<StudentDet
   }
 
   const batch = studentData.batches as unknown as Batch;
-  const department = (batch?.departments as unknown as Department);
+  const department = batch?.departments as unknown as Department; // Corrected type assertion
   const tutor = studentData.tutors as unknown as Profile;
   const hod = studentData.hods as unknown as Profile;
 
@@ -251,7 +252,16 @@ export const deleteTemplate = async (templateId: string): Promise<boolean> => {
   return true;
 };
 
-export const createStudent = async (profileData: Omit<Profile, 'id' | 'created_at' | 'updated_at'>, studentData: Omit<StudentDetails, 'id' | 'created_at' | 'role' | 'email' | 'first_name' | 'last_name' | 'username' | 'phone_number'>): Promise<StudentDetails | null> => {
+// Define a specific type for the studentData parameter in createStudent
+interface NewStudentDetailsPayload {
+  register_number: string;
+  parent_name?: string;
+  batch_id?: string;
+  tutor_id?: string;
+  hod_id?: string;
+}
+
+export const createStudent = async (profileData: Omit<Profile, 'id' | 'created_at' | 'updated_at'>, studentData: NewStudentDetailsPayload): Promise<StudentDetails | null> => {
   const { data: newProfile, error: profileError } = await supabase
     .from("profiles")
     .insert({ ...profileData, role: 'student' })

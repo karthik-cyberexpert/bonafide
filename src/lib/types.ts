@@ -50,6 +50,8 @@ export interface Batch {
   semester_from_date?: string;
   semester_to_date?: string;
   department_id: string; // UUID of the department
+  departments?: Department; // Added for joined data
+  tutors?: Profile; // Added for joined data
   created_at?: string;
 }
 
@@ -65,6 +67,8 @@ export interface Profile {
   role: "student" | "tutor" | "hod" | "admin" | "principal";
   department_id?: string; // For HODs, Tutors
   batch_id?: string; // For Students, Tutors
+  departments?: Department; // Added for joined data
+  batches?: Batch; // Added for joined data
   created_at?: string;
   updated_at?: string;
 }

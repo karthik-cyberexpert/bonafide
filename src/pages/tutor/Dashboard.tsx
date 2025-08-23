@@ -5,6 +5,8 @@ import { FileClock, Users } from "lucide-react";
 import { useSession } from "@/components/auth/SessionContextProvider";
 import { useEffect, useState } from "react";
 import { BonafideRequest, Profile, Batch } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client"; // Imported supabase
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Imported Card components
 
 const TutorDashboard = () => {
   const { user } = useSession();
