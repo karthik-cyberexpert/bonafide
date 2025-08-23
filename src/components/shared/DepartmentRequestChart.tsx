@@ -56,8 +56,7 @@ const DepartmentRequestChart = () => {
         .select(`
           id,
           batches(departments(name))
-        `)
-        .in('id', studentIds);
+        `); // Removed .in('id', studentIds) as it's not needed here and can cause issues if studentIds is empty
 
       if (studentsError) {
         showError("Error fetching student data for chart: " + studentsError.message);
@@ -67,7 +66,7 @@ const DepartmentRequestChart = () => {
 
       const requestsWithDept = requestsData.map(request => {
         const student = studentsData.find(s => s.id === request.student_id);
-        // Directly access the nested department name
+        // Directly access the nested department name without casting to Batch or Department
         const departmentName = student?.batches?.departments?.name;
         return {
           ...request,
