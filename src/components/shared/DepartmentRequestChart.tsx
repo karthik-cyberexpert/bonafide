@@ -67,10 +67,11 @@ const DepartmentRequestChart = () => {
 
       const requestsWithDept = requestsData.map(request => {
         const student = studentsData.find(s => s.id === request.student_id);
-        const department = (student?.batches as Batch)?.departments as Department; // Corrected type assertion
+        // Directly access the nested department name
+        const departmentName = student?.batches?.departments?.name;
         return {
           ...request,
-          department_name: department?.name
+          department_name: departmentName
         };
       });
 
