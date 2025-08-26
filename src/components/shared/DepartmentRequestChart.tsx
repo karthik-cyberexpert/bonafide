@@ -29,11 +29,11 @@ const chartConfig = {
 // Define a type for the data returned by this specific Supabase query
 interface StudentChartData {
   id: string;
-  batches: Array<{ // batches is an array of batch objects
-    departments: { // departments is now a single object within a batch object
+  batches: { // batches is a single batch object
+    departments: { // departments is a single object within the batch object
       name: string;
     };
-  }> | null; // batches can be null
+  } | null; // batches can be null
 }
 
 const DepartmentRequestChart = () => {
@@ -81,7 +81,7 @@ const DepartmentRequestChart = () => {
       const requestsWithDept = requestsData.map(request => {
         const student = studentsData.find(s => s.id === request.student_id);
         // Access the nested department name, now expecting departments to be a single object
-        const departmentName = student?.batches?.[0]?.departments?.name;
+        const departmentName = student?.batches?.departments?.name;
         return {
           ...request,
           department_name: departmentName
