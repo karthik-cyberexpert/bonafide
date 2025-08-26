@@ -28,6 +28,7 @@ export const SessionContextProvider = ({ children }: { children: React.ReactNode
     const getSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
       if (error) {
+        console.error('Supabase getSession error:', error); // Added logging
         showError(error.message);
         setLoading(false);
         return;
@@ -69,6 +70,7 @@ export const SessionContextProvider = ({ children }: { children: React.ReactNode
       .single();
 
     if (error) {
+      console.error('Supabase fetchProfile error:', error); // Added logging
       showError('Failed to fetch profile: ' + error.message);
       setProfile(null);
       navigate('/login', { replace: true }); // Redirect to login if profile fetch fails
