@@ -128,11 +128,11 @@ const ManageTutors = () => {
       email: formData.get("email") as string,
       phone_number: formData.get("phone_number") as string,
       department_id: selectedDepartmentId,
-      batch_id: selectedBatchId || null, // Can be null if no batch assigned
+      batch_id: selectedBatchId === "null-batch-assignment" ? null : selectedBatchId, // Handle "None" value
     };
 
     if (editingTutor) {
-      const updated = await updateTutor(editingTutor.id, tutorData, selectedBatchId || undefined);
+      const updated = await updateTutor(editingTutor.id, tutorData, selectedBatchId === "null-batch-assignment" ? undefined : selectedBatchId);
       if (updated) {
         showSuccess("Tutor details updated successfully.");
         fetchAllData();
@@ -140,7 +140,7 @@ const ManageTutors = () => {
         showError("Failed to update tutor details.");
       }
     } else {
-      const created = await createTutor({ ...tutorData, role: 'tutor' }, selectedBatchId || undefined);
+      const created = await createTutor({ ...tutorData, role: 'tutor' }, selectedBatchId === "null-batch-assignment" ? undefined : selectedBatchId);
       if (created) {
         showSuccess("New tutor added successfully.");
         fetchAllData();
@@ -248,7 +248,7 @@ const ManageTutors = () => {
                 <div className="grid gap-2">
                   <Label htmlFor="batch">Assigned Batch (Optional)</Label>
                   <Select
-                    value={selectedBatchId}
+                    value={selectedBatchId || "null-batch-assignment"} // Ensure value is always a string
                     onValueChange={setSelectedBatchId}
                     disabled={!selectedDepartmentId}
                   >
@@ -256,7 +256,7 @@ const ManageTutors = () => {
                       <SelectValue placeholder="Select Batch" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="null-batch-assignment">None</SelectItem> {/* Changed value */}
                       {batches
                         .filter(b => b.department_id === selectedDepartmentId)
                         .map((batch) => (

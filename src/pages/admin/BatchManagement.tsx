@@ -219,7 +219,7 @@ const BatchManagement = () => {
     if (!editingBatch) return;
 
     const updated = await updateBatch(editingBatch.id, {
-      tutor_id: editingBatch.tutor_id,
+      tutor_id: editingBatch.tutor_id === "unassigned-tutor" ? null : editingBatch.tutor_id, // Handle "Unassigned" value
       current_semester: editingBatch.current_semester,
       semester_from_date: editingBatch.semester_from_date,
       semester_to_date: editingBatch.semester_to_date,
@@ -555,10 +555,10 @@ const BatchManagement = () => {
             <div className="grid gap-2">
               <Label htmlFor="edit-tutor">Assign Tutor</Label>
               <Select
-                value={editingBatch?.tutor_id || "Unassigned"}
+                value={editingBatch?.tutor_id || "unassigned-tutor"} // Ensure value is always a string
                 onValueChange={(value) =>
                   setEditingBatch((prev) =>
-                    prev ? { ...prev, tutor_id: value === "Unassigned" ? null : value } : null
+                    prev ? { ...prev, tutor_id: value === "unassigned-tutor" ? null : value } : null
                   )
                 }
               >
@@ -566,7 +566,7 @@ const BatchManagement = () => {
                   <SelectValue placeholder="Select a tutor" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Unassigned">Unassigned</SelectItem>
+                  <SelectItem value="unassigned-tutor">Unassigned</SelectItem> {/* Changed value */}
                   {tutors
                     .filter(
                       (tutor) =>
