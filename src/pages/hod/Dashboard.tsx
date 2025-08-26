@@ -19,11 +19,10 @@ const HodDashboard = () => {
       if (user?.id && profile?.department_id) {
         setLoading(true);
 
-        // Fetch batches for HOD's department
+        // Fetch batches for HOD's department (RLS will filter by department_id)
         const { data: batchesData, error: batchesError } = await supabase
           .from('batches')
-          .select('id, status')
-          .eq('department_id', profile.department_id);
+          .select('id, status');
 
         if (batchesError) {
           showError("Error fetching batches for department: " + batchesError.message);
@@ -37,40 +36,31 @@ const HodDashboard = () => {
         const activeBatchesCount = batchesData?.filter(b => b.status === 'Active').length || 0;
         setActiveBatches(activeBatchesCount);
 
-        const batchIdsInDepartment = batchesData?.map(b => b.id) || [];
-
-        // Fetch students in HOD's department
+        // Fetch students in HOD's department (RLS will filter by department_id via batches)
         const { data: studentsData, error: studentsError } = await supabase
           .from('students')
-          .select('id')
-          .in('batch_id', batchIdsInDepartment);
+          .select('id');
 
         if (studentsError) {
-          showError("Error fetching students for department: " + studentsError.message);
+          showError("Error fetching student data for department: " + studentsError.message);
           setTotalStudents(0);
         } else {
           setTotalStudents(studentsData?.length || 0);
         }
 
-        // Fetch pending requests for students in HOD's department
-        const studentIdsInDepartment = studentsData?.map(s => s.id) || [];
-        if (studentIdsInDepartment.length > 0) {
-          const { data: requestsData, error: requestsError } = await supabase
-            .from('requests')
-            .select('id')
-            .eq('status', 'Pending HOD Approval')
-            .in('student_id', studentIdsInDepartment);
+        // Fetch pending requests for students in HOD's department (RLS will filter by department_id via students)
+        const { data: requestsData, error: requestsError } = await supabase
+          .from('requests')
+          .select('id')
+          .eq('status', 'Pending HOD Approval');
 
-          if (requestsError) {
-            showError("Error fetching pending requests: " + requestsError.message);
-            setPendingRequests(0);
-          } else {
-            setPendingRequests(requestsData?.length || 0);
-          }
-        } else {
+        if (requestsError) {
+          showError("Error fetching pending requests: " + requestsError.message);
           setPendingRequests(0);
+        } else {
+          setPendingRequests(requestsData?.length || 0);
         }
-
+        
         setLoading(false);
       }
     };

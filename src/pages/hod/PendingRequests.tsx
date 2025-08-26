@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { fetchRequests, updateRequestStatus, fetchTemplates } from "@/data/appData";
+import { fetchTemplates, updateRequestStatus } from "@/data/appData";
 import { BonafideRequest, CertificateTemplate } from "@/lib/types";
 import { showSuccess, showError } from "@/utils/toast";
 import { formatDateToIndian } from "@/lib/utils";
@@ -55,52 +55,11 @@ const HodPendingRequests = () => {
   const fetchHodRequests = async () => {
     if (user?.id && profile?.department_id) {
       setLoading(true);
-      // Fetch batches for HOD's department
-      const { data: batchesData, error: batchesError } = await supabase
-        .from('batches')
-        .select('id')
-        .eq('department_id', profile.department_id);
-
-      if (batchesError) {
-        showError("Error fetching batches for department: " + batchesError.message);
-        setRequests([]);
-        setLoading(false);
-        return;
-      }
-
-      const batchIdsInDepartment = batchesData?.map(b => b.id) || [];
-      if (batchIdsInDepartment.length === 0) {
-        setRequests([]);
-        setLoading(false);
-        return;
-      }
-
-      // Fetch students in these batches
-      const { data: studentsData, error: studentsError } = await supabase
-        .from('students')
-        .select('id')
-        .in('batch_id', batchIdsInDepartment);
-
-      if (studentsError) {
-        showError("Error fetching students for department: " + studentsError.message);
-        setRequests([]);
-        setLoading(false);
-        return;
-      }
-
-      const studentIdsInDepartment = studentsData?.map(s => s.id) || [];
-      if (studentIdsInDepartment.length === 0) {
-        setRequests([]);
-        setLoading(false);
-        return;
-      }
-
-      // Fetch pending requests for these students
+      // Fetch pending requests for students in HOD's department (RLS will filter)
       const { data: requestsData, error: requestsError } = await supabase
         .from('requests')
         .select('*')
-        .eq('status', 'Pending HOD Approval')
-        .in('student_id', studentIdsInDepartment);
+        .eq('status', 'Pending HOD Approval');
 
       if (requestsError) {
         showError("Error fetching pending requests: " + requestsError.message);

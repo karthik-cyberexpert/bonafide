@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { fetchRequests, fetchBatches, fetchStudentDetails } from "@/data/appData";
+import { fetchBatches, fetchStudentDetails } from "@/data/appData";
 import { getStatusVariant, formatDateToIndian } from "@/lib/utils";
 import { BonafideRequest, Batch, StudentDetails } from "@/lib/types";
 import { useSession } from "@/components/auth/SessionContextProvider";
@@ -42,11 +42,10 @@ const HodRequestHistory = () => {
       if (user?.id && profile?.department_id) {
         setLoading(true);
 
-        // Fetch batches for HOD's department
+        // Fetch batches for HOD's department (RLS will filter)
         const { data: batchesData, error: batchesError } = await supabase
           .from('batches')
-          .select('id, name, section, current_semester')
-          .eq('department_id', profile.department_id);
+          .select('id, name, section, current_semester');
 
         if (batchesError) {
           showError("Error fetching batches for department: " + batchesError.message);
@@ -58,24 +57,15 @@ const HodRequestHistory = () => {
         }
         setAllBatches(batchesData as Batch[]);
 
-        const batchIdsInDepartment = batchesData?.map(b => b.id) || [];
-        if (batchIdsInDepartment.length === 0) {
-          setAllStudents([]);
-          setAllRequests([]);
-          setLoading(false);
-          return;
-        }
-
-        // Fetch students in these batches
+        // Fetch students in HOD's department (RLS will filter)
         const { data: studentsData, error: studentsError } = await supabase
           .from('students')
           .select(`
             id,
             register_number,
             profiles(first_name, last_name, email, phone_number),
-            batches(name, section, current_semester)
-          `)
-          .in('batch_id', batchIdsInDepartment);
+            batches(current_semester)
+          `);
 
         if (studentsError) {
           showError("Error fetching students for department: " + studentsError.message);
@@ -99,18 +89,10 @@ const HodRequestHistory = () => {
         }));
         setAllStudents(mappedStudents);
 
-        const studentIdsInDepartment = mappedStudents.map(s => s.id);
-        if (studentIdsInDepartment.length === 0) {
-          setAllRequests([]);
-          setLoading(false);
-          return;
-        }
-
-        // Fetch requests for these students, excluding pending tutor approval
+        // Fetch requests for these students, excluding pending tutor approval (RLS will filter)
         const { data: requestsData, error: requestsError } = await supabase
           .from('requests')
           .select('*')
-          .in('student_id', studentIdsInDepartment)
           .neq('status', 'Pending HOD Approval')
           .neq('status', 'Pending Tutor Approval'); // HOD doesn't see tutor pending either
 
