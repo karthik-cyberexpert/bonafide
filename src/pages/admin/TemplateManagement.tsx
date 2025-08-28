@@ -187,7 +187,7 @@ const TemplateManagement = () => {
               templates.map((template) => (
                 <TableRow key={template.id}>
                   <TableCell className="font-medium">{template.name}</TableCell>
-                  <TableCell>{template.template_type.toUpperCase()}</TableCell>
+                  <TableCell>{template.template_type?.toUpperCase() || 'N/A'}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
