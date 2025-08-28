@@ -71,10 +71,18 @@ const TemplateManagement = () => {
     template?: CertificateTemplate
   ) => {
     setDialogMode(mode);
-    const initialTemplate = template ? { ...template } : { name: "", template_type: "html" };
-    // Ensure content is an empty string if template_type is html and content is undefined/null
-    if (initialTemplate.template_type === "html" && (initialTemplate.content === undefined || initialTemplate.content === null)) {
-      initialTemplate.content = "";
+    let initialTemplate: Partial<CertificateTemplate>;
+
+    if (mode === "create") {
+      // For create mode, explicitly set default values for an HTML template
+      initialTemplate = { name: "", template_type: "html", content: "" };
+    } else { // mode === "edit"
+      // For edit mode, copy the existing template
+      initialTemplate = { ...template! }; // 'template' is guaranteed to be defined in 'edit' mode
+      // Ensure content is an empty string if template_type is html and content is undefined/null
+      if (initialTemplate.template_type === "html" && (initialTemplate.content === undefined || initialTemplate.content === null)) {
+        initialTemplate.content = "";
+      }
     }
     setCurrentTemplate(initialTemplate);
     setSelectedFile(null); // Clear selected file on dialog open
