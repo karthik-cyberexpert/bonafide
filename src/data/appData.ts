@@ -266,7 +266,7 @@ export const updateTemplate = async (
   updates: Partial<Omit<CertificateTemplate, 'created_at' | 'file_url'>>,
   file?: File
 ): Promise<CertificateTemplate | null> => {
-  let file_url: string | undefined;
+  let file_url: string | null | undefined; // Can be string (new upload), null (clear), or undefined (retain existing)
 
   // If a new file is provided, upload it
   if (file) {
@@ -302,7 +302,7 @@ export const updateTemplate = async (
       .from('certificate-templates')
       .upload(filePath, file, {
         cacheControl: '3600',
-        upsert: true, // Use upsert in case of filename collision, though timestamp should prevent
+        upsert: true,
       });
 
     if (uploadError) {
@@ -311,23 +311,17 @@ export const updateTemplate = async (
       return null;
     }
     file_url = supabase.storage.from('certificate-templates').getPublicUrl(filePath).data.publicUrl;
-  } else if (updates.template_type === 'html' && updates.content !== undefined) {
-    // If switching to HTML and no file is provided, clear file_url
+  } else if (updates.template_type === 'html') {
+    // If switching to HTML and no new file is provided, explicitly clear file_url
     file_url = null;
-  } else if ((updates.template_type === 'pdf' || updates.template_type === 'word') && !file && updates.file_url === undefined) {
-    // If template type is file-based but no new file is provided and file_url is not explicitly set to null,
-    // we should retain the existing file_url.
-    // This case is tricky, we need to ensure we don't accidentally clear file_url if no new file is uploaded
-    // but the user is just updating other fields.
-    // For now, if file is not provided, we don't touch file_url unless template_type is HTML.
   }
-
+  // If template_type is 'pdf' or 'word' and no new file is provided,
+  // file_url remains undefined, meaning it won't be updated in the DB,
+  // thus retaining the existing file_url. This is the desired behavior.
 
   const updatePayload: Partial<CertificateTemplate> = { ...updates };
-  if (file) {
+  if (file_url !== undefined) { // Only include file_url in payload if it was explicitly set (to a new URL or null)
     updatePayload.file_url = file_url;
-  } else if (updates.template_type === 'html') {
-    updatePayload.file_url = null; // Clear file_url if switching to HTML
   }
 
   const { data, error } = await supabase.from("templates").update(updatePayload).eq("id", templateId).select().single();
