@@ -15,11 +15,13 @@ import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { CheckCircle, Download, FileText, Clock } from "lucide-react";
 import { useSession } from "@/components/auth/SessionContextProvider";
 import { useEffect, useState } from "react";
+import { showError } from "@/utils/toast";
 
 const StudentDashboard = () => {
   const { user } = useSession();
   const [studentRequests, setStudentRequests] = useState<BonafideRequest[]>([]);
   const [studentDetails, setStudentDetails] = useState<StudentDetails | null>(null);
+  const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,6 +34,9 @@ const StudentDashboard = () => {
 
         const details = await fetchStudentDetails(user.id);
         setStudentDetails(details);
+
+        const fetchedTemplates = await fetchTemplates();
+        setTemplates(fetchedTemplates);
         setLoading(false);
       }
     };
@@ -50,20 +55,32 @@ const StudentDashboard = () => {
 
   const handleDownload = async (request: BonafideRequest) => {
     if (!studentDetails) {
-      console.error("Student details not available for download.");
+      showError("Student details not available for download.");
       return;
     }
-    const templates: CertificateTemplate[] = await fetchTemplates();
     const template: CertificateTemplate | undefined = templates.find((t) => t.id === request.template_id);
 
     if (!template) {
-      console.error("Could not find template for download.");
+      showError("Could not find template for download.");
       return;
     }
 
-    const htmlContent = getCertificateHtml(request, studentDetails, template, true);
-    const fileName = `Bonafide-${studentDetails.register_number}.pdf`;
-    await generatePdf(htmlContent, fileName);
+    if (template.template_type === "html") {
+      const htmlContent = getCertificateHtml(request, studentDetails, template, true);
+      const fileName = `Bonafide-${studentDetails.register_number}.pdf`;
+      await generatePdf(htmlContent, fileName);
+    } else if (template.file_url) {
+      // For PDF or Word templates, directly download the file
+      const link = document.createElement('a');
+      link.href = template.file_url;
+      link.download = `${template.name}-${studentDetails.register_number}.${template.template_type}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      showError("No file URL found for this template type.");
+      return;
+    }
   };
 
   if (loading) {

@@ -29,10 +29,12 @@ import { generatePdf, getCertificateHtml } from "@/lib/pdf";
 import { Download } from "lucide-react";
 import { useSession } from "@/components/auth/SessionContextProvider";
 import { useEffect, useState } from "react";
+import { showError } from "@/utils/toast";
 
 const MyRequests = () => {
   const { user } = useSession();
   const [studentRequests, setStudentRequests] = useState<BonafideRequest[]>([]);
+  const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,6 +44,9 @@ const MyRequests = () => {
         const allRequests = await fetchRequests();
         const filtered = allRequests.filter((req) => req.student_id === user.id);
         setStudentRequests(filtered);
+
+        const fetchedTemplates = await fetchTemplates();
+        setTemplates(fetchedTemplates);
         setLoading(false);
       }
     };
@@ -50,17 +55,29 @@ const MyRequests = () => {
 
   const handleDownload = async (request: BonafideRequest) => {
     const student: StudentDetails | null = await fetchStudentDetails(request.student_id);
-    const templates: CertificateTemplate[] = await fetchTemplates();
     const template: CertificateTemplate | undefined = templates.find((t) => t.id === request.template_id);
 
     if (!student || !template) {
-      console.error("Could not fetch student or template for download.");
+      showError("Could not fetch student or template for download.");
       return;
     }
 
-    const htmlContent = getCertificateHtml(request, student, template, true);
-    const fileName = `Bonafide-${student.register_number}.pdf`;
-    await generatePdf(htmlContent, fileName);
+    if (template.template_type === "html") {
+      const htmlContent = getCertificateHtml(request, student, template, true);
+      const fileName = `Bonafide-${student.register_number}.pdf`;
+      await generatePdf(htmlContent, fileName);
+    } else if (template.file_url) {
+      // For PDF or Word templates, directly download the file
+      const link = document.createElement('a');
+      link.href = template.file_url;
+      link.download = `${template.name}-${student.register_number}.${template.template_type}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      showError("No file URL found for this template type.");
+      return;
+    }
   };
 
   if (loading) {

@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Download } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,6 +36,13 @@ import { CertificateTemplate } from "@/lib/types";
 import { showSuccess, showError } from "@/utils/toast";
 import RichTextEditor from "@/components/shared/RichTextEditor";
 import { createTemplate, deleteTemplate, fetchTemplates, updateTemplate } from "@/data/appData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const TemplateManagement = () => {
   const [templates, setTemplates] =
@@ -44,7 +51,8 @@ const TemplateManagement = () => {
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
   const [currentTemplate, setCurrentTemplate] = useState<
     Partial<CertificateTemplate>
-  >({});
+  >({ template_type: "html" }); // Default to HTML
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchTemplatesData = async () => {
@@ -63,22 +71,34 @@ const TemplateManagement = () => {
     template?: CertificateTemplate
   ) => {
     setDialogMode(mode);
-    setCurrentTemplate(template || { id: "", name: "", content: "" });
+    setCurrentTemplate(template || { name: "", content: "", template_type: "html" });
+    setSelectedFile(null); // Clear selected file on dialog open
     setIsDialogOpen(true);
   };
 
   const handleSaveTemplate = async () => {
-    if (!currentTemplate.name || !currentTemplate.content) {
-      showError("Template name and content are required.");
+    if (!currentTemplate.name) {
+      showError("Template name is required.");
+      return;
+    }
+
+    if (currentTemplate.template_type === "html" && !currentTemplate.content) {
+      showError("HTML content is required for HTML templates.");
+      return;
+    }
+
+    if ((currentTemplate.template_type === "pdf" || currentTemplate.template_type === "word") && !selectedFile && dialogMode === "create") {
+      showError("A file is required for PDF/Word templates.");
       return;
     }
 
     if (dialogMode === "create") {
-      const newTemplatePayload: Omit<CertificateTemplate, 'id' | 'created_at'> = {
+      const newTemplatePayload: Omit<CertificateTemplate, 'id' | 'created_at' | 'file_url'> = {
         name: currentTemplate.name,
-        content: currentTemplate.content,
+        content: currentTemplate.template_type === "html" ? currentTemplate.content : undefined,
+        template_type: currentTemplate.template_type,
       };
-      const created = await createTemplate(newTemplatePayload);
+      const created = await createTemplate(newTemplatePayload, selectedFile || undefined);
       if (created) {
         showSuccess(`Template "${created.name}" created successfully.`);
         fetchTemplatesData();
@@ -92,8 +112,9 @@ const TemplateManagement = () => {
       }
       const updated = await updateTemplate(currentTemplate.id, {
         name: currentTemplate.name,
-        content: currentTemplate.content,
-      });
+        content: currentTemplate.template_type === "html" ? currentTemplate.content : undefined,
+        template_type: currentTemplate.template_type,
+      }, selectedFile || undefined);
       if (updated) {
         showSuccess(`Template "${updated.name}" updated successfully.`);
         fetchTemplatesData();
@@ -112,6 +133,14 @@ const TemplateManagement = () => {
       fetchTemplatesData();
     } else {
       showError("Failed to delete template.");
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setSelectedFile(e.target.files[0]);
+    } else {
+      setSelectedFile(null);
     }
   };
 
@@ -140,8 +169,8 @@ const TemplateManagement = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Template ID</TableHead>
               <TableHead>Template Name</TableHead>
+              <TableHead>Type</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -149,8 +178,8 @@ const TemplateManagement = () => {
             {templates.length > 0 ? (
               templates.map((template) => (
                 <TableRow key={template.id}>
-                  <TableCell className="font-medium">{template.id}</TableCell>
-                  <TableCell>{template.name}</TableCell>
+                  <TableCell className="font-medium">{template.name}</TableCell>
+                  <TableCell>{template.template_type.toUpperCase()}</TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -164,6 +193,13 @@ const TemplateManagement = () => {
                         >
                           Edit
                         </DropdownMenuItem>
+                        {template.file_url && (
+                          <DropdownMenuItem asChild>
+                            <a href={template.file_url} target="_blank" rel="noopener noreferrer" className="flex items-center">
+                              <Download className="mr-2 h-4 w-4" /> Download
+                            </a>
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem
                           className="text-destructive"
                           onClick={() => handleDeleteTemplate(template.id)}
@@ -210,17 +246,64 @@ const TemplateManagement = () => {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="template-content">Content</Label>
-              <RichTextEditor
-                content={currentTemplate.content || ""}
-                onChange={(content) =>
-                  setCurrentTemplate({ ...currentTemplate, content })
-                }
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Use placeholders like {"{studentName}"}, {"{studentId}"}, etc.
-              </p>
+              <Label htmlFor="template-type">Template Type</Label>
+              <Select
+                value={currentTemplate.template_type || "html"}
+                onValueChange={(value: "html" | "pdf" | "word") => {
+                  setCurrentTemplate({ ...currentTemplate, template_type: value, content: value !== "html" ? undefined : currentTemplate.content, file_url: value === "html" ? undefined : currentTemplate.file_url });
+                  setSelectedFile(null); // Clear file when type changes
+                }}
+              >
+                <SelectTrigger id="template-type">
+                  <SelectValue placeholder="Select template type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="html">HTML Content</SelectItem>
+                  <SelectItem value="pdf">PDF Document</SelectItem>
+                  <SelectItem value="word">Word Document</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+
+            {currentTemplate.template_type === "html" ? (
+              <div className="grid gap-2">
+                <Label htmlFor="template-content">Content</Label>
+                <RichTextEditor
+                  content={currentTemplate.content || ""}
+                  onChange={(content) =>
+                    setCurrentTemplate({ ...currentTemplate, content })
+                  }
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Use placeholders like {"{studentName}"}, {"{studentId}"}, etc.
+                </p>
+              </div>
+            ) : (
+              <div className="grid gap-2">
+                <Label htmlFor="template-file">
+                  Upload {currentTemplate.template_type?.toUpperCase()} File
+                </Label>
+                <Input
+                  id="template-file"
+                  type="file"
+                  accept={currentTemplate.template_type === "pdf" ? ".pdf" : ".docx"}
+                  onChange={handleFileChange}
+                />
+                {currentTemplate.file_url && !selectedFile && (
+                  <p className="text-sm text-muted-foreground">
+                    Current file:{" "}
+                    <a
+                      href={currentTemplate.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline"
+                    >
+                      View
+                    </a>
+                  </p>
+                )}
+              </div>
+            )}
           </div>
           <DialogFooter>
             <DialogClose asChild>

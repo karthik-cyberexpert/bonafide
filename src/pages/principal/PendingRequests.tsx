@@ -83,19 +83,31 @@ const PrincipalPendingRequests = () => {
       return;
     }
 
-    const htmlContent = getCertificateHtml(
-      selectedRequest,
-      student,
-      template,
-      addSignature
-    );
-    const fileName = `Bonafide-${student.register_number}.pdf`;
-
-    await generatePdf(htmlContent, fileName);
+    if (template.template_type === "html") {
+      const htmlContent = getCertificateHtml(
+        selectedRequest,
+        student,
+        template,
+        addSignature
+      );
+      const fileName = `Bonafide-${student.register_number}.pdf`;
+      await generatePdf(htmlContent, fileName);
+    } else if (template.file_url) {
+      // For PDF or Word templates, directly download the file
+      const link = document.createElement('a');
+      link.href = template.file_url;
+      link.download = `${template.name}-${student.register_number}.${template.template_type}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      showError("No file URL found for this template type.");
+      return;
+    }
 
     const updated = await updateRequestStatus(selectedRequest.id, "Approved");
     if (updated) {
-      showSuccess(`Request ${selectedRequest.id} approved and PDF downloaded.`);
+      showSuccess(`Request ${selectedRequest.id} approved and document downloaded.`);
       fetchPrincipalRequests(); // Refresh list
       setIsApproveOpen(false);
       setSelectedRequest(null);
@@ -217,29 +229,37 @@ const PrincipalPendingRequests = () => {
           {selectedRequest && (
             <div className="py-4">
               <h3 className="font-semibold mb-2">Certificate Preview</h3>
-              <div
-                className="p-4 border rounded-md bg-muted prose dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{
-                  __html: getCertificateHtml(
-                    selectedRequest,
-                    null, // Student details will be fetched inside getCertificateHtml
-                    templates.find(
-                      (t) => t.id === selectedRequest.template_id
-                    ),
-                    addSignature
-                  ),
-                }}
-              />
-              <div className="flex items-center space-x-2 mt-4">
-                <Checkbox
-                  id="e-sign"
-                  checked={addSignature}
-                  onCheckedChange={(checked) =>
-                    setAddSignature(checked as boolean)
-                  }
-                />
-                <Label htmlFor="e-sign">Add E-Signature</Label>
-              </div>
+              {templates.find((t) => t.id === selectedRequest.template_id)?.template_type === "html" ? (
+                <>
+                  <div
+                    className="p-4 border rounded-md bg-muted prose dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{
+                      __html: getCertificateHtml(
+                        selectedRequest,
+                        null, // Student details will be fetched inside getCertificateHtml
+                        templates.find(
+                          (t) => t.id === selectedRequest.template_id
+                        ),
+                        addSignature
+                      ),
+                    }}
+                  />
+                  <div className="flex items-center space-x-2 mt-4">
+                    <Checkbox
+                      id="e-sign"
+                      checked={addSignature}
+                      onCheckedChange={(checked) =>
+                        setAddSignature(checked as boolean)
+                      }
+                    />
+                    <Label htmlFor="e-sign">Add E-Signature</Label>
+                  </div>
+                </>
+              ) : (
+                <p className="text-muted-foreground">
+                  This is a file-based template ({templates.find((t) => t.id === selectedRequest.template_id)?.template_type?.toUpperCase()}). It will be downloaded directly.
+                </p>
+              )}
             </div>
           )}
           <DialogFooter>
@@ -247,7 +267,7 @@ const PrincipalPendingRequests = () => {
               <Button variant="outline">Cancel</Button>
             </DialogClose>
             <Button onClick={handleApproveAndDownload}>
-              Approve and Download PDF
+              Approve and Download
             </Button>
           </DialogFooter>
         </DialogContent>
