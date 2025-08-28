@@ -242,8 +242,8 @@ export const createTemplate = async (
       });
 
     if (uploadError) {
-      showError("Error uploading file: " + uploadError.message);
       console.error("Error uploading file:", uploadError);
+      showError("Error uploading file: " + uploadError.message);
       return null;
     }
     file_url = supabase.storage.from('certificate-templates').getPublicUrl(filePath).data.publicUrl;
@@ -255,7 +255,8 @@ export const createTemplate = async (
   }).select().single();
 
   if (error) {
-    console.error("Error creating template:", error);
+    console.error("Error creating template in DB:", error);
+    showError("Failed to create template in database: " + error.message);
     return null;
   }
   return data as CertificateTemplate;
@@ -266,7 +267,7 @@ export const updateTemplate = async (
   updates: Partial<Omit<CertificateTemplate, 'created_at' | 'file_url'>>,
   file?: File
 ): Promise<CertificateTemplate | null> => {
-  let file_url: string | null | undefined; // Can be string (new upload), null (clear), or undefined (retain existing)
+  let file_url: string | null | undefined;
 
   // If a new file is provided, upload it
   if (file) {
@@ -279,7 +280,7 @@ export const updateTemplate = async (
 
     if (fetchError) {
       console.error("Error fetching existing template for file update:", fetchError);
-      showError("Failed to update template file.");
+      showError("Failed to update template file: " + fetchError.message);
       return null;
     }
 
@@ -326,7 +327,8 @@ export const updateTemplate = async (
 
   const { data, error } = await supabase.from("templates").update(updatePayload).eq("id", templateId).select().single();
   if (error) {
-    console.error("Error updating template:", error);
+    console.error("Error updating template in DB:", error);
+    showError("Failed to update template in database: " + error.message);
     return null;
   }
   return data as CertificateTemplate;
@@ -342,7 +344,7 @@ export const deleteTemplate = async (templateId: string): Promise<boolean> => {
 
   if (fetchError) {
     console.error("Error fetching template for deletion:", fetchError);
-    showError("Failed to delete template.");
+    showError("Failed to delete template: " + fetchError.message);
     return false;
   }
 
@@ -362,7 +364,8 @@ export const deleteTemplate = async (templateId: string): Promise<boolean> => {
 
   const { error } = await supabase.from("templates").delete().eq("id", templateId);
   if (error) {
-    console.error("Error deleting template:", error);
+    console.error("Error deleting template from DB:", error);
+    showError("Failed to delete template from database: " + error.message);
     return false;
   }
   return true;
