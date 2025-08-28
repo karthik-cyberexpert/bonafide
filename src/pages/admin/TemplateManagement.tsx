@@ -51,7 +51,7 @@ const TemplateManagement = () => {
   const [dialogMode, setDialogMode] = useState<"create" | "edit">("create");
   const [currentTemplate, setCurrentTemplate] = useState<
     Partial<CertificateTemplate>
-  >({ template_type: "html" }); // Default to HTML
+  >({ template_type: "html", content: "" }); // Default to HTML with empty content
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -71,7 +71,12 @@ const TemplateManagement = () => {
     template?: CertificateTemplate
   ) => {
     setDialogMode(mode);
-    setCurrentTemplate(template || { name: "", content: "", template_type: "html" });
+    const initialTemplate = template ? { ...template } : { name: "", template_type: "html" };
+    // Ensure content is an empty string if template_type is html and content is undefined/null
+    if (initialTemplate.template_type === "html" && (initialTemplate.content === undefined || initialTemplate.content === null)) {
+      initialTemplate.content = "";
+    }
+    setCurrentTemplate(initialTemplate);
     setSelectedFile(null); // Clear selected file on dialog open
     setIsDialogOpen(true);
   };
@@ -82,7 +87,10 @@ const TemplateManagement = () => {
       return;
     }
 
-    if (currentTemplate.template_type === "html" && !currentTemplate.content) {
+    // Ensure content is an empty string if template_type is html and content is undefined/null
+    const contentToSave = currentTemplate.template_type === "html" ? (currentTemplate.content || "") : undefined;
+
+    if (currentTemplate.template_type === "html" && !contentToSave) {
       showError("HTML content is required for HTML templates.");
       return;
     }
@@ -95,8 +103,8 @@ const TemplateManagement = () => {
     if (dialogMode === "create") {
       const newTemplatePayload: Omit<CertificateTemplate, 'id' | 'created_at' | 'file_url'> = {
         name: currentTemplate.name,
-        content: currentTemplate.template_type === "html" ? currentTemplate.content : undefined,
-        template_type: currentTemplate.template_type,
+        content: contentToSave,
+        template_type: currentTemplate.template_type!, // template_type is guaranteed to be set
       };
       const created = await createTemplate(newTemplatePayload, selectedFile || undefined);
       if (created) {
@@ -112,8 +120,8 @@ const TemplateManagement = () => {
       }
       const updated = await updateTemplate(currentTemplate.id, {
         name: currentTemplate.name,
-        content: currentTemplate.template_type === "html" ? currentTemplate.content : undefined,
-        template_type: currentTemplate.template_type,
+        content: contentToSave,
+        template_type: currentTemplate.template_type!, // template_type is guaranteed to be set
       }, selectedFile || undefined);
       if (updated) {
         showSuccess(`Template "${updated.name}" updated successfully.`);
@@ -250,7 +258,12 @@ const TemplateManagement = () => {
               <Select
                 value={currentTemplate.template_type || "html"}
                 onValueChange={(value: "html" | "pdf" | "word") => {
-                  setCurrentTemplate({ ...currentTemplate, template_type: value, content: value !== "html" ? undefined : currentTemplate.content, file_url: value === "html" ? undefined : currentTemplate.file_url });
+                  setCurrentTemplate((prev) => ({
+                    ...prev,
+                    template_type: value,
+                    content: value === "html" ? (prev?.content || "") : undefined, // Clear content if not HTML
+                    file_url: value !== "html" ? prev?.file_url : undefined, // Clear file_url if HTML
+                  }));
                   setSelectedFile(null); // Clear file when type changes
                 }}
               >
@@ -269,7 +282,7 @@ const TemplateManagement = () => {
               <div className="grid gap-2">
                 <Label htmlFor="template-content">Content</Label>
                 <RichTextEditor
-                  content={currentTemplate.content || ""}
+                  content={currentTemplate.content || ""} // Ensure content is always a string
                   onChange={(content) =>
                     setCurrentTemplate({ ...currentTemplate, content })
                   }
