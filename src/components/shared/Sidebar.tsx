@@ -9,7 +9,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ navItems, portalName }: SidebarProps) => (
-  <aside className="hidden md:flex md:flex-col md:w-64 border-r bg-background">
+  <aside className="hidden md:flex md:flex-col md:w-64 border-r bg-sidebar"> {/* Changed bg-background to bg-sidebar */}
     <div className="flex h-16 items-center border-b px-6">
       <LayoutDashboard className="h-6 w-6 mr-2" />
       <h2 className="text-lg font-semibold">{portalName}</h2>
