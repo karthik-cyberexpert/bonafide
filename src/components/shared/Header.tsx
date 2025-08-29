@@ -10,13 +10,17 @@ import { useSession } from "@/components/auth/SessionContextProvider"; // Import
 interface HeaderProps {
   navItems: NavItem[];
   portalName: string;
+  headerClassName?: string; // New prop for custom header class
 }
 
-const Header = ({ navItems, portalName }: HeaderProps) => {
+const Header = ({ navItems, portalName, headerClassName }: HeaderProps) => {
   const { signOut } = useSession(); // Use the signOut function
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-header px-4 sm:px-6"> {/* Changed bg-background to bg-header */}
+    <header className={cn(
+      "sticky top-0 z-30 flex h-14 items-center justify-between border-b px-4 sm:px-6",
+      headerClassName || "bg-card" // Use custom class if provided, otherwise default to bg-card
+    )}>
       <div className="md:hidden">
         <Sheet>
           <SheetTrigger asChild>
