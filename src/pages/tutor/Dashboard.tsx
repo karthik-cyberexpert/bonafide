@@ -67,12 +67,14 @@ const TutorDashboard = () => {
         <DashboardCard
           title="Total Students"
           value={totalStudents.toString()}
-          icon={<Users className="h-4 w-4 text-muted-foreground" />}
+          icon={<Users />}
+          iconColor="text-lime-500"
         />
         <DashboardCard
           title="Pending Requests"
           value={pendingRequests.toString()}
-          icon={<FileClock className="h-4 w-4 text-muted-foreground" />}
+          icon={<FileClock />}
+          iconColor="text-amber-500"
         />
       </div>
       <div>

@@ -87,21 +87,23 @@ const HodDashboard = () => {
         <DashboardCard
           title="Pending Requests"
           value={pendingRequests.toString()}
-          icon={<FileClock className="h-4 w-4 text-muted-foreground" />}
+          icon={<FileClock />}
+          iconColor="text-red-500"
         />
         <DashboardCard
           title="Total Students"
           value={totalStudents.toString()}
-          icon={<Users className="h-4 w-4 text-muted-foreground" />}
+          icon={<Users />}
+          iconColor="text-indigo-500"
         />
         <DashboardCard
           title="Active Batches"
           value={activeBatches.toString()}
-          icon={<ClipboardList className="h-4 w-4 text-muted-foreground" />}
+          icon={<ClipboardList />}
+          iconColor="text-teal-500"
         />
       </div>
       <div>
-        {/* BatchRequestChart will need to be updated to fetch data from Supabase */}
         <BatchRequestChart />
       </div>
     </div>

@@ -92,26 +92,29 @@ const PrincipalDashboard = () => {
         <DashboardCard
           title="Total Students"
           value={totalStudents.toString()}
-          icon={<Users className="h-4 w-4 text-muted-foreground" />}
+          icon={<Users />}
+          iconColor="text-blue-500"
         />
         <DashboardCard
           title="Total Staff"
           value={totalStaff.toString()}
-          icon={<Briefcase className="h-4 w-4 text-muted-foreground" />}
+          icon={<Briefcase />}
+          iconColor="text-green-500"
         />
         <DashboardCard
           title="Pending Requests"
           value={pendingRequests.toString()}
-          icon={<FileClock className="h-4 w-4 text-muted-foreground" />}
+          icon={<FileClock />}
+          iconColor="text-yellow-500"
         />
         <DashboardCard
           title="Total Departments"
           value={totalDepartments.toString()}
-          icon={<Building className="h-4 w-4 text-muted-foreground" />}
+          icon={<Building />}
+          iconColor="text-pink-500"
         />
       </div>
       <div>
-        {/* DepartmentRequestChart will need to be updated to fetch data from Supabase */}
         <DepartmentRequestChart />
       </div>
     </div>

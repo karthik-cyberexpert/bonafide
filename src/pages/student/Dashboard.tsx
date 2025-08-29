@@ -104,17 +104,20 @@ const StudentDashboard = () => {
         <DashboardCard
           title="Total Requests"
           value={totalRequests.toString()}
-          icon={<FileText className="h-4 w-4 text-muted-foreground" />}
+          icon={<FileText />}
+          iconColor="text-cyan-500"
         />
         <DashboardCard
           title="Approved"
           value={approvedRequests.length.toString()}
-          icon={<CheckCircle className="h-4 w-4 text-muted-foreground" />}
+          icon={<CheckCircle />}
+          iconColor="text-emerald-500"
         />
         <DashboardCard
           title="Pending / Returned"
           value={pendingOrReturned.toString()}
-          icon={<Clock className="h-4 w-4 text-muted-foreground" />}
+          icon={<Clock />}
+          iconColor="text-rose-500"
         />
       </div>
 

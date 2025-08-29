@@ -65,16 +65,17 @@ const AdminDashboard = () => {
         <DashboardCard
           title="Pending Requests"
           value={pendingRequests.toString()}
-          icon={<FileClock className="h-4 w-4 text-muted-foreground" />}
+          icon={<FileClock />}
+          iconColor="text-orange-500"
         />
         <DashboardCard
           title="Total Departments"
           value={totalDepartments.toString()}
-          icon={<Building className="h-4 w-4 text-muted-foreground" />}
+          icon={<Building />}
+          iconColor="text-purple-500"
         />
       </div>
       <div>
-        {/* DepartmentRequestChart will need to be updated to fetch data from Supabase */}
         <DepartmentRequestChart />
       </div>
     </div>
