@@ -15,6 +15,7 @@ interface HeaderProps {
 
 const Header = ({ navItems, portalName, headerClassName }: HeaderProps) => {
   const { signOut } = useSession(); // Use the signOut function
+  const onHeaderBg = headerClassName?.includes("bg-header");
 
   return (
     <header className={cn(
@@ -24,7 +25,14 @@ const Header = ({ navItems, portalName, headerClassName }: HeaderProps) => {
       <div className="md:hidden">
         <Sheet>
           <SheetTrigger asChild>
-            <Button variant="outline" size="icon" className="shrink-0">
+            <Button
+              variant="outline"
+              size="icon"
+              className={cn(
+                "shrink-0",
+                onHeaderBg && "bg-transparent border-current hover:bg-white/20"
+              )}
+            >
               <Menu className="h-5 w-5" />
               <span className="sr-only">Toggle navigation menu</span>
             </Button>
@@ -64,12 +72,21 @@ const Header = ({ navItems, portalName, headerClassName }: HeaderProps) => {
       <div className="hidden md:block" />
 
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(onHeaderBg && "hover:bg-white/20")}
+        >
           <Bell className="h-5 w-5" />
           <span className="sr-only">View notifications</span>
         </Button>
-        <ThemeToggle />
-        <Button variant="ghost" size="icon" onClick={signOut}>
+        <ThemeToggle onHeaderBg={onHeaderBg} />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={signOut}
+          className={cn(onHeaderBg && "hover:bg-white/20")}
+        >
           <LogOut className="h-5 w-5" />
           <span className="sr-only">Logout</span>
         </Button>
