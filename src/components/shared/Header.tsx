@@ -16,7 +16,7 @@ const Header = ({ navItems, portalName }: HeaderProps) => {
   const { signOut } = useSession(); // Use the signOut function
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background px-4 sm:px-6">
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-header px-4 sm:px-6"> {/* Changed bg-background to bg-header */}
       <div className="md:hidden">
         <Sheet>
           <SheetTrigger asChild>
