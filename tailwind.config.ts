@@ -74,8 +74,7 @@ export default {
           DEFAULT: "hsl(var(--header-background))",
         },
         "student-sidebar": {
-          start: "hsl(var(--student-sidebar-background-start))",
-          end: "hsl(var(--student-sidebar-background-end))",
+          DEFAULT: "hsl(var(--student-sidebar-background))",
           foreground: "hsl(var(--student-sidebar-foreground))",
           "muted-foreground": "hsl(var(--student-sidebar-muted-foreground))",
           active: "hsl(var(--student-sidebar-active-background))",
@@ -85,10 +84,7 @@ export default {
         "student-header": {
           DEFAULT: "hsl(var(--student-header-background))",
         },
-        "student-main-bg": {
-          start: "hsl(var(--student-main-bg-start))",
-          end: "hsl(var(--student-main-bg-end))",
-        },
+        "student-main-bg": "hsl(var(--student-main-background))",
       },
       borderRadius: {
         lg: "var(--radius)",

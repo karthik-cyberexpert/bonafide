@@ -19,7 +19,7 @@ const Sidebar = ({ navItems, portalName, variant = 'default' }: SidebarProps) =>
       "hidden md:flex md:flex-col md:w-64 border-r",
       isDefault && "bg-sidebar",
       isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground",
-      isStudent && "bg-gradient-to-b from-student-sidebar-start to-student-sidebar-end text-student-sidebar-foreground"
+      isStudent && "bg-student-sidebar text-student-sidebar-foreground"
     )}>
       <div className={cn(
         "flex h-16 items-center border-b px-6",
