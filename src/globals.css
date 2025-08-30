@@ -101,6 +101,13 @@
   }
 }
 
+@layer components {
+  .admin-card-theme {
+    --card: hsl(var(--muted));
+    --card-foreground: hsl(var(--muted-foreground));
+  }
+}
+
 @layer base {
   * {
     @apply border-border;
