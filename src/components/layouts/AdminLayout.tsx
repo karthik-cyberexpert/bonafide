@@ -59,7 +59,7 @@ const AdminLayout = () => {
   return (
     <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="Admin Portal" variant="admin" />
-      <div className="flex flex-col flex-1 bg-muted/40">
+      <div className="flex flex-col flex-1 bg-muted">
         <Header navItems={navItems} portalName="Admin Portal" headerClassName="bg-header text-primary-foreground dark:text-primary" />
         <main className="flex-1 p-6">
           <Outlet />
