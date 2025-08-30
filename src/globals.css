@@ -63,8 +63,6 @@
     --student-sidebar-active-foreground: 210 40% 98%;
     --student-sidebar-border: 224 65% 45%;
     --student-header-background: 243 56% 20%;
-    --student-main-bg-start: 220 60% 95%;
-    --student-main-bg-end: 0 0% 100%;
   }
 
   .dark {
@@ -125,8 +123,6 @@
     --student-sidebar-active-foreground: 210 40% 98%;
     --student-sidebar-border: 224 65% 45%;
     --student-header-background: 243 56% 20%;
-    --student-main-bg-start: 222.2 84% 4.9%;
-    --student-main-bg-end: 221 58% 21%;
   }
 }
 

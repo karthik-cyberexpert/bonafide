@@ -85,10 +85,6 @@ export default {
         "student-header": {
           DEFAULT: "hsl(var(--student-header-background))",
         },
-        "student-main-bg": {
-          start: "hsl(var(--student-main-bg-start))",
-          end: "hsl(var(--student-main-bg-end))",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
