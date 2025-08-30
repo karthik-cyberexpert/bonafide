@@ -31,7 +31,7 @@ const StudentLayout = () => {
   return (
     <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="Student Portal" variant="student" />
-      <div className="flex flex-col flex-1 bg-muted/40">
+      <div className="flex flex-col flex-1 bg-gradient-to-b from-student-main-bg-start to-student-main-bg-end">
         <Header navItems={navItems} portalName="Student Portal" headerClassName="bg-student-header text-primary-foreground dark:text-primary" />
         <main className="flex-1 p-6">
           <Outlet />
