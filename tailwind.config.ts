@@ -73,6 +73,18 @@ export default {
         header: { // New header color definition
           DEFAULT: "hsl(var(--header-background))",
         },
+        "student-sidebar": {
+          start: "hsl(var(--student-sidebar-background-start))",
+          end: "hsl(var(--student-sidebar-background-end))",
+          foreground: "hsl(var(--student-sidebar-foreground))",
+          "muted-foreground": "hsl(var(--student-sidebar-muted-foreground))",
+          active: "hsl(var(--student-sidebar-active-background))",
+          "active-foreground": "hsl(var(--student-sidebar-active-foreground))",
+          border: "hsl(var(--student-sidebar-border))",
+        },
+        "student-header": {
+          DEFAULT: "hsl(var(--student-header-background))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

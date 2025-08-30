@@ -6,20 +6,25 @@ import { NavItem } from "@/lib/types";
 interface SidebarProps {
   navItems: NavItem[];
   portalName: string;
-  variant?: 'default' | 'admin';
+  variant?: 'default' | 'admin' | 'student';
 }
 
 const Sidebar = ({ navItems, portalName, variant = 'default' }: SidebarProps) => {
   const isDefault = variant === 'default';
+  const isAdmin = variant === 'admin';
+  const isStudent = variant === 'student';
 
   return (
     <aside className={cn(
       "hidden md:flex md:flex-col md:w-64 border-r",
-      isDefault ? "bg-sidebar" : "bg-admin-sidebar text-admin-sidebar-foreground"
+      isDefault && "bg-sidebar",
+      isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground",
+      isStudent && "bg-gradient-to-b from-student-sidebar-start to-student-sidebar-end text-student-sidebar-foreground"
     )}>
       <div className={cn(
         "flex h-16 items-center border-b px-6",
-        !isDefault && "border-admin-sidebar-border"
+        isAdmin && "border-admin-sidebar-border",
+        isStudent && "border-student-sidebar-border"
       )}>
         <LayoutDashboard className="h-6 w-6 mr-2" />
         <h2 className="text-lg font-semibold">{portalName}</h2>
@@ -33,8 +38,14 @@ const Sidebar = ({ navItems, portalName, variant = 'default' }: SidebarProps) =>
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2 transition-all",
-                isDefault ? "text-muted-foreground hover:text-primary" : "text-admin-sidebar-muted-foreground hover:text-admin-sidebar-foreground",
-                isActive && (isDefault ? "bg-muted text-primary" : "bg-admin-sidebar-active text-admin-sidebar-active-foreground")
+                isDefault && "text-muted-foreground hover:text-primary",
+                isAdmin && "text-admin-sidebar-muted-foreground hover:text-admin-sidebar-foreground",
+                isStudent && "text-student-sidebar-muted-foreground hover:text-student-sidebar-foreground",
+                isActive && (
+                  isDefault ? "bg-muted text-primary" :
+                  isAdmin ? "bg-admin-sidebar-active text-admin-sidebar-active-foreground" :
+                  "bg-student-sidebar-active text-student-sidebar-active-foreground"
+                )
               )
             }
           >

@@ -30,9 +30,9 @@ const navItems: NavItem[] = [
 const StudentLayout = () => {
   return (
     <div className="flex min-h-screen w-full">
-      <Sidebar navItems={navItems} portalName="Student Portal" />
+      <Sidebar navItems={navItems} portalName="Student Portal" variant="student" />
       <div className="flex flex-col flex-1 bg-muted/40">
-        <Header navItems={navItems} portalName="Student Portal" />
+        <Header navItems={navItems} portalName="Student Portal" headerClassName="bg-student-header text-primary-foreground dark:text-primary" />
         <main className="flex-1 p-6">
           <Outlet />
         </main>
