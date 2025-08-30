@@ -55,14 +55,16 @@
     --admin-card-background: 0 0% 94%; /* pale smoke white / light gray */
 
     /* New Student Theme Variables */
-    --student-sidebar-background: 230 35% 15%;
+    --student-sidebar-background-start: 243 56% 20%;
+    --student-sidebar-background-end: 221 58% 21%;
     --student-sidebar-foreground: 210 40% 98%;
     --student-sidebar-muted-foreground: 223 64% 83%;
-    --student-sidebar-active-background: 225 73% 57%;
+    --student-sidebar-active-background: 223 74% 23%;
     --student-sidebar-active-foreground: 210 40% 98%;
-    --student-sidebar-border: 230 35% 25%;
-    --student-header-background: 230 35% 15%;
-    --student-main-background: 210 40% 98%;
+    --student-sidebar-border: 224 65% 45%;
+    --student-header-background: 243 56% 20%;
+    --student-main-bg-start: 220 60% 95%;
+    --student-main-bg-end: 0 0% 100%;
   }
 
   .dark {
@@ -115,14 +117,16 @@
     --admin-card-foreground: 215 20.2% 65.1%;
 
     /* New Student Theme Variables (can be same for dark mode) */
-    --student-sidebar-background: 230 35% 15%;
+    --student-sidebar-background-start: 243 56% 20%;
+    --student-sidebar-background-end: 221 58% 21%;
     --student-sidebar-foreground: 210 40% 98%;
     --student-sidebar-muted-foreground: 223 64% 83%;
-    --student-sidebar-active-background: 225 73% 57%;
+    --student-sidebar-active-background: 223 74% 23%;
     --student-sidebar-active-foreground: 210 40% 98%;
-    --student-sidebar-border: 230 35% 25%;
-    --student-header-background: 230 35% 15%;
-    --student-main-background: 222.2 84% 4.9%;
+    --student-sidebar-border: 224 65% 45%;
+    --student-header-background: 243 56% 20%;
+    --student-main-bg-start: 222.2 84% 4.9%;
+    --student-main-bg-end: 221 58% 21%;
   }
 }
 
