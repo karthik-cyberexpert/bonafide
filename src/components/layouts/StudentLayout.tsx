@@ -31,7 +31,7 @@ const StudentLayout = () => {
   return (
     <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="Student Portal" variant="student" />
-      <div className="flex flex-col flex-1 bg-gradient-to-b from-student-sidebar-start to-student-sidebar-end text-student-sidebar-foreground">
+      <div className="flex flex-col flex-1 bg-[linear-gradient(to_bottom,hsl(var(--student-main-bg-blue))_85%,hsl(var(--student-main-bg-purple))_91%,hsl(var(--student-main-bg-pink))_97%,hsl(var(--student-main-bg-white))_100%)] text-foreground">
         <Header navItems={navItems} portalName="Student Portal" headerClassName="bg-student-header text-primary-foreground dark:text-primary" />
         <main className="flex-1 p-6">
           <Outlet />
