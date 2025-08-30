@@ -63,8 +63,6 @@
     --student-sidebar-active-foreground: 210 40% 98%;
     --student-sidebar-border: 224 65% 45%;
     --student-header-background: 243 56% 20%;
-    --student-main-bg-start: 330 100% 97%; /* very light pink */
-    --student-main-bg-end: 270 100% 97%;   /* very light purple */
   }
 
   .dark {
@@ -125,8 +123,6 @@
     --student-sidebar-active-foreground: 210 40% 98%;
     --student-sidebar-border: 224 65% 45%;
     --student-header-background: 243 56% 20%;
-    --student-main-bg-start: 330 40% 10%; /* dark pinkish */
-    --student-main-bg-end: 270 40% 10%;   /* dark purplish */
   }
 }
 
