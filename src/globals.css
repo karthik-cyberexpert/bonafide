@@ -63,10 +63,6 @@
     --student-sidebar-active-foreground: 210 40% 98%;
     --student-sidebar-border: 224 65% 45%;
     --student-header-background: 243 56% 20%;
-    --student-main-bg-blue: 217 91% 96%;
-    --student-main-bg-purple: 276 100% 97%;
-    --student-main-bg-pink: 336 100% 97%;
-    --student-main-bg-white: 0 0% 100%;
   }
 
   .dark {
@@ -127,10 +123,6 @@
     --student-sidebar-active-foreground: 210 40% 98%;
     --student-sidebar-border: 224 65% 45%;
     --student-header-background: 243 56% 20%;
-    --student-main-bg-blue: 221 39% 11%;
-    --student-main-bg-purple: 276 35% 15%;
-    --student-main-bg-pink: 336 30% 15%;
-    --student-main-bg-white: 240 4% 10%;
   }
 }
 
