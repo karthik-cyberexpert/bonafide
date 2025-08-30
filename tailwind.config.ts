@@ -62,6 +62,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        "admin-sidebar": {
+          DEFAULT: "hsl(var(--admin-sidebar-background))",
+          foreground: "hsl(var(--admin-sidebar-foreground))",
+          "muted-foreground": "hsl(var(--admin-sidebar-muted-foreground))",
+          active: "hsl(var(--admin-sidebar-active-background))",
+          "active-foreground": "hsl(var(--admin-sidebar-active-foreground))",
+          border: "hsl(var(--admin-sidebar-border))",
+        },
         header: { // New header color definition
           DEFAULT: "hsl(var(--header-background))",
         },

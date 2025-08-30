@@ -44,6 +44,13 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     --header-background: 166 90% 20%; /* New: #05614B */
+
+    --admin-sidebar-background: 221 68% 33%;
+    --admin-sidebar-foreground: 210 40% 98%;
+    --admin-sidebar-muted-foreground: 223 64% 83%;
+    --admin-sidebar-active-background: 223 74% 23%;
+    --admin-sidebar-active-foreground: 210 40% 98%;
+    --admin-sidebar-border: 224 65% 45%;
   }
 
   .dark {
@@ -84,6 +91,13 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     --header-background: 166 90% 20%; /* New: #05614B */
+
+    --admin-sidebar-background: 221 68% 33%;
+    --admin-sidebar-foreground: 210 40% 98%;
+    --admin-sidebar-muted-foreground: 223 64% 83%;
+    --admin-sidebar-active-background: 223 74% 23%;
+    --admin-sidebar-active-foreground: 210 40% 98%;
+    --admin-sidebar-border: 224 65% 45%;
   }
 }
 
