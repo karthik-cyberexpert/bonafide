@@ -44,6 +44,8 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     --header-background: 166 90% 20%; /* New: #05614B */
+    --default-header-background: 210 60% 95%; /* Light Blue */
+    --default-main-background: 210 60% 95%; /* Light Blue */
 
     --admin-sidebar-background: 221 68% 33%;
     --admin-sidebar-foreground: 210 40% 98%;
@@ -114,6 +116,8 @@
     --sidebar-ring: 217.2 91.2% 59.8%;
 
     --header-background: 166 90% 20%; /* New: #05614B */
+    --default-header-background: 210 60% 95%; /* Light Blue */
+    --default-main-background: 210 60% 95%; /* Light Blue */
 
     --admin-sidebar-background: 221 68% 33%;
     --admin-sidebar-foreground: 210 40% 98%;
@@ -158,6 +162,9 @@
   }
   .student-layout-theme {
     background-color: hsl(var(--student-main-background));
+  }
+  .default-layout-theme {
+    background-color: hsl(var(--default-main-background));
   }
 }
 

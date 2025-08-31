@@ -39,7 +39,7 @@ const HodLayout = () => {
   return (
     <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="HOD Portal" />
-      <div className="flex flex-col flex-1 bg-muted/40">
+      <div className="flex flex-col flex-1 default-layout-theme">
         <Header navItems={navItems} portalName="HOD Portal" />
         <main className="flex-1 p-6">
           <Outlet />

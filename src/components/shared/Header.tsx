@@ -15,12 +15,12 @@ interface HeaderProps {
 
 const Header = ({ navItems, portalName, headerClassName }: HeaderProps) => {
   const { signOut } = useSession(); // Use the signOut function
-  const onHeaderBg = headerClassName?.includes("bg-header");
+  const onHeaderBg = headerClassName?.includes("bg-header") || headerClassName?.includes("bg-default-header");
 
   return (
     <header className={cn(
       "sticky top-0 z-30 flex h-14 items-center justify-between border-b px-4 sm:px-6",
-      headerClassName || "bg-card" // Use custom class if provided, otherwise default to bg-card
+      headerClassName || "bg-default-header" // Use custom class if provided, otherwise default to bg-default-header
     )}>
       <div className="md:hidden">
         <Sheet>
