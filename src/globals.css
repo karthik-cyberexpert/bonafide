@@ -64,7 +64,7 @@
     --student-sidebar-active-background: 210 40% 98%; /* White for active item */
     --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
     --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
-    --student-header-background: 0 0% 0%; /* Black */
+    --student-header-background: 210 60% 95%; /* Light Blue */
     --student-main-background: 210 60% 95%; /* Light Blue */
 
     /* New Principal Theme Variables */
@@ -137,7 +137,7 @@
     --student-sidebar-active-background: 210 40% 98%; /* White for active item */
     --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
     --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
-    --student-header-background: 0 0% 0%; /* Black */
+    --student-header-background: 210 60% 95%; /* Light Blue */
     --student-main-background: 210 60% 95%; /* Light Blue */
 
     /* New Principal Theme Variables (can be same for dark mode as they are already dark) */
