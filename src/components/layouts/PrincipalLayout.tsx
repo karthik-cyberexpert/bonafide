@@ -41,10 +41,10 @@ const navItems: NavItem[] = [
 const PrincipalLayout = () => {
   return (
     <div className="flex min-h-screen w-full">
-      <Sidebar navItems={navItems} portalName="Principal Portal" />
-      <div className="flex flex-col flex-1 bg-muted/40">
-        <Header navItems={navItems} portalName="Principal Portal" />
-        <main className="flex-1 p-6">
+      <Sidebar navItems={navItems} portalName="Principal Portal" variant="principal" />
+      <div className="flex flex-col flex-1">
+        <Header navItems={navItems} portalName="Principal Portal" headerClassName="bg-principal-header text-principal-sidebar-foreground" />
+        <main className="flex-1 p-6 principal-layout-theme">
           <Outlet />
         </main>
       </div>

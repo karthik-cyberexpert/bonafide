@@ -85,6 +85,20 @@ export default {
         "student-header": {
           DEFAULT: "hsl(var(--student-header-background))",
         },
+        "principal-sidebar": {
+          DEFAULT: "hsl(var(--principal-sidebar-background))",
+          foreground: "hsl(var(--principal-sidebar-foreground))",
+          "muted-foreground": "hsl(var(--principal-sidebar-muted-foreground))",
+          active: "hsl(var(--principal-sidebar-active-background))",
+          "active-foreground": "hsl(var(--principal-sidebar-active-foreground))",
+          border: "hsl(var(--principal-sidebar-border))",
+        },
+        "principal-header": {
+          DEFAULT: "hsl(var(--principal-header-background))",
+        },
+        "principal-main-bg": {
+          DEFAULT: "hsl(var(--principal-main-bg-background))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
