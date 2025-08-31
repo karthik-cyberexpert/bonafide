@@ -43,7 +43,7 @@ const PrincipalLayout = () => {
     <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="Principal Portal" variant="principal" />
       <div className="flex flex-col flex-1">
-        <Header navItems={navItems} portalName="Principal Portal" headerClassName="bg-principal-header text-principal-sidebar-foreground" />
+        <Header navItems={navItems} portalName="Principal Portal" headerClassName="bg-principal-main-bg text-foreground" />
         <main className="flex-1 p-6 principal-layout-theme">
           <Outlet />
         </main>
