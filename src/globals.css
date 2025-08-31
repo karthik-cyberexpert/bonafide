@@ -55,18 +55,15 @@
     --admin-card-background: 0 0% 94%; /* pale smoke white / light gray */
 
     /* New Student Theme Variables */
-    --student-sidebar-background-start: 243 56% 20%;
-    --student-sidebar-background-end: 221 58% 21%;
-    --student-sidebar-foreground: 210 40% 98%;
-    --student-sidebar-muted-foreground: 223 64% 83%;
-    --student-sidebar-active-background: 223 74% 23%;
-    --student-sidebar-active-foreground: 210 40% 98%;
-    --student-sidebar-border: 224 65% 45%;
-    --student-header-background: 243 56% 20%;
-    --student-main-bg-blue: 217 91% 96%;
-    --student-main-bg-purple: 276 100% 97%;
-    --student-main-bg-pink: 336 100% 97%;
-    --student-main-bg-white: 0 0% 100%;
+    --student-sidebar-background-start: 0 0% 0%; /* Black */
+    --student-sidebar-background-end: 0 0% 0%; /* Black */
+    --student-sidebar-foreground: 210 40% 98%; /* White */
+    --student-sidebar-muted-foreground: 215 20.2% 65.1%; /* Light gray */
+    --student-sidebar-active-background: 210 40% 98%; /* White for active item */
+    --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
+    --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --student-header-background: 0 0% 0%; /* Black */
+    --student-main-background: 220 50% 15%; /* Dark Blue */
 
     /* New Principal Theme Variables */
     --principal-sidebar-background: 0 0% 0%; /* Black */
@@ -129,18 +126,15 @@
     --admin-card-foreground: 215 20.2% 65.1%;
 
     /* New Student Theme Variables (can be same for dark mode) */
-    --student-sidebar-background-start: 243 56% 20%;
-    --student-sidebar-background-end: 221 58% 21%;
-    --student-sidebar-foreground: 210 40% 98%;
-    --student-sidebar-muted-foreground: 223 64% 83%;
-    --student-sidebar-active-background: 223 74% 23%;
-    --student-sidebar-active-foreground: 210 40% 98%;
-    --student-sidebar-border: 224 65% 45%;
-    --student-header-background: 243 56% 20%;
-    --student-main-bg-blue: 221 39% 11%;
-    --student-main-bg-purple: 276 35% 15%;
-    --student-main-bg-pink: 336 30% 15%;
-    --student-main-bg-white: 240 4% 10%;
+    --student-sidebar-background-start: 0 0% 0%; /* Black */
+    --student-sidebar-background-end: 0 0% 0%; /* Black */
+    --student-sidebar-foreground: 210 40% 98%; /* White */
+    --student-sidebar-muted-foreground: 215 20.2% 65.1%; /* Light gray */
+    --student-sidebar-active-background: 210 40% 98%; /* White for active item */
+    --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
+    --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --student-header-background: 0 0% 0%; /* Black */
+    --student-main-background: 220 50% 15%; /* Dark Blue */
 
     /* New Principal Theme Variables (can be same for dark mode as they are already dark) */
     --principal-sidebar-background: 0 0% 0%; /* Black */
@@ -161,6 +155,9 @@
   }
   .principal-layout-theme {
     background-color: hsl(var(--principal-main-bg-background));
+  }
+  .student-layout-theme {
+    background-color: hsl(var(--student-main-background));
   }
 }
 
