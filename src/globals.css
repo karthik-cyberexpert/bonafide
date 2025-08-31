@@ -69,13 +69,13 @@
     --student-main-bg-white: 0 0% 100%;
 
     /* New Principal Theme Variables */
-    --principal-sidebar-background: 285 100% 12%; /* #2E003E */
+    --principal-sidebar-background: 0 0% 0%; /* Black */
     --principal-sidebar-foreground: 210 40% 98%; /* White */
     --principal-sidebar-muted-foreground: 285 50% 70%; /* Lighter purple for muted text */
     --principal-sidebar-active-background: 285 80% 20%; /* Darker purple for active item */
     --principal-sidebar-active-foreground: 210 40% 98%; /* White */
     --principal-sidebar-border: 285 70% 30%; /* Border color */
-    --principal-header-background: 285 100% 12%; /* Same as sidebar for consistency */
+    --principal-header-background: 0 0% 0%; /* Same as sidebar for consistency */
     --principal-main-bg-background: 296 96% 23%; /* #6A0572 */
   }
 
@@ -143,13 +143,13 @@
     --student-main-bg-white: 240 4% 10%;
 
     /* New Principal Theme Variables (can be same for dark mode as they are already dark) */
-    --principal-sidebar-background: 285 100% 12%; /* #2E003E */
+    --principal-sidebar-background: 0 0% 0%; /* Black */
     --principal-sidebar-foreground: 210 40% 98%; /* White */
     --principal-sidebar-muted-foreground: 285 50% 70%; /* Lighter purple for muted text */
     --principal-sidebar-active-background: 285 80% 20%; /* Darker purple for active item */
     --principal-sidebar-active-foreground: 210 40% 98%; /* White */
     --principal-sidebar-border: 285 70% 30%; /* Border color */
-    --principal-header-background: 285 100% 12%; /* Same as sidebar for consistency */
+    --principal-header-background: 0 0% 0%; /* Same as sidebar for consistency */
     --principal-main-bg-background: 296 96% 23%; /* #6A0572 */
   }
 }
