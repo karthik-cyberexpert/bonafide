@@ -40,7 +40,7 @@ const HodLayout = () => {
     <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="HOD Portal" variant="hod" />
       <div className="flex flex-col flex-1 bg-gray-100 dark:bg-gray-900"> {/* Explicitly set light background for main content */}
-        <Header navItems={navItems} portalName="HOD Portal" headerClassName="bg-header text-primary-foreground dark:text-primary-foreground" />
+        <Header navItems={navItems} portalName="HOD Portal" headerClassName="bg-gray-100 dark:bg-gray-900 text-foreground" />
         <main className="flex-1 p-6">
           <Outlet />
         </main>
