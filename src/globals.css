@@ -77,13 +77,7 @@
     --principal-header-background: 0 0% 0%; /* Black */
     --principal-main-bg-background: 210 60% 95%; /* Light Blue */
 
-    /* New HOD Theme Variables */
-    --hod-sidebar-background: 0 0% 0%; /* Black */
-    --hod-sidebar-foreground: 0 0% 100%; /* White */
-    --hod-sidebar-muted-foreground: 215 20.2% 65.1%; /* Light gray */
-    --hod-sidebar-active-background: 210 40% 98%; /* White for active item */
-    --hod-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
-    --hod-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    /* HOD Theme Variables - Removed custom variables, will use direct Tailwind classes */
   }
 
   .dark {
@@ -158,13 +152,7 @@
     --principal-header-background: 0 0% 0%; /* Black */
     --principal-main-bg-background: 210 60% 95%; /* Light Blue */
 
-    /* New HOD Theme Variables (can be same for dark mode) */
-    --hod-sidebar-background: 0 0% 0%; /* Black */
-    --hod-sidebar-foreground: 0 0% 100%; /* White */
-    --hod-sidebar-muted-foreground: 215 20.2% 65.1%; /* Light gray */
-    --hod-sidebar-active-background: 210 40% 98%; /* White for active item */
-    --hod-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
-    --hod-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    /* HOD Theme Variables - Removed custom variables, will use direct Tailwind classes */
   }
 }
 
