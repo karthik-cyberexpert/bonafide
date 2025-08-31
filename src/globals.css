@@ -43,7 +43,7 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --header-background: 166 90% 20%; /* New: #05614B */
+    --header-background: 0 0% 0%; /* Black */
     --default-header-background: 210 60% 95%; /* Light Blue */
     --default-main-background: 210 60% 95%; /* Light Blue */
 
@@ -115,7 +115,7 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    --header-background: 166 90% 20%; /* New: #05614B */
+    --header-background: 0 0% 0%; /* Black */
     --default-header-background: 210 60% 95%; /* Light Blue */
     --default-main-background: 210 60% 95%; /* Light Blue */
 
