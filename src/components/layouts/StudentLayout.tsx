@@ -32,7 +32,7 @@ const StudentLayout = () => {
     <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="Student Portal" variant="student" />
       <div className="flex flex-col flex-1 student-layout-theme text-foreground">
-        <Header navItems={navItems} portalName="Student Portal" headerClassName="bg-student-header text-primary-foreground dark:text-primary" />
+        <Header navItems={navItems} portalName="Student Portal" headerClassName="bg-student-header text-foreground" />
         <main className="flex-1 p-6">
           <Outlet />
         </main>
