@@ -63,7 +63,7 @@
     --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
     --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
     --student-header-background: 0 0% 0%; /* Black */
-    --student-main-background: 220 50% 15%; /* Dark Blue */
+    --student-main-background: 210 60% 95%; /* Light Blue */
 
     /* New Principal Theme Variables */
     --principal-sidebar-background: 0 0% 0%; /* Black */
@@ -134,7 +134,7 @@
     --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
     --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
     --student-header-background: 0 0% 0%; /* Black */
-    --student-main-background: 220 50% 15%; /* Dark Blue */
+    --student-main-background: 210 60% 95%; /* Light Blue */
 
     /* New Principal Theme Variables (can be same for dark mode as they are already dark) */
     --principal-sidebar-background: 0 0% 0%; /* Black */
@@ -155,6 +155,9 @@
   }
   .principal-layout-theme {
     background-color: hsl(var(--principal-main-bg-background));
+  }
+  .student-layout-theme {
+    background-color: hsl(var(--student-main-background));
   }
 }
 
