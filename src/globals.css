@@ -130,6 +130,8 @@
     --theme-ocean-breeze-sidebar-active-foreground: 210 40% 5%;
     --theme-ocean-breeze-sidebar-border: 200 50% 80%;
     --theme-ocean-breeze-header-text-color: 210 40% 15%; /* Specific header text color */
+    --theme-ocean-breeze-card-bg: 200 50% 98%; /* Card background for Ocean Breeze */
+    --theme-ocean-breeze-card-foreground: 210 40% 15%; /* Card foreground for Ocean Breeze */
 
     /* Sunset Glow Theme */
     --theme-sunset-glow-bg-start: 30 90% 95%; /* Softer, lighter orange */
@@ -145,6 +147,8 @@
     --theme-sunset-glow-sidebar-active-foreground: 30 80% 10%;
     --theme-sunset-glow-sidebar-border: 30 100% 80%;
     --theme-sunset-glow-header-text-color: 30 80% 20%; /* Specific header text color */
+    --theme-sunset-glow-card-bg: 30 100% 98%; /* Card background for Sunset Glow */
+    --theme-sunset-glow-card-foreground: 30 80% 20%; /* Card foreground for Sunset Glow */
 
     /* Forest Retreat Theme */
     --theme-forest-retreat-bg-start: 120 30% 95%; /* Softer, lighter green */
@@ -160,6 +164,8 @@
     --theme-forest-retreat-sidebar-active-foreground: 120 40% 5%;
     --theme-forest-retreat-sidebar-border: 120 20% 80%;
     --theme-forest-retreat-header-text-color: 120 40% 15%; /* Specific header text color */
+    --theme-forest-retreat-card-bg: 120 20% 98%; /* Card background for Forest Retreat */
+    --theme-forest-retreat-card-foreground: 120 40% 15%; /* Card foreground for Forest Retreat */
   }
 
   .dark {
@@ -266,14 +272,7 @@
     --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
     --tutor-card-foreground: 222.2 84% 4.9%;
 
-    /* Student Dashboard Themes */
-    --student-dashboard-bg-start: 210 60% 95%; /* Default light blue */
-    --student-dashboard-bg-end: 210 60% 90%; /* Slightly darker light blue */
-    --student-dashboard-card-bg: 0 0% 100%;
-    --student-dashboard-card-foreground: 222.2 84% 4.9%;
-    --student-dashboard-text-color: 222.2 84% 4.9%;
-
-    /* Ocean Breeze Theme (Dark Mode) */
+    /* Student Dashboard Themes (Dark Mode) */
     --dark-theme-ocean-breeze-bg-start: 200 80% 15%; /* Darker blue */
     --dark-theme-ocean-breeze-bg-end: 180 60% 20%; /* Darker aqua */
     --dark-theme-ocean-breeze-card-bg: 217.2 32.6% 17.5%;
@@ -287,8 +286,9 @@
     --dark-theme-ocean-breeze-sidebar-active-foreground: 210 40% 98%;
     --dark-theme-ocean-breeze-sidebar-border: 200 50% 30%;
     --dark-theme-ocean-breeze-header-text-color: 210 40% 98%; /* Specific header text color */
+    --dark-theme-ocean-breeze-card-bg: 217.2 32.6% 17.5%; /* Card background for Ocean Breeze (Dark) */
+    --dark-theme-ocean-breeze-card-foreground: 210 40% 98%; /* Card foreground for Ocean Breeze (Dark) */
 
-    /* Sunset Glow Theme (Dark Mode) */
     --dark-theme-sunset-glow-bg-start: 30 90% 15%; /* Darker orange */
     --dark-theme-sunset-glow-bg-end: 330 80% 15%; /* Darker pink */
     --dark-theme-sunset-glow-card-bg: 217.2 32.6% 17.5%;
@@ -302,8 +302,9 @@
     --dark-theme-sunset-glow-sidebar-active-foreground: 30 80% 98%;
     --dark-theme-sunset-glow-sidebar-border: 30 100% 30%;
     --dark-theme-sunset-glow-header-text-color: 210 40% 98%; /* Specific header text color */
+    --dark-theme-sunset-glow-card-bg: 217.2 32.6% 17.5%; /* Card background for Sunset Glow (Dark) */
+    --dark-theme-sunset-glow-card-foreground: 210 40% 98%; /* Card foreground for Sunset Glow (Dark) */
 
-    /* Forest Retreat Theme (Dark Mode) */
     --dark-theme-forest-retreat-bg-start: 120 30% 15%; /* Darker green */
     --dark-theme-forest-retreat-bg-end: 90 20% 20%; /* Darker earthy green */
     --dark-theme-forest-retreat-card-bg: 217.2 32.6% 17.5%;
@@ -317,6 +318,8 @@
     --dark-theme-forest-retreat-sidebar-active-foreground: 120 40% 98%;
     --dark-theme-forest-retreat-sidebar-border: 120 20% 30%;
     --dark-theme-forest-retreat-header-text-color: 210 40% 98%; /* Specific header text color */
+    --dark-theme-forest-retreat-card-bg: 217.2 32.6% 17.5%; /* Card background for Forest Retreat (Dark) */
+    --dark-theme-forest-retreat-card-foreground: 210 40% 98%; /* Card foreground for Forest Retreat (Dark) */
   }
 }
 

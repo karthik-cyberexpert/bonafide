@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"; // Import Input
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
 import { useSession } from "@/components/auth/SessionContextProvider"; // Import useSession
 import { StudentTheme } from "@/components/student/StudentDashboardTheme"; // Import StudentTheme type
+import { useTheme } from "next-themes"; // Import useTheme to check dark mode
 
 interface SidebarProps {
   navItems: NavItem[];
@@ -26,6 +27,7 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
   const isTutor = variant === 'tutor';
 
   const { profile } = useSession(); // Get user profile
+  const { theme: systemTheme } = useTheme(); // Get the system theme (light/dark)
 
   return (
     <aside className={cn(
@@ -118,7 +120,7 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
                 isActive && (
                   isDefault ? "bg-muted text-primary" :
                   isAdmin ? "bg-admin-sidebar-active text-admin-sidebar-active-foreground" :
-                  isStudent ? "bg-student-sidebar-active text-student-sidebar-active-foreground" :
+                  isStudent ? (systemTheme === 'dark' ? "bg-student-sidebar-active text-[hsl(var(--dark-theme-ocean-breeze-sidebar-active-foreground))]" : "bg-student-sidebar-active text-[hsl(var(--theme-ocean-breeze-sidebar-active-foreground))]") : // Explicitly set text color for student active state
                   isPrincipal ? "bg-principal-sidebar-active text-principal-sidebar-active-foreground" :
                   isHod ? "bg-hod-sidebar-active text-hod-sidebar-active-foreground" : // HOD active styling
                   isTutor ? "bg-tutor-sidebar-active text-tutor-sidebar-active-foreground" : // Tutor active styling

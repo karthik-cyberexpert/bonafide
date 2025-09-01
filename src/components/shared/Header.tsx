@@ -6,6 +6,8 @@ import { LayoutDashboard, Menu, Bell, LogOut, ChevronLeft, ChevronRight } from "
 import { ThemeToggle } from "./ThemeToggle";
 import { NavItem } from "@/lib/types";
 import { useSession } from "@/components/auth/SessionContextProvider";
+import { useStudentDashboardTheme } from "../student/StudentDashboardTheme"; // Import student theme hook
+import { useTheme } from "next-themes"; // Import useTheme to check dark mode
 
 interface HeaderProps {
   navItems: NavItem[];
@@ -18,8 +20,32 @@ interface HeaderProps {
 
 const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsCollapsed, glassmorphism }: HeaderProps) => {
   const { signOut } = useSession();
+  const { theme: studentTheme } = useStudentDashboardTheme(); // Get student theme
+  const { theme: systemTheme } = useTheme(); // Get system theme
+
   // Determine if buttons/icons should have 'on dark background' styling
   const onHeaderBg = glassmorphism || headerClassName?.includes("bg-header") || headerClassName?.includes("bg-default-header") || headerClassName?.includes("bg-admin-header") || headerClassName?.includes("bg-principal-header") || headerClassName?.includes("bg-hod-header") || headerClassName?.includes("bg-tutor-header");
+
+  // Determine dynamic text color for header buttons/icons
+  const getButtonTextColorClass = () => {
+    if (systemTheme === 'dark') {
+      switch (studentTheme) {
+        case 'ocean-breeze': return 'text-[hsl(var(--dark-theme-ocean-breeze-header-text-color))]';
+        case 'sunset-glow': return 'text-[hsl(var(--dark-theme-sunset-glow-header-text-color))]';
+        case 'forest-retreat': return 'text-[hsl(var(--dark-theme-forest-retreat-header-text-color))]';
+        default: return 'text-white'; // Default dark mode header buttons
+      }
+    } else {
+      switch (studentTheme) {
+        case 'ocean-breeze': return 'text-[hsl(var(--theme-ocean-breeze-header-text-color))]';
+        case 'sunset-glow': return 'text-[hsl(var(--theme-sunset-glow-header-text-color))]';
+        case 'forest-retreat': return 'text-[hsl(var(--theme-forest-retreat-header-text-color))]';
+        default: return 'text-foreground'; // Default light mode header buttons
+      }
+    }
+  };
+
+  const buttonTextColorClass = getButtonTextColorClass();
 
   return (
     <header className={cn(
@@ -37,7 +63,8 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
                 size="icon"
                 className={cn(
                   "shrink-0",
-                  onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10 text-white" // Added text-white
+                  onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10",
+                  buttonTextColorClass // Apply dynamic text color
                 )}
               >
                 <Menu className="h-5 w-5" />
@@ -82,7 +109,8 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
             size="icon"
             className={cn(
               "hidden md:flex shrink-0",
-              onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10 text-white" // Added text-white
+              onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10",
+              buttonTextColorClass // Apply dynamic text color
             )}
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
@@ -99,7 +127,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
         <Button
           variant="ghost"
           size="icon"
-          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10 text-white")} // Added text-white
+          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10", buttonTextColorClass)} // Apply dynamic text color
         >
           <Bell className="h-5 w-5" />
           <span className="sr-only">View notifications</span>
@@ -109,7 +137,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
           variant="ghost"
           size="icon"
           onClick={signOut}
-          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10 text-white")} // Added text-white
+          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10", buttonTextColorClass)} // Apply dynamic text color
         >
           <LogOut className="h-5 w-5" />
           <span className="sr-only">Logout</span>
