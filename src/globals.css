@@ -208,11 +208,11 @@
     --tutor-sidebar-active-background: 217.2 91.2% 59.8%; /* Vibrant blue for active state */
     --tutor-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
     --tutor-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
-    --tutor-layout-gradient-start: 260 80% 20%; /* Darker soft purple */
-    --tutor-layout-gradient-end: 320 80% 20%; /* Darker soft pink */
+    --tutor-layout-gradient-start: 260 80% 90%; /* Soft purple */
+    --tutor-layout-gradient-end: 320 80% 90%; /* Soft pink */
     --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
-    --tutor-card-background: 217.2 32.6% 17.5%;
-    --tutor-card-foreground: 215 20.2% 65.1%;
+    --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
+    --tutor-card-foreground: 222.2 84% 4.9%;
   }
 }
 
