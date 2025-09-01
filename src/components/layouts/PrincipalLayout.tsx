@@ -52,7 +52,13 @@ const PrincipalLayout = () => {
         setIsCollapsed={setIsCollapsed} // Pass setter
       />
       <div className="flex flex-col flex-1">
-        <Header navItems={navItems} portalName="Principal Portal" headerClassName="bg-principal-header text-primary-foreground dark:text-primary-foreground" />
+        <Header
+          navItems={navItems}
+          portalName="Principal Portal"
+          headerClassName="bg-principal-header text-primary-foreground dark:text-primary-foreground"
+          isCollapsed={isCollapsed} // Pass isCollapsed to Header
+          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+        />
         <main className="flex-1 p-6">
           <Outlet />
         </main>

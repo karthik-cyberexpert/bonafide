@@ -80,6 +80,8 @@
     --principal-layout-gradient-start: 300 80% 90%; /* Soft magenta */
     --principal-layout-gradient-end: 240 80% 90%; /* Soft blue */
     --principal-header-background: 222.2 84% 4.9%; /* Dark background for header */
+    --principal-card-background: 0 0% 94%; /* pale smoke white / light gray */
+    --principal-card-foreground: 222.2 84% 4.9%;
 
     /* HOD Theme Variables */
     --hod-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
@@ -91,6 +93,8 @@
     --hod-layout-gradient-start: 200 80% 90%; /* Soft blue */
     --hod-layout-gradient-end: 140 80% 90%; /* Soft green */
     --hod-header-background: 220 20% 15%; /* Dark blue/indigo for header */
+    --hod-card-background: 0 0% 94%; /* pale smoke white / light gray */
+    --hod-card-foreground: 222.2 84% 4.9%;
 
     /* Tutor Theme Variables */
     --tutor-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
@@ -102,6 +106,8 @@
     --tutor-layout-gradient-start: 260 80% 90%; /* Soft purple */
     --tutor-layout-gradient-end: 320 80% 90%; /* Soft pink */
     --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
+    --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
+    --tutor-card-foreground: 222.2 84% 4.9%;
   }
 
   .dark {
@@ -179,6 +185,8 @@
     --principal-layout-gradient-start: 300 80% 20%; /* Darker soft magenta */
     --principal-layout-gradient-end: 240 80% 20%; /* Darker soft blue */
     --principal-header-background: 222.2 84% 4.9%;
+    --principal-card-background: 217.2 32.6% 17.5%;
+    --principal-card-foreground: 215 20.2% 65.1%;
 
     /* HOD Theme Variables */
     --hod-sidebar-background: 220 20% 15%;
@@ -190,6 +198,428 @@
     --hod-layout-gradient-start: 200 80% 20%;
     --hod-layout-gradient-end: 140 80% 20%;
     --hod-header-background: 220 20% 15%;
+    --hod-card-background: 217.2 32.6% 17.5%;
+    --hod-card-foreground: 215 20.2% 65.1%;
+
+    /* Tutor Theme Variables */
+    --tutor-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
+    --tutor-sidebar-foreground: 210 40% 98%; /* White text */
+    --tutor-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --tutor-sidebar-active-background: 217.2 91.2% 55.8%; /* Vibrant blue for active state */
+    --tutor-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --tutor-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --tutor-layout-gradient-start: 260 80% 90%; /* Soft purple */
+    --tutor-layout-gradient-end: 320 80% 90%; /* Soft pink */
+    --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
+    --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
+    --tutor-card-foreground: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 180 86% 3%; /* Updated to #020E0E */
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --header-background: 0 0% 0%; /* Black */
+    --default-header-background: 210 60% 95%; /* Light Blue */
+    --default-main-background: 210 60% 95%; /* Light Blue */
+
+    /* Admin Theme Variables */
+    --admin-sidebar-background: 222.2 84% 4.9%;
+    --admin-sidebar-foreground: 210 40% 98%;
+    --admin-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --admin-sidebar-active-background: 217.2 91.2% 59.8%;
+    --admin-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --admin-sidebar-border: 217.2 32.6% 17.5%;
+    --admin-layout-gradient-start: 220 100% 20%; /* Darker blue */
+    --admin-layout-gradient-end: 280 100% 20%; /* Darker purple */
+
+    --admin-card-background: 217.2 32.6% 17.5%;
+    --admin-card-foreground: 215 20.2% 65.1%;
+
+    /* New Student Theme Variables (can be same for dark mode) */
+    --student-sidebar-background-start: 222.2 84% 4.9%; /* Dark background */
+    --student-sidebar-background-end: 222.2 84% 4.9%; /* Dark background */
+    --student-sidebar-foreground: 210 40% 98%; /* White */
+    --student-sidebar-muted-foreground: 215 20.2% 65.1%; /* Light gray */
+    --student-sidebar-active-background: 210 40% 98%; /* White for active item */
+    --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
+    --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --student-header-background: 222.2 84% 4.9%; /* Dark header */
+    --student-main-background: 222.2 84% 4.9%; /* Dark main background */
+
+    /* New Principal Theme Variables (can be same for dark mode as they are already dark) */
+    --principal-sidebar-background: 222.2 84% 4.9%;
+    --principal-sidebar-foreground: 210 40% 98%;
+    --principal-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --principal-sidebar-active-background: 217.2 91.2% 59.8%;
+    --principal-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --principal-sidebar-border: 217.2 32.6% 17.5%;
+    --principal-layout-gradient-start: 300 80% 20%; /* Darker soft magenta */
+    --principal-layout-gradient-end: 240 80% 20%; /* Darker soft blue */
+    --principal-header-background: 222.2 84% 4.9%;
+    --principal-card-background: 217.2 32.6% 17.5%;
+    --principal-card-foreground: 215 20.2% 65.1%;
+
+    /* HOD Theme Variables */
+    --hod-sidebar-background: 220 20% 15%;
+    --hod-sidebar-foreground: 210 40% 98%;
+    --hod-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --hod-sidebar-active-background: 217.2 91.2% 59.8%;
+    --hod-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --hod-sidebar-border: 217.2 32.6% 17.5%;
+    --hod-layout-gradient-start: 200 80% 20%;
+    --hod-layout-gradient-end: 140 80% 20%;
+    --hod-header-background: 220 20% 15%;
+    --hod-card-background: 217.2 32.6% 17.5%;
+    --hod-card-foreground: 215 20.2% 65.1%;
+
+    /* Tutor Theme Variables */
+    --tutor-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
+    --tutor-sidebar-foreground: 210 40% 98%; /* White text */
+    --tutor-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --tutor-sidebar-active-background: 217.2 91.2% 59.8%; /* Vibrant blue for active state */
+    --tutor-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --tutor-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --tutor-layout-gradient-start: 260 80% 90%; /* Soft purple */
+    --tutor-layout-gradient-end: 320 80% 90%; /* Soft pink */
+    --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
+    --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
+    --tutor-card-foreground: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 180 86% 3%; /* Updated to #020E0E */
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --header-background: 0 0% 0%; /* Black */
+    --default-header-background: 210 60% 95%; /* Light Blue */
+    --default-main-background: 210 60% 95%; /* Light Blue */
+
+    /* Admin Theme Variables */
+    --admin-sidebar-background: 222.2 84% 4.9%;
+    --admin-sidebar-foreground: 210 40% 98%;
+    --admin-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --admin-sidebar-active-background: 217.2 91.2% 59.8%;
+    --admin-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --admin-sidebar-border: 217.2 32.6% 17.5%;
+    --admin-layout-gradient-start: 220 100% 20%; /* Darker blue */
+    --admin-layout-gradient-end: 280 100% 20%; /* Darker purple */
+
+    --admin-card-background: 217.2 32.6% 17.5%;
+    --admin-card-foreground: 215 20.2% 65.1%;
+
+    /* New Student Theme Variables (can be same for dark mode) */
+    --student-sidebar-background-start: 222.2 84% 4.9%; /* Dark background */
+    --student-sidebar-background-end: 222.2 84% 4.9%; /* Dark background */
+    --student-sidebar-foreground: 210 40% 98%; /* White */
+    --student-sidebar-muted-foreground: 215 20.2% 65.1%; /* Light gray */
+    --student-sidebar-active-background: 210 40% 98%; /* White for active item */
+    --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
+    --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --student-header-background: 222.2 84% 4.9%; /* Dark header */
+    --student-main-background: 222.2 84% 4.9%; /* Dark main background */
+
+    /* New Principal Theme Variables (can be same for dark mode as they are already dark) */
+    --principal-sidebar-background: 222.2 84% 4.9%;
+    --principal-sidebar-foreground: 210 40% 98%;
+    --principal-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --principal-sidebar-active-background: 217.2 91.2% 59.8%;
+    --principal-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --principal-sidebar-border: 217.2 32.6% 17.5%;
+    --principal-layout-gradient-start: 300 80% 20%; /* Darker soft magenta */
+    --principal-layout-gradient-end: 240 80% 20%; /* Darker soft blue */
+    --principal-header-background: 222.2 84% 4.9%;
+    --principal-card-background: 217.2 32.6% 17.5%;
+    --principal-card-foreground: 215 20.2% 65.1%;
+
+    /* HOD Theme Variables */
+    --hod-sidebar-background: 220 20% 15%;
+    --hod-sidebar-foreground: 210 40% 98%;
+    --hod-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --hod-sidebar-active-background: 217.2 91.2% 59.8%;
+    --hod-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --hod-sidebar-border: 217.2 32.6% 17.5%;
+    --hod-layout-gradient-start: 200 80% 20%;
+    --hod-layout-gradient-end: 140 80% 20%;
+    --hod-header-background: 220 20% 15%;
+    --hod-card-background: 217.2 32.6% 17.5%;
+    --hod-card-foreground: 215 20.2% 65.1%;
+
+    /* Tutor Theme Variables */
+    --tutor-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
+    --tutor-sidebar-foreground: 210 40% 98%; /* White text */
+    --tutor-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --tutor-sidebar-active-background: 217.2 91.2% 59.8%; /* Vibrant blue for active state */
+    --tutor-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --tutor-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --tutor-layout-gradient-start: 260 80% 90%; /* Soft purple */
+    --tutor-layout-gradient-end: 320 80% 90%; /* Soft pink */
+    --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
+    --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
+    --tutor-card-foreground: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 180 86% 3%; /* Updated to #020E0E */
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --header-background: 0 0% 0%; /* Black */
+    --default-header-background: 210 60% 95%; /* Light Blue */
+    --default-main-background: 210 60% 95%; /* Light Blue */
+
+    /* Admin Theme Variables */
+    --admin-sidebar-background: 222.2 84% 4.9%;
+    --admin-sidebar-foreground: 210 40% 98%;
+    --admin-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --admin-sidebar-active-background: 217.2 91.2% 59.8%;
+    --admin-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --admin-sidebar-border: 217.2 32.6% 17.5%;
+    --admin-layout-gradient-start: 220 100% 20%; /* Darker blue */
+    --admin-layout-gradient-end: 280 100% 20%; /* Darker purple */
+
+    --admin-card-background: 217.2 32.6% 17.5%;
+    --admin-card-foreground: 215 20.2% 65.1%;
+
+    /* New Student Theme Variables (can be same for dark mode) */
+    --student-sidebar-background-start: 222.2 84% 4.9%; /* Dark background */
+    --student-sidebar-background-end: 222.2 84% 4.9%; /* Dark background */
+    --student-sidebar-foreground: 210 40% 98%; /* White */
+    --student-sidebar-muted-foreground: 215 20.2% 65.1%; /* Light gray */
+    --student-sidebar-active-background: 210 40% 98%; /* White for active item */
+    --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
+    --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --student-header-background: 222.2 84% 4.9%; /* Dark header */
+    --student-main-background: 222.2 84% 4.9%; /* Dark main background */
+
+    /* New Principal Theme Variables (can be same for dark mode as they are already dark) */
+    --principal-sidebar-background: 222.2 84% 4.9%;
+    --principal-sidebar-foreground: 210 40% 98%;
+    --principal-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --principal-sidebar-active-background: 217.2 91.2% 59.8%;
+    --principal-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --principal-sidebar-border: 217.2 32.6% 17.5%;
+    --principal-layout-gradient-start: 300 80% 20%; /* Darker soft magenta */
+    --principal-layout-gradient-end: 240 80% 20%; /* Darker soft blue */
+    --principal-header-background: 222.2 84% 4.9%;
+    --principal-card-background: 217.2 32.6% 17.5%;
+    --principal-card-foreground: 215 20.2% 65.1%;
+
+    /* HOD Theme Variables */
+    --hod-sidebar-background: 220 20% 15%;
+    --hod-sidebar-foreground: 210 40% 98%;
+    --hod-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --hod-sidebar-active-background: 217.2 91.2% 59.8%;
+    --hod-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --hod-sidebar-border: 217.2 32.6% 17.5%;
+    --hod-layout-gradient-start: 200 80% 20%;
+    --hod-layout-gradient-end: 140 80% 20%;
+    --hod-header-background: 220 20% 15%;
+    --hod-card-background: 217.2 32.6% 17.5%;
+    --hod-card-foreground: 215 20.2% 65.1%;
+
+    /* Tutor Theme Variables */
+    --tutor-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
+    --tutor-sidebar-foreground: 210 40% 98%; /* White text */
+    --tutor-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --tutor-sidebar-active-background: 217.2 91.2% 59.8%; /* Vibrant blue for active state */
+    --tutor-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --tutor-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --tutor-layout-gradient-start: 260 80% 90%; /* Soft purple */
+    --tutor-layout-gradient-end: 320 80% 90%; /* Soft pink */
+    --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
+    --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
+    --tutor-card-foreground: 222.2 84% 4.9%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --sidebar-background: 180 86% 3%; /* Updated to #020E0E */
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --header-background: 0 0% 0%; /* Black */
+    --default-header-background: 210 60% 95%; /* Light Blue */
+    --default-main-background: 210 60% 95%; /* Light Blue */
+
+    /* Admin Theme Variables */
+    --admin-sidebar-background: 222.2 84% 4.9%;
+    --admin-sidebar-foreground: 210 40% 98%;
+    --admin-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --admin-sidebar-active-background: 217.2 91.2% 59.8%;
+    --admin-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --admin-sidebar-border: 217.2 32.6% 17.5%;
+    --admin-layout-gradient-start: 220 100% 20%; /* Darker blue */
+    --admin-layout-gradient-end: 280 100% 20%; /* Darker purple */
+
+    --admin-card-background: 217.2 32.6% 17.5%;
+    --admin-card-foreground: 215 20.2% 65.1%;
+
+    /* New Student Theme Variables (can be same for dark mode) */
+    --student-sidebar-background-start: 222.2 84% 4.9%; /* Dark background */
+    --student-sidebar-background-end: 222.2 84% 4.9%; /* Dark background */
+    --student-sidebar-foreground: 210 40% 98%; /* White */
+    --student-sidebar-muted-foreground: 215 20.2% 65.1%; /* Light gray */
+    --student-sidebar-active-background: 210 40% 98%; /* White for active item */
+    --student-sidebar-active-foreground: 0 0% 0%; /* Black for active text */
+    --student-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --student-header-background: 222.2 84% 4.9%; /* Dark header */
+    --student-main-background: 222.2 84% 4.9%; /* Dark main background */
+
+    /* New Principal Theme Variables (can be same for dark mode as they are already dark) */
+    --principal-sidebar-background: 222.2 84% 4.9%;
+    --principal-sidebar-foreground: 210 40% 98%;
+    --principal-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --principal-sidebar-active-background: 217.2 91.2% 59.8%;
+    --principal-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --principal-sidebar-border: 217.2 32.6% 17.5%;
+    --principal-layout-gradient-start: 300 80% 20%; /* Darker soft magenta */
+    --principal-layout-gradient-end: 240 80% 20%; /* Darker soft blue */
+    --principal-header-background: 222.2 84% 4.9%;
+    --principal-card-background: 217.2 32.6% 17.5%;
+    --principal-card-foreground: 215 20.2% 65.1%;
+
+    /* HOD Theme Variables */
+    --hod-sidebar-background: 220 20% 15%;
+    --hod-sidebar-foreground: 210 40% 98%;
+    --hod-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --hod-sidebar-active-background: 217.2 91.2% 59.8%;
+    --hod-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --hod-sidebar-border: 217.2 32.6% 17.5%;
+    --hod-layout-gradient-start: 200 80% 20%;
+    --hod-layout-gradient-end: 140 80% 20%;
+    --hod-header-background: 220 20% 15%;
+    --hod-card-background: 217.2 32.6% 17.5%;
+    --hod-card-foreground: 215 20.2% 65.1%;
 
     /* Tutor Theme Variables */
     --tutor-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
@@ -201,6 +631,8 @@
     --tutor-layout-gradient-start: 260 80% 20%; /* Darker soft purple */
     --tutor-layout-gradient-end: 320 80% 20%; /* Darker soft pink */
     --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
+    --tutor-card-background: 217.2 32.6% 17.5%;
+    --tutor-card-foreground: 215 20.2% 65.1%;
   }
 }
 
@@ -210,6 +642,8 @@
     --card-foreground: hsl(var(--admin-card-foreground));
   }
   .principal-layout-theme {
+    --card: hsl(var(--principal-card-background)); /* Assuming a card background for principal */
+    --card-foreground: hsl(var(--principal-card-foreground)); /* Assuming a card foreground for principal */
     background: linear-gradient(to bottom right, hsl(var(--principal-layout-gradient-start)), hsl(var(--principal-layout-gradient-end)));
   }
   .student-layout-theme {
@@ -226,6 +660,10 @@
   }
   .tutor-gradient-bg {
     background: linear-gradient(to bottom right, hsl(var(--tutor-layout-gradient-start)), hsl(var(--tutor-layout-gradient-end)));
+  }
+  .tutor-layout-theme {
+    --card: hsl(var(--tutor-card-background));
+    --card-foreground: hsl(var(--tutor-card-foreground));
   }
 }
 

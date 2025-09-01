@@ -35,7 +35,13 @@ const StudentLayout = () => {
     <div className="flex min-h-screen w-full">
       <Sidebar navItems={navItems} portalName="Student Portal" variant="student" isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <div className="flex flex-col flex-1 student-layout-theme text-foreground">
-        <Header navItems={navItems} portalName="Student Portal" headerClassName="bg-student-header text-foreground" />
+        <Header
+          navItems={navItems}
+          portalName="Student Portal"
+          headerClassName="bg-student-header text-foreground"
+          isCollapsed={isCollapsed} // Pass isCollapsed to Header
+          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+        />
         <main className="flex-1 p-6">
           <Outlet />
         </main>

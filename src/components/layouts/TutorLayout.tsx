@@ -46,8 +46,14 @@ const TutorLayout = () => {
     <div className="flex min-h-screen w-full tutor-gradient-bg"> {/* Apply Tutor gradient here */}
       <Sidebar navItems={navItems} portalName="Tutor Portal" variant="tutor" isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <div className="flex flex-col flex-1">
-        <Header navItems={navItems} portalName="Tutor Portal" headerClassName="bg-tutor-header text-primary-foreground dark:text-primary-foreground" />
-        <main className="flex-1 p-6">
+        <Header
+          navItems={navItems}
+          portalName="Tutor Portal"
+          headerClassName="bg-tutor-header text-primary-foreground dark:text-primary-foreground"
+          isCollapsed={isCollapsed} // Pass isCollapsed to Header
+          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+        />
+        <main className="flex-1 p-6 tutor-layout-theme">
           <Outlet />
         </main>
       </div>

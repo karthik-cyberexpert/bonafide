@@ -73,6 +73,8 @@ const AdminLayout = () => {
           navItems={navItems}
           portalName="Admin Portal"
           headerClassName="bg-header text-primary-foreground dark:text-primary-foreground"
+          isCollapsed={isCollapsed} // Pass isCollapsed to Header
+          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
         />
         <main className="flex-1 p-6 admin-layout-theme">
           <Outlet />

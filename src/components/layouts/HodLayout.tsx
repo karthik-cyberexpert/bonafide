@@ -49,8 +49,14 @@ const HodLayout = () => {
         setIsCollapsed={setIsCollapsed} // Pass setter
       />
       <div className="flex flex-col flex-1">
-        <Header navItems={navItems} portalName="HOD Portal" headerClassName="bg-hod-header text-primary-foreground dark:text-primary-foreground" />
-        <main className="flex-1 p-6">
+        <Header
+          navItems={navItems}
+          portalName="HOD Portal"
+          headerClassName="bg-hod-header text-primary-foreground dark:text-primary-foreground"
+          isCollapsed={isCollapsed} // Pass isCollapsed to Header
+          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+        />
+        <main className="flex-1 p-6 hod-layout-theme">
           <Outlet />
         </main>
       </div>

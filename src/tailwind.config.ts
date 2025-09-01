@@ -89,6 +89,9 @@ export default {
         "student-header": {
           DEFAULT: "hsl(var(--student-header-background))",
         },
+        "student-main-bg": {
+          DEFAULT: "hsl(var(--student-main-background))",
+        },
         "principal-sidebar": {
           DEFAULT: "hsl(var(--principal-sidebar-background))",
           foreground: "hsl(var(--principal-sidebar-foreground))",
@@ -136,6 +139,10 @@ export default {
         },
         "tutor-header": { // Tutor header color
           DEFAULT: "hsl(var(--tutor-header-background))",
+        },
+        "tutor-card": { // New Tutor card colors
+          DEFAULT: "hsl(var(--tutor-card-background))",
+          foreground: "hsl(var(--tutor-card-foreground))",
         },
       },
       borderRadius: {
