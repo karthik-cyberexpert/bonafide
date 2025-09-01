@@ -35,12 +35,22 @@ const StudentLayoutContent = () => {
   const { theme } = useStudentDashboardTheme(); // Get the current student dashboard theme
 
   const mainContentThemeClass = cn(
-    "flex-1 p-0", // Keep p-0 here, the inner div in Dashboard.tsx will handle padding
+    "flex-1", // Removed p-0, the theme class will handle padding
     "student-dashboard-main-content", // Base class for main content styling
     {
       'theme-ocean-breeze': theme === 'ocean-breeze',
       'theme-sunset-glow': theme === 'sunset-glow',
       'theme-forest-retreat': theme === 'forest-retreat',
+    }
+  );
+
+  const headerThemeClass = cn(
+    "bg-student-header",
+    "text-foreground", // Default text color
+    {
+      'text-[hsl(var(--theme-ocean-breeze-text-color))]': theme === 'ocean-breeze',
+      'text-[hsl(var(--theme-sunset-glow-text-color))]': theme === 'sunset-glow',
+      'text-[hsl(var(--theme-forest-retreat-text-color))]': theme === 'forest-retreat',
     }
   );
 
@@ -58,7 +68,7 @@ const StudentLayoutContent = () => {
         <Header
           navItems={navItems}
           portalName="Student Portal"
-          headerClassName="bg-student-header text-foreground"
+          headerClassName={headerThemeClass} // Apply dynamic header class
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
           glassmorphism={true} // Enable glassmorphism

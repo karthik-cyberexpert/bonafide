@@ -11,7 +11,7 @@ interface DashboardCardProps {
 
 const DashboardCard = ({ title, value, icon, iconColor }: DashboardCardProps) => {
   return (
-    <Card className="hover:scale-[1.02] transition-transform duration-200 ease-in-out shadow-md"> {/* Added hover effect */}
+    <Card className="hover:-translate-y-1 hover:shadow-lg transition-all duration-300 ease-in-out"> {/* Enhanced hover effect */}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         {React.cloneElement(icon as React.ReactElement, {
