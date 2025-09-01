@@ -47,12 +47,15 @@
     --default-header-background: 210 60% 95%; /* Light Blue */
     --default-main-background: 210 60% 95%; /* Light Blue */
 
-    --admin-sidebar-background: 221 68% 33%;
-    --admin-sidebar-foreground: 210 40% 98%;
-    --admin-sidebar-muted-foreground: 223 64% 83%;
-    --admin-sidebar-active-background: 223 74% 23%;
-    --admin-sidebar-active-foreground: 210 40% 98%;
-    --admin-sidebar-border: 224 65% 45%;
+    /* Admin Theme Variables */
+    --admin-sidebar-background: 222.2 84% 4.9%; /* Dark background, similar to dark mode primary */
+    --admin-sidebar-foreground: 210 40% 98%; /* White text */
+    --admin-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --admin-sidebar-active-background: 217.2 91.2% 55.8%; /* A vibrant blue for active state */
+    --admin-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --admin-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --admin-layout-gradient-start: 220 100% 80%; /* Light blue */
+    --admin-layout-gradient-end: 280 100% 80%; /* Light purple */
 
     --admin-card-background: 0 0% 94%; /* pale smoke white / light gray */
 
@@ -121,12 +124,15 @@
     --default-header-background: 210 60% 95%; /* Light Blue */
     --default-main-background: 210 60% 95%; /* Light Blue */
 
-    --admin-sidebar-background: 221 68% 33%;
+    /* Admin Theme Variables */
+    --admin-sidebar-background: 222.2 84% 4.9%;
     --admin-sidebar-foreground: 210 40% 98%;
-    --admin-sidebar-muted-foreground: 223 64% 83%;
-    --admin-sidebar-active-background: 223 74% 23%;
-    --admin-sidebar-active-foreground: 210 40% 98%;
-    --admin-sidebar-border: 224 65% 45%;
+    --admin-sidebar-muted-foreground: 215.4 16.3% 56.9%;
+    --admin-sidebar-active-background: 217.2 91.2% 59.8%;
+    --admin-sidebar-active-foreground: 222.2 47.4% 11.2%;
+    --admin-sidebar-border: 217.2 32.6% 17.5%;
+    --admin-layout-gradient-start: 220 100% 20%; /* Darker blue */
+    --admin-layout-gradient-end: 280 100% 20%; /* Darker purple */
 
     --admin-card-background: 217.2 32.6% 17.5%;
     --admin-card-foreground: 215 20.2% 65.1%;
@@ -169,6 +175,9 @@
   }
   .default-layout-theme {
     background-color: hsl(var(--default-main-background));
+  }
+  .admin-gradient-bg {
+    background: linear-gradient(to bottom right, hsl(var(--admin-layout-gradient-start)), hsl(var(--admin-layout-gradient-end)));
   }
 }
 

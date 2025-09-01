@@ -1,41 +1,86 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard } from "lucide-react";
+import { LayoutDashboard, ChevronLeft, ChevronRight, Search, User as UserIcon } from "lucide-react"; // Added Chevron and Search icons, renamed User to UserIcon to avoid conflict
 import { NavItem } from "@/lib/types";
+import { Button } from "@/components/ui/button"; // Import Button
+import { Input } from "@/components/ui/input"; // Import Input
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
+import { useSession } from "@/components/auth/SessionContextProvider"; // Import useSession
 
 interface SidebarProps {
   navItems: NavItem[];
   portalName: string;
   variant?: 'default' | 'admin' | 'student' | 'principal' | 'hod';
+  isCollapsed: boolean; // Added isCollapsed prop
+  setIsCollapsed: (collapsed: boolean) => void; // Added setIsCollapsed prop
 }
 
-const Sidebar = ({ navItems, portalName, variant = 'default' }: SidebarProps) => {
+const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIsCollapsed }: SidebarProps) => {
   const isDefault = variant === 'default';
   const isAdmin = variant === 'admin';
   const isStudent = variant === 'student';
   const isPrincipal = variant === 'principal';
   const isHod = variant === 'hod';
 
+  const { profile } = useSession(); // Get user profile
+
   return (
     <aside className={cn(
-      "hidden md:flex md:flex-col md:w-64 border-r",
+      "hidden md:flex md:flex-col h-screen transition-all duration-300 ease-in-out",
+      isCollapsed ? "md:w-20" : "md:w-64", // Adjust width based on collapsed state
+      "border-r rounded-lg m-4", // Rounded corners and margin
       isDefault && "bg-sidebar",
-      isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground",
-      isStudent && "bg-gradient-to-b from-student-sidebar-start to-student-sidebar-end text-student-sidebar-foreground",
-      isPrincipal && "bg-principal-sidebar text-principal-sidebar-foreground",
-      isHod && "bg-black text-white" // Directly apply black background and white text
+      isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border", // Use admin theme variables
+      isStudent && "bg-gradient-to-b from-student-sidebar-start to-student-sidebar-end text-student-sidebar-foreground border-student-sidebar-border",
+      isPrincipal && "bg-principal-sidebar text-principal-sidebar-foreground border-principal-sidebar-border",
+      isHod && "bg-black text-white border-gray-700",
+      "z-20" // Ensure sidebar is above main content
     )}>
       <div className={cn(
-        "flex h-16 items-center border-b px-6",
+        "flex items-center h-16 px-6 relative", // Added relative for absolute positioning of toggle button
+        isCollapsed && "justify-center px-0",
         isAdmin && "border-admin-sidebar-border",
         isStudent && "border-student-sidebar-border",
         isPrincipal && "border-principal-sidebar-border",
-        isHod && "border-gray-700" // A subtle border for contrast
+        isHod && "border-gray-700"
       )}>
-        <LayoutDashboard className="h-6 w-6 mr-2" />
-        <h2 className="text-lg font-semibold">{portalName}</h2>
+        {!isCollapsed && (
+          <>
+            <LayoutDashboard className="h-6 w-6 mr-2" />
+            <h2 className="text-lg font-semibold">{portalName}</h2>
+          </>
+        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            "absolute -right-4 top-1/2 -translate-y-1/2 rounded-full bg-background border shadow-md",
+            "hidden md:flex h-8 w-8 items-center justify-center",
+            isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border hover:bg-admin-sidebar-active hover:text-admin-sidebar-active-foreground"
+          )}
+          onClick={() => setIsCollapsed(!isCollapsed)}
+        >
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          <span className="sr-only">Toggle sidebar</span>
+        </Button>
       </div>
-      <nav className="flex-1 space-y-2 p-4">
+
+      {isAdmin && ( // Admin-specific search box
+        <div className={cn("p-4", isCollapsed && "px-2")}>
+          <div className="relative">
+            <Search className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground", isCollapsed && "left-1/2 -translate-x-1/2")} />
+            {!isCollapsed && (
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="w-full pl-9 bg-admin-sidebar-active text-admin-sidebar-active-foreground border-admin-sidebar-border focus:ring-admin-sidebar-active"
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      <nav className="flex-1 space-y-2 p-4 overflow-y-auto">
         {navItems.map((item) => (
           <NavLink
             key={item.href}
@@ -48,23 +93,47 @@ const Sidebar = ({ navItems, portalName, variant = 'default' }: SidebarProps) =>
                 isAdmin && "text-admin-sidebar-muted-foreground hover:text-admin-sidebar-foreground",
                 isStudent && "text-student-sidebar-muted-foreground hover:text-student-sidebar-foreground",
                 isPrincipal && "text-principal-sidebar-muted-foreground hover:text-principal-sidebar-foreground",
-                isHod && "text-gray-300 hover:text-white", // Muted foreground for inactive, white on hover
+                isHod && "text-gray-300 hover:text-white",
                 isActive && (
                   isDefault ? "bg-muted text-primary" :
                   isAdmin ? "bg-admin-sidebar-active text-admin-sidebar-active-foreground" :
                   isStudent ? "bg-student-sidebar-active text-student-sidebar-active-foreground" :
                   isPrincipal ? "bg-principal-sidebar-active text-principal-sidebar-active-foreground" :
-                  isHod ? "bg-gray-700 text-white" : // Active background and white text
+                  isHod ? "bg-gray-700 text-white" :
                   ""
-                )
+                ),
+                isCollapsed && "justify-center" // Center items when collapsed
               )
             }
           >
             {item.icon}
-            {item.title}
+            {!isCollapsed && <span className="text-sm font-medium">{item.title}</span>}
           </NavLink>
         ))}
       </nav>
+
+      {isAdmin && profile && ( // Admin-specific user profile section
+        <div className={cn("p-4 border-t", isCollapsed && "px-2 py-4 border-t-0")}>
+          <div className={cn("flex items-center gap-3", isCollapsed && "flex-col gap-1")}>
+            <Avatar className={cn("h-9 w-9", isCollapsed && "h-10 w-10")}>
+              <AvatarImage src={profile.avatar_url || undefined} alt={profile.username || "User"} />
+              <AvatarFallback>
+                <UserIcon className="h-5 w-5" />
+              </AvatarFallback>
+            </Avatar>
+            {!isCollapsed && (
+              <div className="flex flex-col">
+                <span className="text-sm font-medium text-admin-sidebar-foreground">
+                  {profile.first_name} {profile.last_name}
+                </span>
+                <span className="text-xs text-admin-sidebar-muted-foreground">
+                  {profile.role}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </aside>
   );
 };
