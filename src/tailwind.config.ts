@@ -103,6 +103,21 @@ export default {
         "principal-main-bg": {
           DEFAULT: "hsl(var(--principal-main-bg-background))",
         },
+        "hod-sidebar": { // HOD sidebar colors
+          DEFAULT: "hsl(var(--hod-sidebar-background))",
+          foreground: "hsl(var(--hod-sidebar-foreground))",
+          "muted-foreground": "hsl(var(--hod-sidebar-muted-foreground))",
+          active: "hsl(var(--hod-sidebar-active-background))",
+          "active-foreground": "hsl(var(--hod-sidebar-active-foreground))",
+          border: "hsl(var(--hod-sidebar-border))",
+        },
+        "hod-layout-gradient": { // HOD layout gradient colors
+          start: "hsl(var(--hod-layout-gradient-start))",
+          end: "hsl(var(--hod-layout-gradient-end))",
+        },
+        "hod-header": { // HOD header color
+          DEFAULT: "hsl(var(--hod-header-background))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

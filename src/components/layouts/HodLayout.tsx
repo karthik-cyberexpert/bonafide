@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
+import { useState } from "react"; // Import useState
 
 const navItems: NavItem[] = [
   {
@@ -36,11 +37,19 @@ const navItems: NavItem[] = [
 ];
 
 const HodLayout = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false); // State for sidebar collapse
+
   return (
-    <div className="flex min-h-screen w-full">
-      <Sidebar navItems={navItems} portalName="HOD Portal" variant="hod" />
-      <div className="flex flex-col flex-1 bg-gray-100 dark:bg-gray-900"> {/* Explicitly set light background for main content */}
-        <Header navItems={navItems} portalName="HOD Portal" headerClassName="bg-gray-100 dark:bg-gray-900 text-foreground" />
+    <div className="flex min-h-screen w-full hod-gradient-bg"> {/* Apply HOD gradient here */}
+      <Sidebar
+        navItems={navItems}
+        portalName="HOD Portal"
+        variant="hod"
+        isCollapsed={isCollapsed} // Pass state
+        setIsCollapsed={setIsCollapsed} // Pass setter
+      />
+      <div className="flex flex-col flex-1">
+        <Header navItems={navItems} portalName="HOD Portal" headerClassName="bg-hod-header text-primary-foreground dark:text-primary-foreground" />
         <main className="flex-1 p-6">
           <Outlet />
         </main>

@@ -80,7 +80,16 @@
     --principal-header-background: 0 0% 0%; /* Black */
     --principal-main-bg-background: 210 60% 95%; /* Light Blue */
 
-    /* HOD Theme Variables - Removed custom variables, will use direct Tailwind classes */
+    /* HOD Theme Variables */
+    --hod-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
+    --hod-sidebar-foreground: 210 40% 98%; /* White text */
+    --hod-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --hod-sidebar-active-background: 217.2 91.2% 55.8%; /* Vibrant blue for active state */
+    --hod-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --hod-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --hod-layout-gradient-start: 200 80% 90%; /* Soft blue */
+    --hod-layout-gradient-end: 140 80% 90%; /* Soft green */
+    --hod-header-background: 220 20% 15%; /* Dark blue/indigo for header */
   }
 
   .dark {
@@ -158,7 +167,16 @@
     --principal-header-background: 0 0% 0%; /* Black */
     --principal-main-bg-background: 210 60% 95%; /* Light Blue */
 
-    /* HOD Theme Variables - Removed custom variables, will use direct Tailwind classes */
+    /* HOD Theme Variables */
+    --hod-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
+    --hod-sidebar-foreground: 210 40% 98%; /* White text */
+    --hod-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --hod-sidebar-active-background: 217.2 91.2% 59.8%; /* Vibrant blue for active state */
+    --hod-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --hod-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --hod-layout-gradient-start: 200 80% 20%; /* Darker soft blue */
+    --hod-layout-gradient-end: 140 80% 20%; /* Darker soft green */
+    --hod-header-background: 220 20% 15%; /* Dark blue/indigo for header */
   }
 }
 
@@ -178,6 +196,9 @@
   }
   .admin-gradient-bg {
     background: linear-gradient(to bottom right, hsl(var(--admin-layout-gradient-start)), hsl(var(--admin-layout-gradient-end)));
+  }
+  .hod-gradient-bg {
+    background: linear-gradient(to bottom right, hsl(var(--hod-layout-gradient-start)), hsl(var(--hod-layout-gradient-end)));
   }
 }
 

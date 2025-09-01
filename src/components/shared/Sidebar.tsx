@@ -33,7 +33,7 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
       isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border", // Use admin theme variables
       isStudent && "bg-gradient-to-b from-student-sidebar-start to-student-sidebar-end text-student-sidebar-foreground border-student-sidebar-border",
       isPrincipal && "bg-principal-sidebar text-principal-sidebar-foreground border-principal-sidebar-border",
-      isHod && "bg-black text-white border-gray-700",
+      isHod && "bg-hod-sidebar text-hod-sidebar-foreground border-hod-sidebar-border", // Use HOD theme variables
       "z-20" // Ensure sidebar is above main content
     )}>
       <div className={cn(
@@ -42,7 +42,7 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
         isAdmin && "border-admin-sidebar-border",
         isStudent && "border-student-sidebar-border",
         isPrincipal && "border-principal-sidebar-border",
-        isHod && "border-gray-700"
+        isHod && "border-hod-sidebar-border" // Use HOD theme variables
       )}>
         {!isCollapsed && (
           <>
@@ -56,7 +56,8 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
           className={cn(
             "absolute -right-4 top-1/2 -translate-y-1/2 rounded-full bg-background border shadow-md",
             "hidden md:flex h-8 w-8 items-center justify-center",
-            isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border hover:bg-admin-sidebar-active hover:text-admin-sidebar-active-foreground"
+            isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border hover:bg-admin-sidebar-active hover:text-admin-sidebar-active-foreground",
+            isHod && "bg-hod-sidebar text-hod-sidebar-foreground border-hod-sidebar-border hover:bg-hod-sidebar-active hover:text-hod-sidebar-active-foreground" // HOD specific styling
           )}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
@@ -65,7 +66,7 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
         </Button>
       </div>
 
-      {isAdmin && ( // Admin-specific search box
+      {(isAdmin || isHod) && ( // Admin and HOD-specific search box
         <div className={cn("p-4", isCollapsed && "px-2")}>
           <div className="relative">
             <Search className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground", isCollapsed && "left-1/2 -translate-x-1/2")} />
@@ -73,7 +74,11 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
               <Input
                 type="search"
                 placeholder="Search..."
-                className="w-full pl-9 bg-admin-sidebar-active text-admin-sidebar-active-foreground border-admin-sidebar-border focus:ring-admin-sidebar-active"
+                className={cn(
+                  "w-full pl-9",
+                  isAdmin && "bg-admin-sidebar-active text-admin-sidebar-active-foreground border-admin-sidebar-border focus:ring-admin-sidebar-active",
+                  isHod && "bg-hod-sidebar-active text-hod-sidebar-active-foreground border-hod-sidebar-border focus:ring-hod-sidebar-active" // HOD specific styling
+                )}
               />
             )}
           </div>
@@ -93,13 +98,13 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
                 isAdmin && "text-admin-sidebar-muted-foreground hover:text-admin-sidebar-foreground",
                 isStudent && "text-student-sidebar-muted-foreground hover:text-student-sidebar-foreground",
                 isPrincipal && "text-principal-sidebar-muted-foreground hover:text-principal-sidebar-foreground",
-                isHod && "text-gray-300 hover:text-white",
+                isHod && "text-hod-sidebar-muted-foreground hover:text-hod-sidebar-foreground", // HOD specific styling
                 isActive && (
                   isDefault ? "bg-muted text-primary" :
                   isAdmin ? "bg-admin-sidebar-active text-admin-sidebar-active-foreground" :
                   isStudent ? "bg-student-sidebar-active text-student-sidebar-active-foreground" :
                   isPrincipal ? "bg-principal-sidebar-active text-principal-sidebar-active-foreground" :
-                  isHod ? "bg-gray-700 text-white" :
+                  isHod ? "bg-hod-sidebar-active text-hod-sidebar-active-foreground" : // HOD active styling
                   ""
                 ),
                 isCollapsed && "justify-center" // Center items when collapsed
@@ -112,8 +117,8 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
         ))}
       </nav>
 
-      {isAdmin && profile && ( // Admin-specific user profile section
-        <div className={cn("p-4 border-t", isCollapsed && "px-2 py-4 border-t-0")}>
+      {(isAdmin || isHod) && profile && ( // Admin and HOD-specific user profile section
+        <div className={cn("p-4 border-t", isCollapsed && "px-2 py-4 border-t-0", isAdmin && "border-admin-sidebar-border", isHod && "border-hod-sidebar-border")}>
           <div className={cn("flex items-center gap-3", isCollapsed && "flex-col gap-1")}>
             <Avatar className={cn("h-9 w-9", isCollapsed && "h-10 w-10")}>
               <AvatarImage src={profile.avatar_url || undefined} alt={profile.username || "User"} />
@@ -123,10 +128,10 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
             </Avatar>
             {!isCollapsed && (
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-admin-sidebar-foreground">
+                <span className={cn("text-sm font-medium", isAdmin && "text-admin-sidebar-foreground", isHod && "text-hod-sidebar-foreground")}>
                   {profile.first_name} {profile.last_name}
                 </span>
-                <span className="text-xs text-admin-sidebar-muted-foreground">
+                <span className={cn("text-xs", isAdmin && "text-admin-sidebar-muted-foreground", isHod && "text-hod-sidebar-muted-foreground")}>
                   {profile.role}
                 </span>
               </div>
