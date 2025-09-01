@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 
-type StudentTheme = 'default' | 'ocean-breeze' | 'sunset-glow' | 'forest-retreat';
+export type StudentTheme = 'default' | 'ocean-breeze' | 'sunset-glow' | 'forest-retreat'; // Exported for use in other components
 
 interface StudentDashboardThemeContextType {
   theme: StudentTheme;
@@ -20,26 +20,15 @@ export const StudentDashboardThemeProvider = ({ children }: { children: ReactNod
     }
     return 'default';
   });
-  const { theme: systemTheme } = useTheme(); // Get system theme (light/dark)
+  // No longer applying themeClass here. It will be applied in StudentLayout.
 
   useEffect(() => {
     localStorage.setItem('student-dashboard-theme', theme);
   }, [theme]);
 
-  const themeClass = cn(
-    'student-dashboard-theme',
-    {
-      'theme-ocean-breeze': theme === 'ocean-breeze',
-      'theme-sunset-glow': theme === 'sunset-glow',
-      'theme-forest-retreat': theme === 'forest-retreat',
-    }
-  );
-
   return (
     <StudentDashboardThemeContext.Provider value={{ theme, setTheme }}>
-      <div className={themeClass}>
-        {children}
-      </div>
+      {children}
     </StudentDashboardThemeContext.Provider>
   );
 };

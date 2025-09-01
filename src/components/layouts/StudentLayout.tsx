@@ -4,7 +4,8 @@ import { LayoutDashboard, FilePlus, History, User } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
 import { useState } from "react";
-import { StudentDashboardThemeProvider } from "@/components/student/StudentDashboardTheme"; // Import the provider
+import { StudentDashboardThemeProvider, useStudentDashboardTheme } from "@/components/student/StudentDashboardTheme"; // Import the provider and hook
+import { cn } from "@/lib/utils"; // Import cn for conditional class names
 
 const navItems: NavItem[] = [
   {
@@ -29,12 +30,30 @@ const navItems: NavItem[] = [
   },
 ];
 
-const StudentLayout = () => {
+const StudentLayoutContent = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { theme } = useStudentDashboardTheme(); // Get the current student dashboard theme
+
+  const mainContentThemeClass = cn(
+    "flex-1 p-0", // Keep p-0 here, the inner div in Dashboard.tsx will handle padding
+    "student-dashboard-main-content", // Base class for main content styling
+    {
+      'theme-ocean-breeze': theme === 'ocean-breeze',
+      'theme-sunset-glow': theme === 'sunset-glow',
+      'theme-forest-retreat': theme === 'forest-retreat',
+    }
+  );
 
   return (
     <div className="flex min-h-screen w-full">
-      <Sidebar navItems={navItems} portalName="Student Portal" variant="student" isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <Sidebar
+        navItems={navItems}
+        portalName="Student Portal"
+        variant="student"
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
+        studentTheme={theme} // Pass the student theme to the sidebar
+      />
       <div className="flex flex-col flex-1 student-layout-theme text-foreground">
         <Header
           navItems={navItems}
@@ -44,14 +63,18 @@ const StudentLayout = () => {
           setIsCollapsed={setIsCollapsed}
           glassmorphism={true} // Enable glassmorphism
         />
-        <main className="flex-1 p-0"> {/* Removed default padding, theme will handle */}
-          <StudentDashboardThemeProvider> {/* Wrap Outlet with the theme provider */}
-            <Outlet />
-          </StudentDashboardThemeProvider>
+        <main className={mainContentThemeClass}> {/* Apply theme classes directly to main */}
+          <Outlet />
         </main>
       </div>
     </div>
   );
 };
+
+const StudentLayout = () => (
+  <StudentDashboardThemeProvider>
+    <StudentLayoutContent />
+  </StudentDashboardThemeProvider>
+);
 
 export default StudentLayout;

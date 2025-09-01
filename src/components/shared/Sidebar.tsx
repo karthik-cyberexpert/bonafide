@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"; // Import Button
 import { Input } from "@/components/ui/input"; // Import Input
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
 import { useSession } from "@/components/auth/SessionContextProvider"; // Import useSession
+import { StudentTheme } from "@/components/student/StudentDashboardTheme"; // Import StudentTheme type
 
 interface SidebarProps {
   navItems: NavItem[];
@@ -13,9 +14,10 @@ interface SidebarProps {
   variant?: 'default' | 'admin' | 'student' | 'principal' | 'hod' | 'tutor';
   isCollapsed: boolean; // Added isCollapsed prop
   setIsCollapsed: (collapsed: boolean) => void; // Added setIsCollapsed prop
+  studentTheme?: StudentTheme; // New prop for student-specific themes
 }
 
-const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIsCollapsed }: SidebarProps) => {
+const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIsCollapsed, studentTheme }: SidebarProps) => {
   const isDefault = variant === 'default';
   const isAdmin = variant === 'admin';
   const isStudent = variant === 'student';
@@ -32,10 +34,15 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
       "border-r rounded-lg m-4", // Rounded corners and margin
       isDefault && "bg-sidebar",
       isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border", // Use admin theme variables
-      isStudent && "bg-gradient-to-b from-student-sidebar-background-start to-student-sidebar-background-end text-student-sidebar-foreground border-student-sidebar-border",
       isPrincipal && "bg-principal-sidebar text-principal-sidebar-foreground border-principal-sidebar-border",
       isHod && "bg-hod-sidebar text-hod-sidebar-foreground border-hod-sidebar-border", // Use HOD theme variables
       isTutor && "bg-tutor-sidebar text-tutor-sidebar-foreground border-tutor-sidebar-border", // Use Tutor theme variables
+      isStudent && "student-sidebar-theme", // Base class for student sidebar theming
+      isStudent && studentTheme && { // Apply specific student theme classes
+        'theme-ocean-breeze': studentTheme === 'ocean-breeze',
+        'theme-sunset-glow': studentTheme === 'sunset-glow',
+        'theme-forest-retreat': studentTheme === 'forest-retreat',
+      },
       "z-20" // Ensure sidebar is above main content
     )}>
       <div className={cn(
