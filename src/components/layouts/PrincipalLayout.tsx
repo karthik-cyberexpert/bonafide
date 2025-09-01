@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
+import { useState } from "react"; // Import useState
 
 const navItems: NavItem[] = [
   {
@@ -39,12 +40,20 @@ const navItems: NavItem[] = [
 ];
 
 const PrincipalLayout = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false); // State for sidebar collapse
+
   return (
-    <div className="flex min-h-screen w-full">
-      <Sidebar navItems={navItems} portalName="Principal Portal" variant="principal" />
+    <div className="flex min-h-screen w-full principal-layout-theme"> {/* Apply Principal gradient here */}
+      <Sidebar
+        navItems={navItems}
+        portalName="Principal Portal"
+        variant="principal"
+        isCollapsed={isCollapsed} // Pass state
+        setIsCollapsed={setIsCollapsed} // Pass setter
+      />
       <div className="flex flex-col flex-1">
-        <Header navItems={navItems} portalName="Principal Portal" headerClassName="bg-principal-main-bg text-foreground" />
-        <main className="flex-1 p-6 principal-layout-theme">
+        <Header navItems={navItems} portalName="Principal Portal" headerClassName="bg-principal-header text-primary-foreground dark:text-primary-foreground" />
+        <main className="flex-1 p-6">
           <Outlet />
         </main>
       </div>

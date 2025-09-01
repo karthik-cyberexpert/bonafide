@@ -57,7 +57,8 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
             "absolute -right-4 top-1/2 -translate-y-1/2 rounded-full bg-background border shadow-md",
             "hidden md:flex h-8 w-8 items-center justify-center",
             isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border hover:bg-admin-sidebar-active hover:text-admin-sidebar-active-foreground",
-            isHod && "bg-hod-sidebar text-hod-sidebar-foreground border-hod-sidebar-border hover:bg-hod-sidebar-active hover:text-hod-sidebar-active-foreground" // HOD specific styling
+            isHod && "bg-hod-sidebar text-hod-sidebar-foreground border-hod-sidebar-border hover:bg-hod-sidebar-active hover:text-hod-sidebar-active-foreground", // HOD specific styling
+            isPrincipal && "bg-principal-sidebar text-principal-sidebar-foreground border-principal-sidebar-border hover:bg-principal-sidebar-active hover:text-principal-sidebar-active-foreground" // Principal specific styling
           )}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
@@ -66,7 +67,7 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
         </Button>
       </div>
 
-      {(isAdmin || isHod) && ( // Admin and HOD-specific search box
+      {(isAdmin || isHod || isPrincipal) && ( // Admin, HOD, and Principal-specific search box
         <div className={cn("p-4", isCollapsed && "px-2")}>
           <div className="relative">
             <Search className={cn("absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground", isCollapsed && "left-1/2 -translate-x-1/2")} />
@@ -77,7 +78,8 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
                 className={cn(
                   "w-full pl-9",
                   isAdmin && "bg-admin-sidebar-active text-admin-sidebar-active-foreground border-admin-sidebar-border focus:ring-admin-sidebar-active",
-                  isHod && "bg-hod-sidebar-active text-hod-sidebar-active-foreground border-hod-sidebar-border focus:ring-hod-sidebar-active" // HOD specific styling
+                  isHod && "bg-hod-sidebar-active text-hod-sidebar-active-foreground border-hod-sidebar-border focus:ring-hod-sidebar-active", // HOD specific styling
+                  isPrincipal && "bg-principal-sidebar-active text-principal-sidebar-active-foreground border-principal-sidebar-border focus:ring-principal-sidebar-active" // Principal specific styling
                 )}
               />
             )}
@@ -117,8 +119,8 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
         ))}
       </nav>
 
-      {(isAdmin || isHod) && profile && ( // Admin and HOD-specific user profile section
-        <div className={cn("p-4 border-t", isCollapsed && "px-2 py-4 border-t-0", isAdmin && "border-admin-sidebar-border", isHod && "border-hod-sidebar-border")}>
+      {(isAdmin || isHod || isPrincipal) && profile && ( // Admin, HOD, and Principal-specific user profile section
+        <div className={cn("p-4 border-t", isCollapsed && "px-2 py-4 border-t-0", isAdmin && "border-admin-sidebar-border", isHod && "border-hod-sidebar-border", isPrincipal && "border-principal-sidebar-border")}>
           <div className={cn("flex items-center gap-3", isCollapsed && "flex-col gap-1")}>
             <Avatar className={cn("h-9 w-9", isCollapsed && "h-10 w-10")}>
               <AvatarImage src={profile.avatar_url || undefined} alt={profile.username || "User"} />
@@ -128,10 +130,10 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
             </Avatar>
             {!isCollapsed && (
               <div className="flex flex-col">
-                <span className={cn("text-sm font-medium", isAdmin && "text-admin-sidebar-foreground", isHod && "text-hod-sidebar-foreground")}>
+                <span className={cn("text-sm font-medium", isAdmin && "text-admin-sidebar-foreground", isHod && "text-hod-sidebar-foreground", isPrincipal && "text-principal-sidebar-foreground")}>
                   {profile.first_name} {profile.last_name}
                 </span>
-                <span className={cn("text-xs", isAdmin && "text-admin-sidebar-muted-foreground", isHod && "text-hod-sidebar-muted-foreground")}>
+                <span className={cn("text-xs", isAdmin && "text-admin-sidebar-muted-foreground", isHod && "text-hod-sidebar-muted-foreground", isPrincipal && "text-principal-sidebar-muted-foreground")}>
                   {profile.role}
                 </span>
               </div>

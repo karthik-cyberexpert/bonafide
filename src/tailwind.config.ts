@@ -103,6 +103,10 @@ export default {
         "principal-main-bg": {
           DEFAULT: "hsl(var(--principal-main-bg-background))",
         },
+        "principal-layout-gradient": { // Principal layout gradient colors
+          start: "hsl(var(--principal-layout-gradient-start))",
+          end: "hsl(var(--principal-layout-gradient-end))",
+        },
         "hod-sidebar": { // HOD sidebar colors
           DEFAULT: "hsl(var(--hod-sidebar-background))",
           foreground: "hsl(var(--hod-sidebar-foreground))",
