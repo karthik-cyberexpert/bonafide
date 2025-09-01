@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 
 const navItems: NavItem[] = [
   {
@@ -40,24 +40,25 @@ const navItems: NavItem[] = [
 ];
 
 const PrincipalLayout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false); // State for sidebar collapse
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="flex min-h-screen w-full principal-layout-theme"> {/* Apply Principal gradient here */}
+    <div className="flex min-h-screen w-full principal-layout-theme">
       <Sidebar
         navItems={navItems}
         portalName="Principal Portal"
         variant="principal"
-        isCollapsed={isCollapsed} // Pass state
-        setIsCollapsed={setIsCollapsed} // Pass setter
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
       />
       <div className="flex flex-col flex-1">
         <Header
           navItems={navItems}
           portalName="Principal Portal"
           headerClassName="bg-principal-header text-primary-foreground dark:text-primary-foreground"
-          isCollapsed={isCollapsed} // Pass isCollapsed to Header
-          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+          glassmorphism={true} // Enable glassmorphism
         />
         <main className="flex-1 p-6">
           <Outlet />

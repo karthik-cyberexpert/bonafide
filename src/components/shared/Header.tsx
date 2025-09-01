@@ -2,27 +2,30 @@ import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { LayoutDashboard, Menu, Bell, LogOut, ChevronLeft, ChevronRight } from "lucide-react"; // Added Chevron icons
+import { LayoutDashboard, Menu, Bell, LogOut, ChevronLeft, ChevronRight } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { NavItem } from "@/lib/types";
-import { useSession } from "@/components/auth/SessionContextProvider"; // Import useSession
+import { useSession } from "@/components/auth/SessionContextProvider";
 
 interface HeaderProps {
   navItems: NavItem[];
   portalName: string;
-  headerClassName?: string; // New prop for custom header class
-  isCollapsed?: boolean; // Added isCollapsed prop
-  setIsCollapsed?: (collapsed: boolean) => void; // Added setIsCollapsed prop
+  headerClassName?: string;
+  isCollapsed?: boolean;
+  setIsCollapsed?: (collapsed: boolean) => void;
+  glassmorphism?: boolean; // New prop for glassmorphism effect
 }
 
-const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsCollapsed }: HeaderProps) => {
-  const { signOut } = useSession(); // Use the signOut function
-  const onHeaderBg = headerClassName?.includes("bg-header") || headerClassName?.includes("bg-default-header");
+const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsCollapsed, glassmorphism }: HeaderProps) => {
+  const { signOut } = useSession();
+  // Determine if buttons/icons should have 'on dark background' styling
+  const onHeaderBg = glassmorphism || headerClassName?.includes("bg-header") || headerClassName?.includes("bg-default-header");
 
   return (
     <header className={cn(
       "sticky top-0 z-30 flex h-14 items-center justify-between border-b px-4 sm:px-6",
-      headerClassName || "bg-default-header" // Use custom class if provided, otherwise default to bg-default-header
+      headerClassName || "bg-default-header",
+      glassmorphism && "backdrop-blur-md bg-background/30 border-white/20 dark:border-white/10" // Glassmorphism styles
     )}>
       <div className="flex items-center gap-4">
         {/* Mobile Sheet Trigger */}
@@ -34,7 +37,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
                 size="icon"
                 className={cn(
                   "shrink-0",
-                  onHeaderBg && "bg-transparent border-current hover:bg-white/20"
+                  onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10"
                 )}
               >
                 <Menu className="h-5 w-5" />
@@ -73,13 +76,13 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
         </div>
 
         {/* Desktop Sidebar Toggle Button */}
-        {setIsCollapsed && ( // Only render if setIsCollapsed is provided (i.e., not for default layout)
+        {setIsCollapsed && (
           <Button
             variant="ghost"
             size="icon"
             className={cn(
               "hidden md:flex shrink-0",
-              onHeaderBg && "bg-transparent border-current hover:bg-white/20"
+              onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10"
             )}
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
@@ -96,7 +99,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
         <Button
           variant="ghost"
           size="icon"
-          className={cn(onHeaderBg && "hover:bg-white/20")}
+          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10")}
         >
           <Bell className="h-5 w-5" />
           <span className="sr-only">View notifications</span>
@@ -106,7 +109,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
           variant="ghost"
           size="icon"
           onClick={signOut}
-          className={cn(onHeaderBg && "hover:bg-white/20")}
+          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10")}
         >
           <LogOut className="h-5 w-5" />
           <span className="sr-only">Logout</span>

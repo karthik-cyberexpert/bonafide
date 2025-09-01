@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 
 const navItems: NavItem[] = [
   {
@@ -57,24 +57,25 @@ const navItems: NavItem[] = [
 ];
 
 const AdminLayout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false); // State for sidebar collapse
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="flex min-h-screen w-full admin-gradient-bg"> {/* Apply gradient here */}
+    <div className="flex min-h-screen w-full admin-gradient-bg">
       <Sidebar
         navItems={navItems}
         portalName="Admin Portal"
         variant="admin"
-        isCollapsed={isCollapsed} // Pass state
-        setIsCollapsed={setIsCollapsed} // Pass setter
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
       />
-      <div className="flex flex-col flex-1"> {/* Removed bg-muted here, as gradient is on parent */}
+      <div className="flex flex-col flex-1">
         <Header
           navItems={navItems}
           portalName="Admin Portal"
-          headerClassName="bg-header text-primary-foreground dark:text-primary-foreground"
-          isCollapsed={isCollapsed} // Pass isCollapsed to Header
-          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+          headerClassName="bg-admin-header text-primary-foreground dark:text-primary-foreground"
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+          glassmorphism={true} // Enable glassmorphism
         />
         <main className="flex-1 p-6 admin-layout-theme">
           <Outlet />

@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 
 const navItems: NavItem[] = [
   {
@@ -37,24 +37,25 @@ const navItems: NavItem[] = [
 ];
 
 const HodLayout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false); // State for sidebar collapse
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="flex min-h-screen w-full hod-gradient-bg"> {/* Apply HOD gradient here */}
+    <div className="flex min-h-screen w-full hod-gradient-bg">
       <Sidebar
         navItems={navItems}
         portalName="HOD Portal"
         variant="hod"
-        isCollapsed={isCollapsed} // Pass state
-        setIsCollapsed={setIsCollapsed} // Pass setter
+        isCollapsed={isCollapsed}
+        setIsCollapsed={setIsCollapsed}
       />
       <div className="flex flex-col flex-1">
         <Header
           navItems={navItems}
           portalName="HOD Portal"
           headerClassName="bg-hod-header text-primary-foreground dark:text-primary-foreground"
-          isCollapsed={isCollapsed} // Pass isCollapsed to Header
-          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+          glassmorphism={true} // Enable glassmorphism
         />
         <main className="flex-1 p-6 hod-layout-theme">
           <Outlet />

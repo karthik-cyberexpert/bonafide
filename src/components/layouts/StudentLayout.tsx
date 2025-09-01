@@ -3,7 +3,7 @@ import Header from "@/components/shared/Header";
 import { LayoutDashboard, FilePlus, History, User } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
-import { useState } from "react"; // Import useState
+import { useState } from "react";
 
 const navItems: NavItem[] = [
   {
@@ -29,7 +29,7 @@ const navItems: NavItem[] = [
 ];
 
 const StudentLayout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false); // State for sidebar collapse
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
     <div className="flex min-h-screen w-full">
@@ -39,8 +39,9 @@ const StudentLayout = () => {
           navItems={navItems}
           portalName="Student Portal"
           headerClassName="bg-student-header text-foreground"
-          isCollapsed={isCollapsed} // Pass isCollapsed to Header
-          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+          glassmorphism={true} // Enable glassmorphism
         />
         <main className="flex-1 p-6">
           <Outlet />

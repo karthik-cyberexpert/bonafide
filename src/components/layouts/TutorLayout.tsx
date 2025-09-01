@@ -40,18 +40,19 @@ const navItems: NavItem[] = [
 ];
 
 const TutorLayout = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false); // State for sidebar collapse
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div className="flex min-h-screen w-full tutor-gradient-bg"> {/* Apply Tutor gradient here */}
+    <div className="flex min-h-screen w-full tutor-gradient-bg">
       <Sidebar navItems={navItems} portalName="Tutor Portal" variant="tutor" isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
       <div className="flex flex-col flex-1">
         <Header
           navItems={navItems}
           portalName="Tutor Portal"
           headerClassName="bg-tutor-header text-primary-foreground dark:text-primary-foreground"
-          isCollapsed={isCollapsed} // Pass isCollapsed to Header
-          setIsCollapsed={setIsCollapsed} // Pass setIsCollapsed to Header
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+          glassmorphism={true} // Enable glassmorphism
         />
         <main className="flex-1 p-6 tutor-layout-theme">
           <Outlet />
