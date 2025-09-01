@@ -31,7 +31,7 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
       "border-r rounded-lg m-4", // Rounded corners and margin
       isDefault && "bg-sidebar",
       isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border", // Use admin theme variables
-      isStudent && "bg-gradient-to-b from-student-sidebar-start to-student-sidebar-end text-student-sidebar-foreground border-student-sidebar-border",
+      isStudent && "bg-gradient-to-b from-student-sidebar-background-start to-student-sidebar-background-end text-student-sidebar-foreground border-student-sidebar-border",
       isPrincipal && "bg-principal-sidebar text-principal-sidebar-foreground border-principal-sidebar-border",
       isHod && "bg-hod-sidebar text-hod-sidebar-foreground border-hod-sidebar-border", // Use HOD theme variables
       "z-20" // Ensure sidebar is above main content
@@ -58,7 +58,8 @@ const Sidebar = ({ navItems, portalName, variant = 'default', isCollapsed, setIs
             "hidden md:flex h-8 w-8 items-center justify-center",
             isAdmin && "bg-admin-sidebar text-admin-sidebar-foreground border-admin-sidebar-border hover:bg-admin-sidebar-active hover:text-admin-sidebar-active-foreground",
             isHod && "bg-hod-sidebar text-hod-sidebar-foreground border-hod-sidebar-border hover:bg-hod-sidebar-active hover:text-hod-sidebar-active-foreground", // HOD specific styling
-            isPrincipal && "bg-principal-sidebar text-principal-sidebar-foreground border-principal-sidebar-border hover:bg-principal-sidebar-active hover:text-principal-sidebar-active-foreground" // Principal specific styling
+            isPrincipal && "bg-principal-sidebar text-principal-sidebar-foreground border-principal-sidebar-border hover:bg-principal-sidebar-active hover:text-principal-sidebar-active-foreground", // Principal specific styling
+            isStudent && "bg-student-sidebar-background-start text-student-sidebar-foreground border-student-sidebar-border hover:bg-student-sidebar-active hover:text-student-sidebar-active-foreground" // Student specific styling
           )}
           onClick={() => setIsCollapsed(!isCollapsed)}
         >

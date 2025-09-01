@@ -89,6 +89,9 @@ export default {
         "student-header": {
           DEFAULT: "hsl(var(--student-header-background))",
         },
+        "student-main-bg": {
+          DEFAULT: "hsl(var(--student-main-background))",
+        },
         "principal-sidebar": {
           DEFAULT: "hsl(var(--principal-sidebar-background))",
           foreground: "hsl(var(--principal-sidebar-foreground))",
