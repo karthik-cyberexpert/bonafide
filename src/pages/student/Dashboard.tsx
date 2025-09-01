@@ -101,7 +101,7 @@ const StudentDashboardContent = () => {
   }
 
   return (
-    <div className="space-y-6 min-h-[calc(100vh-100px)] p-6 rounded-lg shadow-inner">
+    <div className="space-y-6"> {/* Removed min-h, p-6, rounded-lg, shadow-inner */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Dashboard</h1>
         <StudentThemeSelector />

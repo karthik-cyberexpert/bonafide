@@ -16,15 +16,17 @@ interface HeaderProps {
   isCollapsed?: boolean;
   setIsCollapsed?: (collapsed: boolean) => void;
   glassmorphism?: boolean; // New prop for glassmorphism effect
+  isStudentLayout?: boolean; // New prop to indicate if it's a student layout
 }
 
-const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsCollapsed, glassmorphism }: HeaderProps) => {
+const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsCollapsed, glassmorphism, isStudentLayout }: HeaderProps) => {
   const { signOut } = useSession();
   const { theme: studentTheme } = useStudentDashboardTheme(); // Get student theme
   const { theme: systemTheme } = useTheme(); // Get system theme
 
   // Determine if buttons/icons should have 'on dark background' styling
-  const onHeaderBg = glassmorphism || headerClassName?.includes("bg-header") || headerClassName?.includes("bg-default-header") || headerClassName?.includes("bg-admin-header") || headerClassName?.includes("bg-principal-header") || headerClassName?.includes("bg-hod-header") || headerClassName?.includes("bg-tutor-header");
+  // If it's a student layout, the header background is always dynamic, so onHeaderBg should be true.
+  const onHeaderBg = isStudentLayout || glassmorphism || headerClassName?.includes("bg-header") || headerClassName?.includes("bg-default-header") || headerClassName?.includes("bg-admin-header") || headerClassName?.includes("bg-principal-header") || headerClassName?.includes("bg-hod-header") || headerClassName?.includes("bg-tutor-header");
 
   // Determine dynamic text color for header buttons/icons
   const getButtonTextColorClass = () => {
@@ -40,7 +42,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
         case 'ocean-breeze': return 'text-[hsl(var(--theme-ocean-breeze-header-text-color))]';
         case 'sunset-glow': return 'text-[hsl(var(--theme-sunset-glow-header-text-color))]';
         case 'forest-retreat': return 'text-[hsl(var(--theme-forest-retreat-header-text-color))]';
-        default: return 'text-foreground'; // Default light mode header buttons
+        default: return 'text-foreground'; // Default light mode foreground
       }
     }
   };

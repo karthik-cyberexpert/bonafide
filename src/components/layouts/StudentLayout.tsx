@@ -36,14 +36,21 @@ const StudentLayoutContent = () => {
   const { theme: studentTheme } = useStudentDashboardTheme(); // Get the current student dashboard theme
   const { theme: systemTheme } = useTheme(); // Get the system theme (light/dark)
 
-  const mainContentThemeClass = cn(
-    "flex-1", // Removed p-0, the theme class will handle padding
-    "student-dashboard-main-content", // Base class for main content styling
+  // This class should apply to the container of header and main
+  const layoutAndMainContainerClass = cn(
+    "flex flex-col flex-1", // Keep flex properties
+    "student-layout-theme", // Base class for the overall layout background
     {
       'theme-ocean-breeze': studentTheme === 'ocean-breeze',
       'theme-sunset-glow': studentTheme === 'sunset-glow',
       'theme-forest-retreat': studentTheme === 'forest-retreat',
     }
+  );
+
+  // This class applies to the main content area (Outlet)
+  const mainContentClass = cn(
+    "flex-1 p-6 rounded-lg shadow-inner", // Keep padding, rounded corners, shadow
+    "text-foreground", // Ensure text color is set, it will be overridden by theme-specific text-color from parent
   );
 
   // Determine header text color based on studentTheme and systemTheme
@@ -67,8 +74,29 @@ const StudentLayoutContent = () => {
 
   const headerTextColorClass = getHeaderTextColorClass();
 
+  // Determine header background based on studentTheme and systemTheme
+  const getHeaderBackgroundColorClass = () => {
+    if (systemTheme === 'dark') {
+      switch (studentTheme) {
+        case 'ocean-breeze': return 'bg-[hsl(var(--dark-theme-ocean-breeze-header-background))]';
+        case 'sunset-glow': return 'bg-[hsl(var(--dark-theme-sunset-glow-header-background))]';
+        case 'forest-retreat': return 'bg-[hsl(var(--dark-theme-forest-retreat-header-background))]';
+        default: return 'bg-student-header'; // Default dark mode header background
+      }
+    } else {
+      switch (studentTheme) {
+        case 'ocean-breeze': return 'bg-[hsl(var(--theme-ocean-breeze-header-background))]';
+        case 'sunset-glow': return 'bg-[hsl(var(--theme-sunset-glow-header-background))]';
+        case 'forest-retreat': return 'bg-[hsl(var(--theme-forest-retreat-header-background))]';
+        default: return 'bg-student-header'; // Default light mode header background
+      }
+    }
+  };
+
+  const headerBackgroundColorClass = getHeaderBackgroundColorClass();
+
   const headerClassName = cn(
-    "bg-student-header",
+    headerBackgroundColorClass, // Apply dynamic header background
     headerTextColorClass
   );
 
@@ -82,16 +110,17 @@ const StudentLayoutContent = () => {
         setIsCollapsed={setIsCollapsed}
         studentTheme={studentTheme} // Pass the student theme to the sidebar
       />
-      <div className="flex flex-col flex-1 student-layout-theme text-foreground">
+      <div className={layoutAndMainContainerClass}> {/* Apply layout theme here */}
         <Header
           navItems={navItems}
           portalName="Student Portal"
-          headerClassName={headerClassName} // Apply dynamic header class
+          headerClassName={headerClassName}
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
           glassmorphism={true} // Enable glassmorphism
+          isStudentLayout={true} // Indicate that this is a student layout
         />
-        <main className={mainContentThemeClass}> {/* Apply theme classes directly to main */}
+        <main className={mainContentClass}> {/* Main content styling */}
           <Outlet />
         </main>
       </div>
