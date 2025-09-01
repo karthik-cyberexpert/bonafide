@@ -90,8 +90,8 @@
     --hod-sidebar-active-background: 0 0% 0%; /* Black for active state */
     --hod-sidebar-active-foreground: 210 40% 98%; /* White for active text */
     --hod-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
-    --hod-layout-gradient-start: 200 80% 90%; /* Soft blue */
-    --hod-layout-gradient-end: 140 80% 90%; /* Soft green */
+    --hod-layout-gradient-start: 220 20% 10%; /* Dark gray */
+    --hod-layout-gradient-end: 0 0% 0%; /* Black */
     --hod-header-background: 220 20% 15%; /* Dark blue/indigo for header */
     --hod-card-background: 0 0% 94%; /* pale smoke white / light gray */
     --hod-card-foreground: 222.2 84% 4.9%;
@@ -195,8 +195,8 @@
     --hod-sidebar-active-background: 0 0% 0%; /* Black for active state */
     --hod-sidebar-active-foreground: 210 40% 98%;
     --hod-sidebar-border: 217.2 32.6% 17.5%;
-    --hod-layout-gradient-start: 200 80% 20%;
-    --hod-layout-gradient-end: 140 80% 20%;
+    --hod-layout-gradient-start: 220 20% 10%;
+    --hod-layout-gradient-end: 0 0% 0%;
     --hod-header-background: 220 20% 15%;
     --hod-card-background: 217.2 32.6% 17.5%;
     --hod-card-foreground: 215 20.2% 65.1%;
