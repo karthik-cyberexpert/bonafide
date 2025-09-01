@@ -4,6 +4,7 @@ import { LayoutDashboard, FilePlus, History, User } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
 import { useState } from "react";
+import { StudentDashboardThemeProvider } from "@/components/student/StudentDashboardTheme"; // Import the provider
 
 const navItems: NavItem[] = [
   {
@@ -43,8 +44,10 @@ const StudentLayout = () => {
           setIsCollapsed={setIsCollapsed}
           glassmorphism={true} // Enable glassmorphism
         />
-        <main className="flex-1 p-6">
-          <Outlet />
+        <main className="flex-1 p-0"> {/* Removed default padding, theme will handle */}
+          <StudentDashboardThemeProvider> {/* Wrap Outlet with the theme provider */}
+            <Outlet />
+          </StudentDashboardThemeProvider>
         </main>
       </div>
     </div>

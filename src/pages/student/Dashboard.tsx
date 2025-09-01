@@ -16,13 +16,17 @@ import { CheckCircle, Download, FileText, Clock } from "lucide-react";
 import { useSession } from "@/components/auth/SessionContextProvider";
 import { useEffect, useState } from "react";
 import { showError } from "@/utils/toast";
+import { StudentDashboardThemeProvider, useStudentDashboardTheme } from "@/components/student/StudentDashboardTheme";
+import StudentThemeSelector from "@/components/student/StudentThemeSelector";
+import { cn } from "@/lib/utils"; // Import cn for conditional class names
 
-const StudentDashboard = () => {
+const StudentDashboardContent = () => {
   const { user } = useSession();
   const [studentRequests, setStudentRequests] = useState<BonafideRequest[]>([]);
   const [studentDetails, setStudentDetails] = useState<StudentDetails | null>(null);
   const [templates, setTemplates] = useState<CertificateTemplate[]>([]);
   const [loading, setLoading] = useState(true);
+  const { theme } = useStudentDashboardTheme(); // Use the theme context
 
   useEffect(() => {
     const fetchData = async () => {
@@ -97,8 +101,11 @@ const StudentDashboard = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+    <div className="space-y-6 min-h-[calc(100vh-100px)] p-6 rounded-lg shadow-inner">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <StudentThemeSelector />
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <DashboardCard
@@ -124,7 +131,7 @@ const StudentDashboard = () => {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
           {latestRequest ? (
-            <Card>
+            <Card className="hover:scale-[1.02] transition-transform duration-200 ease-in-out shadow-md">
               <CardHeader>
                 <CardTitle>Latest Application Status</CardTitle>
                 <CardDescription>
@@ -163,7 +170,7 @@ const StudentDashboard = () => {
               </CardContent>
             </Card>
           ) : (
-            <Card>
+            <Card className="hover:scale-[1.02] transition-transform duration-200 ease-in-out shadow-md">
               <CardHeader>
                 <CardTitle>No Requests Yet</CardTitle>
               </CardHeader>
@@ -179,7 +186,7 @@ const StudentDashboard = () => {
           {approvedRequests.length > 0 ? (
             <div className="grid gap-4 md:grid-cols-2">
               {approvedRequests.map((request) => (
-                <Card key={request.id}>
+                <Card key={request.id} className="hover:scale-[1.02] transition-transform duration-200 ease-in-out shadow-md">
                   <CardHeader>
                     <CardTitle className="text-lg">{request.type}</CardTitle>
                     <CardDescription>
@@ -208,5 +215,11 @@ const StudentDashboard = () => {
     </div>
   );
 };
+
+const StudentDashboard = () => (
+  <StudentDashboardThemeProvider>
+    <StudentDashboardContent />
+  </StudentDashboardThemeProvider>
+);
 
 export default StudentDashboard;

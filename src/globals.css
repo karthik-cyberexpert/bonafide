@@ -108,6 +108,34 @@
     --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
     --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
     --tutor-card-foreground: 222.2 84% 4.9%;
+
+    /* Student Dashboard Themes */
+    --student-dashboard-bg-start: 210 60% 95%; /* Default light blue */
+    --student-dashboard-bg-end: 210 60% 90%; /* Slightly darker light blue */
+    --student-dashboard-card-bg: 0 0% 100%;
+    --student-dashboard-card-foreground: 222.2 84% 4.9%;
+    --student-dashboard-text-color: 222.2 84% 4.9%;
+
+    /* Ocean Breeze Theme */
+    --theme-ocean-breeze-bg-start: 200 100% 90%; /* Light sky blue */
+    --theme-ocean-breeze-bg-end: 180 70% 85%; /* Light aqua */
+    --theme-ocean-breeze-card-bg: 200 50% 98%; /* Very light blue */
+    --theme-ocean-breeze-card-foreground: 210 40% 15%;
+    --theme-ocean-breeze-text-color: 210 40% 15%;
+
+    /* Sunset Glow Theme */
+    --theme-sunset-glow-bg-start: 30 100% 90%; /* Light orange */
+    --theme-sunset-glow-bg-end: 330 100% 90%; /* Light pink */
+    --theme-sunset-glow-card-bg: 30 100% 98%; /* Very light orange */
+    --theme-sunset-glow-card-foreground: 30 80% 20%;
+    --theme-sunset-glow-text-color: 30 80% 20%;
+
+    /* Forest Retreat Theme */
+    --theme-forest-retreat-bg-start: 120 40% 90%; /* Light green */
+    --theme-forest-retreat-bg-end: 90 30% 80%; /* Earthy green */
+    --theme-forest-retreat-card-bg: 120 20% 98%; /* Very light green */
+    --theme-forest-retreat-card-foreground: 120 40% 15%;
+    --theme-forest-retreat-text-color: 120 40% 15%;
   }
 
   .dark {
@@ -213,6 +241,25 @@
     --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
     --tutor-card-background: 0 0% 94%; /* pale smoke white / light gray */
     --tutor-card-foreground: 222.2 84% 4.9%;
+
+    /* Student Dashboard Themes (Dark Mode) */
+    --dark-theme-ocean-breeze-bg-start: 200 100% 10%; /* Darker blue */
+    --dark-theme-ocean-breeze-bg-end: 180 70% 15%; /* Darker aqua */
+    --dark-theme-ocean-breeze-card-bg: 217.2 32.6% 17.5%;
+    --dark-theme-ocean-breeze-card-foreground: 210 40% 98%;
+    --dark-theme-ocean-breeze-text-color: 210 40% 98%;
+
+    --dark-theme-sunset-glow-bg-start: 30 100% 10%; /* Darker orange */
+    --dark-theme-sunset-glow-bg-end: 330 100% 10%; /* Darker pink */
+    --dark-theme-sunset-glow-card-bg: 217.2 32.6% 17.5%;
+    --dark-theme-sunset-glow-card-foreground: 210 40% 98%;
+    --dark-theme-sunset-glow-text-color: 210 40% 98%;
+
+    --dark-theme-forest-retreat-bg-start: 120 40% 10%; /* Darker green */
+    --dark-theme-forest-retreat-bg-end: 90 30% 15%; /* Darker earthy green */
+    --dark-theme-forest-retreat-card-bg: 217.2 32.6% 17.5%;
+    --dark-theme-forest-retreat-card-foreground: 210 40% 98%;
+    --dark-theme-forest-retreat-text-color: 210 40% 98%;
   }
 }
 
@@ -244,6 +291,68 @@
   .tutor-layout-theme {
     --card: hsl(var(--tutor-card-background));
     --card-foreground: hsl(var(--tutor-card-foreground));
+  }
+
+  /* Student Dashboard Theme Classes */
+  .student-dashboard-theme {
+    background: linear-gradient(to bottom right, hsl(var(--student-dashboard-bg-start)), hsl(var(--student-dashboard-bg-end)));
+    color: hsl(var(--student-dashboard-text-color));
+    transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
+  }
+
+  .student-dashboard-theme .card {
+    background-color: hsl(var(--student-dashboard-card-bg));
+    color: hsl(var(--student-dashboard-card-foreground));
+    transition: background-color 0.5s ease-in-out, color 0.5s ease-in-out;
+  }
+
+  .student-dashboard-theme.theme-ocean-breeze {
+    --student-dashboard-bg-start: var(--theme-ocean-breeze-bg-start);
+    --student-dashboard-bg-end: var(--theme-ocean-breeze-bg-end);
+    --student-dashboard-card-bg: var(--theme-ocean-breeze-card-bg);
+    --student-dashboard-card-foreground: var(--theme-ocean-breeze-card-foreground);
+    --student-dashboard-text-color: var(--theme-ocean-breeze-text-color);
+  }
+
+  .student-dashboard-theme.theme-sunset-glow {
+    --student-dashboard-bg-start: var(--theme-sunset-glow-bg-start);
+    --student-dashboard-bg-end: var(--theme-sunset-glow-bg-end);
+    --student-dashboard-card-bg: var(--theme-sunset-glow-card-bg);
+    --student-dashboard-card-foreground: var(--theme-sunset-glow-card-foreground);
+    --student-dashboard-text-color: var(--theme-sunset-glow-text-color);
+  }
+
+  .student-dashboard-theme.theme-forest-retreat {
+    --student-dashboard-bg-start: var(--theme-forest-retreat-bg-start);
+    --student-dashboard-bg-end: var(--theme-forest-retreat-bg-end);
+    --student-dashboard-card-bg: var(--theme-forest-retreat-card-bg);
+    --student-dashboard-card-foreground: var(--theme-forest-retreat-card-foreground);
+    --student-dashboard-text-color: var(--theme-forest-retreat-text-color);
+  }
+
+  /* Dark mode overrides for student dashboard themes */
+  .dark .student-dashboard-theme.theme-ocean-breeze {
+    --student-dashboard-bg-start: var(--dark-theme-ocean-breeze-bg-start);
+    --student-dashboard-bg-end: var(--dark-theme-ocean-breeze-bg-end);
+    --student-dashboard-card-bg: var(--dark-theme-ocean-breeze-card-bg);
+    --student-dashboard-card-foreground: var(--dark-theme-ocean-breeze-card-foreground);
+    --student-dashboard-text-color: var(--dark-theme-ocean-breeze-text-color);
+  }
+
+  .dark .student-dashboard-theme.theme-sunset-glow {
+    --student-dashboard-bg-start: var(--dark-theme-sunset-glow-bg-start);
+    --student-dashboard-bg-end: var(--dark-theme-sunset-glow-bg-end);
+    --student-dashboard-card-bg: var(--dark-theme-sunset-glow-card-bg);
+    --student-dashboard-card-foreground: var(--dark-theme-sunset-glow-card-foreground);
+    --student-dashboard-text-color: var(--dark-theme-sunset-glow-text-color);
+  }
+
+  .dark .student-dashboard-theme.theme-forest-retreat {
+    --student-dashboard-bg-start: var(--dark-theme-forest-retreat-bg-start);
+    --student-dashboard-bg-end: var(--dark-theme-forest-retreat-bg-end);
+    --student-dashboard-card-bg: var(--dark-theme-forest-retreat-card-bg);
+    --student-dashboard-card-foreground: var(--dark-theme-forest-retreat-card-foreground);
+    --student-dashboard-text-color: var(--dark-theme-forest-retreat-text-color);
   }
 }
 
