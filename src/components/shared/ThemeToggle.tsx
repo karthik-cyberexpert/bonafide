@@ -27,7 +27,7 @@ export function ThemeToggle({ onHeaderBg }: ThemeToggleProps) {
           variant="outline"
           size="icon"
           className={cn(
-            onHeaderBg && "bg-transparent border-current hover:bg-white/20"
+            onHeaderBg && "bg-transparent border-current hover:bg-white/20 text-white" // Added text-white
           )}
         >
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />

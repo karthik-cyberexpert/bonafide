@@ -19,7 +19,7 @@ interface HeaderProps {
 const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsCollapsed, glassmorphism }: HeaderProps) => {
   const { signOut } = useSession();
   // Determine if buttons/icons should have 'on dark background' styling
-  const onHeaderBg = glassmorphism || headerClassName?.includes("bg-header") || headerClassName?.includes("bg-default-header");
+  const onHeaderBg = glassmorphism || headerClassName?.includes("bg-header") || headerClassName?.includes("bg-default-header") || headerClassName?.includes("bg-admin-header") || headerClassName?.includes("bg-principal-header") || headerClassName?.includes("bg-hod-header") || headerClassName?.includes("bg-tutor-header");
 
   return (
     <header className={cn(
@@ -37,7 +37,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
                 size="icon"
                 className={cn(
                   "shrink-0",
-                  onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10"
+                  onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10 text-white" // Added text-white
                 )}
               >
                 <Menu className="h-5 w-5" />
@@ -82,7 +82,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
             size="icon"
             className={cn(
               "hidden md:flex shrink-0",
-              onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10"
+              onHeaderBg && "bg-transparent border-current hover:bg-white/20 dark:hover:bg-white/10 text-white" // Added text-white
             )}
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
@@ -99,7 +99,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
         <Button
           variant="ghost"
           size="icon"
-          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10")}
+          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10 text-white")} // Added text-white
         >
           <Bell className="h-5 w-5" />
           <span className="sr-only">View notifications</span>
@@ -109,7 +109,7 @@ const Header = ({ navItems, portalName, headerClassName, isCollapsed, setIsColla
           variant="ghost"
           size="icon"
           onClick={signOut}
-          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10")}
+          className={cn(onHeaderBg && "hover:bg-white/20 dark:hover:bg-white/10 text-white")} // Added text-white
         >
           <LogOut className="h-5 w-5" />
           <span className="sr-only">Logout</span>
