@@ -6,6 +6,7 @@ import { NavItem } from "@/lib/types";
 import { useState } from "react";
 import { StudentDashboardThemeProvider, useStudentDashboardTheme } from "@/components/student/StudentDashboardTheme"; // Import the provider and hook
 import { cn } from "@/lib/utils"; // Import cn for conditional class names
+import { useTheme } from "next-themes"; // Import useTheme to check dark mode
 
 const navItems: NavItem[] = [
   {
@@ -32,26 +33,43 @@ const navItems: NavItem[] = [
 
 const StudentLayoutContent = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { theme } = useStudentDashboardTheme(); // Get the current student dashboard theme
+  const { theme: studentTheme } = useStudentDashboardTheme(); // Get the current student dashboard theme
+  const { theme: systemTheme } = useTheme(); // Get the system theme (light/dark)
 
   const mainContentThemeClass = cn(
     "flex-1", // Removed p-0, the theme class will handle padding
     "student-dashboard-main-content", // Base class for main content styling
     {
-      'theme-ocean-breeze': theme === 'ocean-breeze',
-      'theme-sunset-glow': theme === 'sunset-glow',
-      'theme-forest-retreat': theme === 'forest-retreat',
+      'theme-ocean-breeze': studentTheme === 'ocean-breeze',
+      'theme-sunset-glow': studentTheme === 'sunset-glow',
+      'theme-forest-retreat': studentTheme === 'forest-retreat',
     }
   );
 
-  const headerThemeClass = cn(
-    "bg-student-header",
-    "text-foreground", // Default text color
-    {
-      'text-[hsl(var(--theme-ocean-breeze-text-color))]': theme === 'ocean-breeze',
-      'text-[hsl(var(--theme-sunset-glow-text-color))]': theme === 'sunset-glow',
-      'text-[hsl(var(--theme-forest-retreat-text-color))]': theme === 'forest-retreat',
+  // Determine header text color based on studentTheme and systemTheme
+  const getHeaderTextColorClass = () => {
+    if (systemTheme === 'dark') {
+      switch (studentTheme) {
+        case 'ocean-breeze': return 'text-[hsl(var(--dark-theme-ocean-breeze-header-text-color))]';
+        case 'sunset-glow': return 'text-[hsl(var(--dark-theme-sunset-glow-header-text-color))]';
+        case 'forest-retreat': return 'text-[hsl(var(--dark-theme-forest-retreat-header-text-color))]';
+        default: return 'text-foreground'; // Default dark mode foreground
+      }
+    } else {
+      switch (studentTheme) {
+        case 'ocean-breeze': return 'text-[hsl(var(--theme-ocean-breeze-header-text-color))]';
+        case 'sunset-glow': return 'text-[hsl(var(--theme-sunset-glow-header-text-color))]';
+        case 'forest-retreat': return 'text-[hsl(var(--theme-forest-retreat-header-text-color))]';
+        default: return 'text-foreground'; // Default light mode foreground
+      }
     }
+  };
+
+  const headerTextColorClass = getHeaderTextColorClass();
+
+  const headerClassName = cn(
+    "bg-student-header",
+    headerTextColorClass
   );
 
   return (
@@ -62,13 +80,13 @@ const StudentLayoutContent = () => {
         variant="student"
         isCollapsed={isCollapsed}
         setIsCollapsed={setIsCollapsed}
-        studentTheme={theme} // Pass the student theme to the sidebar
+        studentTheme={studentTheme} // Pass the student theme to the sidebar
       />
       <div className="flex flex-col flex-1 student-layout-theme text-foreground">
         <Header
           navItems={navItems}
           portalName="Student Portal"
-          headerClassName={headerThemeClass} // Apply dynamic header class
+          headerClassName={headerClassName} // Apply dynamic header class
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
           glassmorphism={true} // Enable glassmorphism
