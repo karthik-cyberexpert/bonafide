@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Outlet } from "react-router-dom";
 import { NavItem } from "@/lib/types";
+import { useState } from "react";
 
 const navItems: NavItem[] = [
   {
@@ -39,11 +40,13 @@ const navItems: NavItem[] = [
 ];
 
 const TutorLayout = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false); // State for sidebar collapse
+
   return (
-    <div className="flex min-h-screen w-full">
-      <Sidebar navItems={navItems} portalName="Tutor Portal" />
-      <div className="flex flex-col flex-1 default-layout-theme">
-        <Header navItems={navItems} portalName="Tutor Portal" />
+    <div className="flex min-h-screen w-full tutor-gradient-bg"> {/* Apply Tutor gradient here */}
+      <Sidebar navItems={navItems} portalName="Tutor Portal" variant="tutor" isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} />
+      <div className="flex flex-col flex-1">
+        <Header navItems={navItems} portalName="Tutor Portal" headerClassName="bg-tutor-header text-primary-foreground dark:text-primary-foreground" />
         <main className="flex-1 p-6">
           <Outlet />
         </main>

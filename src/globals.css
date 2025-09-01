@@ -85,12 +85,23 @@
     --hod-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
     --hod-sidebar-foreground: 210 40% 98%; /* White text */
     --hod-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
-    --hod-sidebar-active-background: 217.2 91.2% 55.8%; /* Vibrant blue for active state */
+    --hod-sidebar-active-background: 217.2 91.2% 59.8%; /* Vibrant blue for active state */
     --hod-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
     --hod-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
     --hod-layout-gradient-start: 200 80% 90%; /* Soft blue */
     --hod-layout-gradient-end: 140 80% 90%; /* Soft green */
     --hod-header-background: 220 20% 15%; /* Dark blue/indigo for header */
+
+    /* Tutor Theme Variables */
+    --tutor-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
+    --tutor-sidebar-foreground: 210 40% 98%; /* White text */
+    --tutor-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --tutor-sidebar-active-background: 217.2 91.2% 55.8%; /* Vibrant blue for active state */
+    --tutor-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --tutor-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --tutor-layout-gradient-start: 260 80% 90%; /* Soft purple */
+    --tutor-layout-gradient-end: 320 80% 90%; /* Soft pink */
+    --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
   }
 
   .dark {
@@ -179,6 +190,17 @@
     --hod-layout-gradient-start: 200 80% 20%;
     --hod-layout-gradient-end: 140 80% 20%;
     --hod-header-background: 220 20% 15%;
+
+    /* Tutor Theme Variables */
+    --tutor-sidebar-background: 220 20% 15%; /* Dark blue/indigo */
+    --tutor-sidebar-foreground: 210 40% 98%; /* White text */
+    --tutor-sidebar-muted-foreground: 215.4 16.3% 56.9%; /* Lighter gray for muted text */
+    --tutor-sidebar-active-background: 217.2 91.2% 59.8%; /* Vibrant blue for active state */
+    --tutor-sidebar-active-foreground: 222.2 47.4% 11.2%; /* Dark text on blue active */
+    --tutor-sidebar-border: 217.2 32.6% 17.5%; /* Darker border */
+    --tutor-layout-gradient-start: 260 80% 20%; /* Darker soft purple */
+    --tutor-layout-gradient-end: 320 80% 20%; /* Darker soft pink */
+    --tutor-header-background: 220 20% 15%; /* Dark blue/indigo for header */
   }
 }
 
@@ -201,6 +223,9 @@
   }
   .hod-gradient-bg {
     background: linear-gradient(to bottom right, hsl(var(--hod-layout-gradient-start)), hsl(var(--hod-layout-gradient-end)));
+  }
+  .tutor-gradient-bg {
+    background: linear-gradient(to bottom right, hsl(var(--tutor-layout-gradient-start)), hsl(var(--tutor-layout-gradient-end)));
   }
 }
 

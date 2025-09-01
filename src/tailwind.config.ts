@@ -89,9 +89,6 @@ export default {
         "student-header": {
           DEFAULT: "hsl(var(--student-header-background))",
         },
-        "student-main-bg": {
-          DEFAULT: "hsl(var(--student-main-background))",
-        },
         "principal-sidebar": {
           DEFAULT: "hsl(var(--principal-sidebar-background))",
           foreground: "hsl(var(--principal-sidebar-foreground))",
@@ -124,6 +121,21 @@ export default {
         },
         "hod-header": { // HOD header color
           DEFAULT: "hsl(var(--hod-header-background))",
+        },
+        "tutor-sidebar": { // Tutor sidebar colors
+          DEFAULT: "hsl(var(--tutor-sidebar-background))",
+          foreground: "hsl(var(--tutor-sidebar-foreground))",
+          "muted-foreground": "hsl(var(--tutor-sidebar-muted-foreground))",
+          active: "hsl(var(--tutor-sidebar-active-background))",
+          "active-foreground": "hsl(var(--tutor-sidebar-active-foreground))",
+          border: "hsl(var(--tutor-sidebar-border))",
+        },
+        "tutor-layout-gradient": { // Tutor layout gradient colors
+          start: "hsl(var(--tutor-layout-gradient-start))",
+          end: "hsl(var(--tutor-layout-gradient-end))",
+        },
+        "tutor-header": { // Tutor header color
+          DEFAULT: "hsl(var(--tutor-header-background))",
         },
       },
       borderRadius: {
